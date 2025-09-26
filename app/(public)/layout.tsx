@@ -1,16 +1,12 @@
-import PublicNavbar from "@/components/PublicNavbar";
-
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html>
-      <body>
-        <PublicNavbar />
-        {children}
-      </body>
-    </html>
+    <>
+      {children}
+    </>
+
   );
 }

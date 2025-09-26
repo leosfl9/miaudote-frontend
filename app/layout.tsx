@@ -18,9 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br">
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-      <body className={`${fredoka.variable} antialiased`}>
+    <html lang="pt-BR">
+    <link rel="icon" href="/icon.ico" sizes="any" type="image/png" />
+      <body className={`${fredoka.variable} antialiased`}
+        suppressHydrationWarning={true}>
         {children}
       </body>
     </html>
