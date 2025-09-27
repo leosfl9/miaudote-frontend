@@ -5,10 +5,12 @@ import FormButton from "@/components/FormButton";
 
 export default function CadastroParceiro() {
     return (
-        <div className="flex items-center justify-center min-h-screen px-2 md:px-8 py-8 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
-
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+            <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
+                <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
+            </div>
             
-            <div className="bg-white flex flex-col gap-3 items-center w-full max-w-4xl px-3 md:px-6 py-6 rounded-xl">
+            <div className="bg-white flex flex-col gap-3 items-center w-full max-w-4xl px-3 md:px-6 lg:px-12 py-6 rounded-xl">
                 <div className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
                 </div>
