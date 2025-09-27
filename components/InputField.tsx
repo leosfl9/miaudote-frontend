@@ -46,8 +46,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       <div className="flex flex-col gap-1 w-full">
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-text-gray"
-        >
+          className="text-sm font-medium text-text-gray">
           {label}
         </label>
         <div className="relative">

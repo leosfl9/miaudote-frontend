@@ -1,11 +1,12 @@
 import LinkButton from "@/components/LinkButton";
 import Image from "next/image";
 import InputField from "@/components/InputField";
+import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
 
 export default function CadastroParceiro() {
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
             </div>
@@ -24,7 +25,11 @@ export default function CadastroParceiro() {
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="Nome da ONG/protetor *" name="nome" type="text" placeholder="Digite o nome" className="mb-2" />
-                        <InputField label="Tipo" name="site" type="text" placeholder="ONG ou protetor" className="mb-2" />
+                        <SelectField label="Tipo *" name="tipo" className="appearance-none mb-2">
+                            <option value="">Selecione o tipo</option>
+                            <option value="ONG">ONG</option>
+                            <option value="Protetor">Protetor</option>
+                        </SelectField>
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
