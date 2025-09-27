@@ -4,7 +4,7 @@ import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
 
-export default function CadastroParceiro() {
+export default function CadastroAdotante() {
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
@@ -18,31 +18,27 @@ export default function CadastroParceiro() {
                 <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
                     Informações básicas</h1>
                 <div className="flex flex-col gap-1 self-start w-full">
-                    <h2 className="text-miau-green text-sm lg:text-base font-medium">Dados da ONG/protetor</h2>
+                    <h2 className="text-miau-green text-sm lg:text-base font-medium">Dados pessoais</h2>
                     <hr className="border-hr" />
                 </div>
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Nome da ONG/protetor *" name="nome" type="text" placeholder="Digite o nome" className="mb-2" />
-                        <SelectField defaultValue={""} label="Tipo *" name="tipo" className="appearance-none mb-2">
-                            <option value={""} disabled>Selecione o tipo</option>
-                            <option value="ONG">ONG</option>
-                            <option value="Protetor">Protetor</option>
-                        </SelectField>
+                        <InputField label="Nome completo *" name="nome" type="text" placeholder="Digite seu nome e sobrenome" className="mb-2" />
+                        <InputField label="CPF *" name="cpf" type="text" placeholder="Digite seu CPF" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CNPJ ou CPF *" name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
-                        <InputField label="Telefone *" name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
+                        <InputField label="E-mail *" name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                        <InputField label="Telefone *" name="telefone" type="text" placeholder="(00) 00000-0000" className="mb-2" />
+                        <InputField label="Data de nascimento *" name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="E-mail *" name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
-                        <InputField label="Senha *" name="senha" type="password" placeholder="Digite a senha" className="mb-2" />
+                        <InputField label="Senha *" name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
+                        <InputField label="Confirmar senha *" name="confSenha" type="password" placeholder="Digite a senha" className="mb-2" />
                     </div>
 
-                    <InputField label="Site ou rede social" name="site" type="text" placeholder="Link do site ou rede social" className="mb-2" />
                 </div>
 
                 <div className="flex flex-col gap-1 self-start w-full">
@@ -69,7 +65,7 @@ export default function CadastroParceiro() {
                     </div>
                 </div>
 
-                <FormButton text="Confirmar" color="green" />
+                <FormButton text="Cadastrar-se" color="green" />
 
             </div>
         </div>

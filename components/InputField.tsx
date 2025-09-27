@@ -30,7 +30,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             ? String(props.value)
             : undefined
         }
-        className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
+        className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
           placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     ) : (
       <input
@@ -38,7 +38,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         ref={ref}
         type={inputType}
         {...props}
-        className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
+        className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
           placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     );
 

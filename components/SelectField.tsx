@@ -22,7 +22,7 @@ const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           id={selectId}
           ref={ref}
           {...props}
-          className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
+          className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
           ${error ? "border-red-500" : "border-input-bd"} ${className}`} >
           {children}
         </select>
