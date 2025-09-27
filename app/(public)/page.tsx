@@ -1,12 +1,11 @@
 import PublicNavbar from "@/components/PublicNavbar";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() { 
   return ( 
     <> 
       <PublicNavbar /> 
-      <div className="flex items-center justify-center px-4 py-8 bg-miau-gray"> 
+      <div className="flex items-center justify-center px-2 ssm:px-4 py-8 bg-miau-gray"> 
         <div className="flex flex-col mxl:flex-row gap-8 mxl:gap-16 xl:gap-24"> 
           {/* texto */} 
           <div className="flex flex-col gap-8 mxl:gap-12 justify-center"> 
