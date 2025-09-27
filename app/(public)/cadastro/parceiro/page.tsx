@@ -24,18 +24,20 @@ export default function CadastroParceiro() {
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="Nome da ONG/protetor *" name="nome" type="text" placeholder="Digite o nome" className="mb-2" />
-                        <InputField label="CNPJ ou CPF *" name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
+                        <InputField label="Tipo" name="site" type="text" placeholder="ONG ou protetor" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="E-mail *" name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
+                        <InputField label="CNPJ ou CPF *" name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
                         <InputField label="Telefone *" name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+                        <InputField label="E-mail *" name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
                         <InputField label="Senha *" name="nome" type="password" placeholder="Digite a senha" className="mb-2" />
-                        <InputField label="Site ou rede social" name="site" type="text" placeholder="Link do site ou rede social" className="mb-2" />
                     </div>
+
+                    <InputField label="Site ou rede social" name="site" type="text" placeholder="Link do site ou rede social" className="mb-2" />
                 </div>
 
                 <div className="flex flex-col gap-1 self-start w-full">
