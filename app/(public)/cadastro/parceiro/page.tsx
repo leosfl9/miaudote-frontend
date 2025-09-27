@@ -25,8 +25,8 @@ export default function CadastroParceiro() {
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="Nome da ONG/protetor *" name="nome" type="text" placeholder="Digite o nome" className="mb-2" />
-                        <SelectField label="Tipo *" name="tipo" className="appearance-none mb-2">
-                            <option value="">Selecione o tipo</option>
+                        <SelectField defaultValue={""} label="Tipo *" name="tipo" className="appearance-none mb-2">
+                            <option value={""} disabled>Selecione o tipo</option>
                             <option value="ONG">ONG</option>
                             <option value="Protetor">Protetor</option>
                         </SelectField>
@@ -52,7 +52,7 @@ export default function CadastroParceiro() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CEP *" name="cep" type="text" placeholder="Digite o CEP" className="mb-2" />
+                        <InputField label="CEP *" mask={"00000-000"} name="cep" type="text" placeholder="Digite o CEP" className="mb-2" />
                         <InputField label="Estado *" name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
                     </div>
 

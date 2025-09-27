@@ -1,8 +1,8 @@
 "use client";
 
-import InputMask from "react-input-mask";
 import { forwardRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { IMaskInput } from "react-imask";
 
 interface InputFieldProps extends React.ComponentProps<"input"> {
   label: string;
@@ -19,18 +19,19 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const inputType = isPassword && showPassword ? "text" : type;
 
     const inputElement = mask ? (
-      <InputMask mask={mask} {...props}>
-        {(inputProps: any) => (
-          <input
-            id={inputId}
-            ref={ref}
-            type={inputType}
-            {...inputProps}
-            className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
-              ${error ? "border-red-500" : "border-input-bd"} ${className}`}
-          />
-        )}
-      </InputMask>
+      <IMaskInput
+        id={inputId}
+        inputRef={ref as any}
+        type={inputType}
+        mask={mask}
+        {...props}
+        value={
+          props.value !== undefined
+            ? String(props.value)
+            : undefined
+        }
+        className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
+          placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     ) : (
       <input
         id={inputId}
@@ -38,15 +39,15 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         type={inputType}
         {...props}
         className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black pr-10
-          ${error ? "border-red-500" : "border-input-bd"} ${className}`}
-      />
+          placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     );
 
     return (
       <div className="flex flex-col gap-1 w-full">
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-text-gray">
+          className="text-sm font-medium text-text-gray"
+        >
           {label}
         </label>
         <div className="relative">
@@ -69,4 +70,3 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
 
 InputField.displayName = "InputField";
 export default InputField;
-
