@@ -12,11 +12,14 @@
   /* custom colors */
   --color-text-black: #0c0d0d;
   --color-text-light-gray: #3C3C3C;
+  --color-text-gray: #676868;
+  --color-hr: #D4D4D4;
   --color-miau-green: #1B998B;
   --color-miau-light-green: #2bb5a6;
   --color-miau-orange: #FF8552;
   --color-miau-gray: #D9D9D9;
   --color-miau-purple: #C09BD8;
+  --color-input-bd: #D4D4D4;
 
   --breakpoint-ssm: 460px;
   --breakpoint-mxl: 1136px;
