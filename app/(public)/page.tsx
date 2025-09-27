@@ -38,7 +38,7 @@ export default function Home() {
                   <img src="/grafo.png" alt="Grafo" className="w-86 mxl:w-100 xl:w-120 2xl:w-140 h-60 mxl:h-80 xl:h-90 2xl:h-105 object-contain" /> 
               </div> 
             
-              <Link href={""} className="w-full mxl:w-fit mxl:px-12 text-center py-4 rounded-[48px]
+              <Link href={"/tipo-cadastro"} className="w-full mxl:w-fit mxl:px-12 text-center py-4 rounded-[48px]
               bg-miau-orange text-text-black font-bold text-3xl hover:bg-miau-green active:bg-miau-green/80 
               active:text-background hover:text-background transition shadow-[0_4px_4px_rgba(0,0,0,0.25)]"> Inscreva-se! </Link> 
 
