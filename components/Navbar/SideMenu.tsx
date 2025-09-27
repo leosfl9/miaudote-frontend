@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import Link from "next/link";
+import LinkButton from "../LinkButton";
 
 interface SideMenuProps {
   open: boolean;
@@ -29,10 +30,7 @@ export default function SideMenu({ open, onClose }: SideMenuProps) {
           <Link className="active:text-miau-green transition" href={"/ONGs"}>ONGs</Link>
         </nav>
 
-        <Link href={"/Login"} className="px-5 py-2 md:px-6 md:py-3 text-2xl md:text-[28px] mt-auto rounded-4xl 
-          bg-miau-green text-background active:bg-miau-green/80 transition">
-          Login
-        </Link>
+        <LinkButton href={"/Login"} text={"Login"} center={true} bottom={true} color={"green"} />
       </div>
     </>
   );
