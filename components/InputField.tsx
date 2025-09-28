@@ -50,8 +50,9 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         >
           {label}
         </label>
-        <div className="relative">
+        <div className="flex flex-col relative">
           {inputElement}
+          {error && <span className="text-xs text-red-500">{error}</span>}
           {isPassword && (
             <button
               type="button"
@@ -62,7 +63,6 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             </button>
           )}
         </div>
-        {error && <span className="text-xs text-red-500">{error}</span>}
       </div>
     );
   }
