@@ -29,11 +29,11 @@ const cadastroSchema = z.object({
         if (!valido) {
             ctx.addIssue({
             code: "custom",
-            message: "Documento inválido (informe CPF ou CNPJ)",
+            message: "Número de documento inválido",
             });
         }
     }),
-    telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
+    telefone: z.string().regex(/^\(\d{2}\)\s(9\d{4}-\d{4}|\d{4}-\d{4})$/, "Telefone inválido"), 
     senha: z.string().superRefine((val, ctx) => {
         const {valido, mensagem} = validaSenha(val, 8);
         if (!valido) {
@@ -49,7 +49,7 @@ const cadastroSchema = z.object({
     bairro: z.string().min(2, "Bairro obrigatório"), 
     cidade: z.string().min(2, "Cidade obrigatória"), 
     logradouro: z.string().min(2, "Logradouro obrigatório"), 
-    numero: z.string().min(1, "Número obrigatório"), 
+    numero: z.string().regex(/^\d+$/, "Número inválido"), 
     complemento: z.string().optional(), });
             
 type CadastroForm = z.infer<typeof cadastroSchema>;
@@ -120,7 +120,7 @@ export default function CadastroParceiro() {
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="CNPJ ou CPF *" {...register("documento")} error={errors.documento?.message} mask={[{mask: "000.000.000-00", overwrite: true}, {mask: "00.000.000/0000-00", overwrite: true}]} name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
                         <InputField label="E-mail *" {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
-                        <InputField label="Telefone *" {...register("telefone")} error={errors.telefone?.message} name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
+                        <InputField label="Telefone *" {...register("telefone")} error={errors.telefone?.message} mask={[{mask: "(00) 0000-0000", overwrite: true}, {mask: "(00) 00000-0000", overwrite: true}]} name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">

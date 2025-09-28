@@ -18,15 +18,17 @@ const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           className="text-sm font-medium text-text-gray">
           {label}
         </label>
-        <select
-          id={selectId}
-          ref={ref}
-          {...props}
-          className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
-          ${error ? "border-red-500" : "border-input-bd"} ${className}`} >
-          {children}
-        </select>
-        {error && <span className="text-xs text-red-500">{error}</span>}
+        <div className="flex flex-col">
+          <select
+            id={selectId}
+            ref={ref}
+            {...props}
+            className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
+            ${error ? "border-red-500" : "border-input-bd"} ${className}`} >
+            {children}
+          </select>
+          {error && <span className="text-xs text-red-500">{error}</span>}
+        </div>
       </div>
     );
   }

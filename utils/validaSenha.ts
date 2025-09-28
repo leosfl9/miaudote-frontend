@@ -3,6 +3,10 @@ export function validaSenha(senha: string, minLength = 8) {
     return { valido: false, mensagem: "Senha inválida" };
   }
 
+  if (/^\s|\s$/.test(senha)) {
+    return { valido: false, mensagem: "A senha não pode começar ou terminar com espaços" };
+  }
+
   if (senha.length < minLength) {
     return { valido: false, mensagem: `A senha deve ter no mínimo ${minLength} caracteres` };
   }
@@ -25,3 +29,4 @@ export function validaSenha(senha: string, minLength = 8) {
 
   return { valido: true, mensagem: null };
 }
+

@@ -51,7 +51,7 @@ const cadastroSchema = z.object({
     bairro: z.string().min(2, "Bairro obrigatório"), 
     cidade: z.string().min(2, "Cidade obrigatória"), 
     logradouro: z.string().min(2, "Logradouro obrigatório"), 
-    numero: z.string().min(1, "Número obrigatório"), 
+    numero: z.string().regex(/^\d+$/, "Número inválido, use apenas números"), 
     complemento: z.string().optional(), }).refine((data) => 
         data.senha === data.confSenha, { 
             message: "As senhas não coincidem", 
