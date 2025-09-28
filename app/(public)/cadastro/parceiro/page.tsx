@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
@@ -12,7 +13,7 @@ import { validaCNPJ } from "@/utils/validaCNPJ";
 import { validaSenha } from "@/utils/validaSenha";
 
 import { useForm } from "react-hook-form"; 
-import { overwrite, z } from "zod"; 
+import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const cadastroSchema = z.object({ 
@@ -55,6 +56,8 @@ const cadastroSchema = z.object({
 type CadastroForm = z.infer<typeof cadastroSchema>;
 
 export default function CadastroParceiro() {
+    const router = useRouter();
+
     const { 
         register, 
         handleSubmit, 
@@ -87,6 +90,8 @@ export default function CadastroParceiro() {
 
     const onSubmit = (data: CadastroForm) => { 
         console.log("ok", data); 
+        sessionStorage.setItem("justRegistered", "parceiro");
+        router.push("/confirmacao?role=parceiro")
     };
 
 
@@ -97,9 +102,9 @@ export default function CadastroParceiro() {
             </div>
             
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full max-w-4xl px-3 md:px-6 lg:px-12 py-6 rounded-4xl">
-                <div className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
+                <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
-                </div>
+                </Link>
                 <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
                     Informações básicas</h1>
                 <div className="flex flex-col gap-1 self-start w-full">

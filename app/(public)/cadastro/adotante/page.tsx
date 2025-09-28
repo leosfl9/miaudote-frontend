@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
@@ -60,6 +61,8 @@ const cadastroSchema = z.object({
 type CadastroForm = z.infer<typeof cadastroSchema>;
 
 export default function CadastroAdotante() {
+    const router = useRouter();
+
     const { 
         register, 
         handleSubmit, 
@@ -92,6 +95,8 @@ export default function CadastroAdotante() {
 
     const onSubmit = (data: CadastroForm) => { 
         console.log("ok", data); 
+        sessionStorage.setItem("justRegistered", "adotante");
+        router.push("/confirmacao?role=adotante")
     };
 
     return (
@@ -101,9 +106,9 @@ export default function CadastroAdotante() {
             </div>
             
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full max-w-4xl px-3 md:px-6 lg:px-12 py-6 rounded-4xl">
-                <div className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
+                <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
-                </div>
+                </Link>
                 <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
                     Informações básicas</h1>
                 <div className="flex flex-col gap-1 self-start w-full">
