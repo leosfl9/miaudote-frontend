@@ -69,10 +69,10 @@ export default function CadastroAdotante() {
             const data = await res.json();
 
             if (!data.erro) {
-            setValue("logradouro", data.logradouro || "");
-            setValue("bairro", data.bairro || "");
-            setValue("cidade", data.localidade || "");
-            setValue("estado", data.uf || "");
+            setValue("logradouro", data.logradouro || "", { shouldValidate: true });
+            setValue("bairro", data.bairro || "", { shouldValidate: true });
+            setValue("cidade", data.localidade || "", { shouldValidate: true });
+            setValue("estado", data.uf || "", { shouldValidate: true });
             }
         } catch (error) {
             console.error("Erro ao buscar CEP:", error);
@@ -128,17 +128,16 @@ export default function CadastroAdotante() {
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite o CEP" className="mb-2" />
-                        <InputField label="Estado *" {...register("estado")} error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
+                        <InputField label="Logradouro *" {...register("logradouro")} error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Bairro *" {...register("bairro")} error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
                         <InputField label="Cidade *" {...register("cidade")} error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
+                        <InputField label="Bairro *" {...register("bairro")} error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
                     </div>
 
-                    <InputField label="Logradouro *" {...register("logradouro")} error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
-
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+                        <InputField label="Estado *" {...register("estado")} error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
                         <InputField label="Número *" {...register("numero")} error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
                         <InputField label="Complemento" {...register("complemento")} error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
                     </div>
