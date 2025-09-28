@@ -1,7 +1,8 @@
 "use client"
 
-import LinkButton from "@/components/LinkButton";
+import Link from "next/link";
 import Image from "next/image";
+import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
 import { validaCPF } from "@/utils/validaCPF";
@@ -115,7 +116,7 @@ export default function CadastroAdotante() {
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="Senha *" {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
-                        <InputField label="Confirmar senha *" {...register("confSenha")} error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha" className="mb-2" />
+                        <InputField label="Confirmar senha *" {...register("confSenha")} error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha novamente" className="mb-2" />
                     </div>
 
                 </div>
@@ -127,7 +128,7 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite o CEP" className="mb-2" />
+                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite seu CEP" className="mb-2" />
                         <InputField label="Logradouro *" {...register("logradouro")} error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
                     </div>
 
@@ -139,11 +140,14 @@ export default function CadastroAdotante() {
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="Estado *" {...register("estado")} error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
                         <InputField label="Número *" {...register("numero")} error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
-                        <InputField label="Complemento" {...register("complemento")} error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
+                        <InputField label="Complemento (opcional)" {...register("complemento")} error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
                     </div>
                 </div>
 
-                <FormButton text="Cadastrar-se" color="green" type="submit" />
+                <FormButton text="Cadastrar-se" color="green" type="submit" className="mt-2" />
+                <div className="w-full text-center text-md text-miau-orange hover:text-miau-green active:text-miau-light-green">
+                    <Link href="/login">Já possui uma conta? Faça login</Link>
+                </div>
 
             </form>
         </div>
