@@ -6,7 +6,7 @@ import { IMaskInput } from "react-imask";
 
 interface InputFieldProps extends React.ComponentProps<"input"> {
   label: string;
-  mask?: string;
+  mask?: any;
   error?: string;
 }
 

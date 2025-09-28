@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
@@ -20,13 +21,20 @@ const cadastroSchema = z.object({
     email: z.email("E-mail inválido"), 
     telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
     dataNasc: z.string().superRefine((val, ctx) => {
-      const { valido, mensagem } = validaIdade(val, 16);
-      if (!valido) {
+        if (val.length < 10) {
+            ctx.addIssue({
+            code: "custom",
+            message: "Data inválida",
+            });
+            return;
+        }
+        const { valido, mensagem } = validaIdade(val, 16);
+        if (!valido) {
         ctx.addIssue({
-          code: "custom",
-          message: mensagem ?? "Data inválida",
+            code: "custom",
+            message: mensagem ?? "Data inválida",
         });
-      }
+        }
     }),
     senha: z.string().superRefine((val, ctx) => {
         const {valido, mensagem} = validaSenha(val, 8);
@@ -58,7 +66,8 @@ export default function CadastroAdotante() {
         setValue,
         formState: { errors }, 
     } = useForm<CadastroForm>({ 
-        resolver: zodResolver(cadastroSchema), 
+        resolver: zodResolver(cadastroSchema),
+        mode: "all" 
     });
 
     const buscarCep = async (cep: string) => {
@@ -110,7 +119,7 @@ export default function CadastroAdotante() {
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="E-mail *" {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                        <InputField label="Telefone *" {...register("telefone")} error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
+                        <InputField label="Celular / WhatsApp *" {...register("telefone")} error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
                         <InputField label="Data de nascimento *" {...register("dataNasc")} error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
                     </div>
 
@@ -145,6 +154,7 @@ export default function CadastroAdotante() {
                 </div>
 
                 <FormButton text="Cadastrar-se" color="green" type="submit" className="mt-2" />
+
                 <div className="w-full text-center text-md text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login</Link>
                 </div>
