@@ -46,8 +46,8 @@ export default function Login() {
                 </Link>
 
                 <div className="flex flex-col gap-2 lg:gap-3 w-full">
-                    <InputField label="E-mail *" {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                    <InputField label="Senha *" {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
+                    <InputField label="E-mail *" maxLength={200} {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                    <InputField label="Senha *" maxLength={70} {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
                 </div>
 
                 <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />
