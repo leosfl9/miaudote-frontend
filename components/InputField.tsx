@@ -31,7 +31,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             : undefined
         }
         className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
-          placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
+          placeholder:text-text-gray focus:placeholder:text-miau-green ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     ) : (
       <input
         id={inputId}
@@ -39,7 +39,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         type={inputType}
         {...props}
         className={`border p-2 rounded-md focus:outline-none focus:ring-0 focus:border-miau-green w-full text-text-black
-          placeholder:text-text-gray ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
+          placeholder:text-text-gray focus:placeholder:text-miau-green ${error ? "border-red-500" : "border-input-bd"} ${className}`} />
     );
 
     return (
@@ -50,14 +50,14 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         >
           {label}
         </label>
-        <div className="flex flex-col relative">
+        <div className="group flex flex-col relative">
           {inputElement}
           {error && <span className="text-xs text-red-500">{error}</span>}
           {isPassword && (
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-2 top-[22px] -translate-y-1/2 text-text-gray hover:text-miau-green cursor-pointer"
+              className="absolute group-focus-within:text-miau-green right-2 top-[22px] -translate-y-1/2 text-text-gray hover:text-miau-green cursor-pointer"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>

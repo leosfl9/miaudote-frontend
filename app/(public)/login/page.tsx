@@ -39,7 +39,8 @@ export default function Login() {
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-4 xl:gap-6 items-center w-full max-w-[300px] md:max-w-[340px] 2xl:max-w-[380px] px-5 md:px-6 lg:px-8 py-6 rounded-4xl">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-4 xl:gap-6 items-center
+                w-full max-w-[300px] md:max-w-[340px] 2xl:max-w-[380px] px-5 md:px-6 lg:px-8 py-6 rounded-4xl ">
                 <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
                 </Link>
