@@ -7,16 +7,31 @@ import { useRouter } from "next/navigation";
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
-import { validaCPF } from "@/utils/validaCPF";
-import { validaIdade } from "@/utils/validaIdade";
-import { validaSenha } from "@/utils/validaSenha";
 
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+const loginSchema = z.object({
+    email: z.email("E-mail inválido"),
+    senha: z.string().min(1, "Senha obrigatória")
+})
+
+type LoginForm = z.infer<typeof loginSchema>;
+
 export default function Login() {
-    const router = useRouter();
+    const { 
+        register, 
+        handleSubmit, 
+        setValue,
+        formState: { errors }, 
+    } = useForm<LoginForm>({ 
+        resolver: zodResolver(loginSchema),
+    });
+
+    const onSubmit = (data: LoginForm) => { 
+        console.log("ok", data); 
+    };
 
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
@@ -24,14 +39,14 @@ export default function Login() {
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
             </div>
             
-            <form className="bg-white flex flex-col gap-4 xl:gap-6 items-center w-full max-w-[300px] md:max-w-[340px] 2xl:max-w-[380px] px-5 md:px-6 lg:px-8 py-6 rounded-4xl">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-4 xl:gap-6 items-center w-full max-w-[300px] md:max-w-[340px] 2xl:max-w-[380px] px-5 md:px-6 lg:px-8 py-6 rounded-4xl">
                 <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
                 </Link>
 
                 <div className="flex flex-col gap-2 lg:gap-3 w-full">
-                    <InputField label="E-mail *" name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                    <InputField label="Senha *" name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
+                    <InputField label="E-mail *" {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                    <InputField label="Senha *" {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
                 </div>
 
                 <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />
