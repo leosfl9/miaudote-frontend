@@ -23,7 +23,7 @@ export default function ConfirmacaoPage() {
   if (!valid) return null; // evita piscar a tela errada
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+    <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
       <ConfirmationCard role={role as "adotante" | "parceiro"} />
     </div>
   );

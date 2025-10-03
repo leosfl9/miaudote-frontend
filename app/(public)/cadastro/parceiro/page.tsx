@@ -160,8 +160,8 @@ export default function CadastroParceiro() {
 
                 <FormButton text="Confirmar cadastro" color="green" type="submit" className="mt-2" />
 
-                <div className="w-full text-center text-md text-miau-orange hover:text-miau-green active:text-miau-light-green">
-                    <Link href="/login">Já possui uma conta? Faça login</Link>
+                <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
+                    <Link href="/login">Já possui uma conta? Faça login!</Link>
                 </div>
 
             </form>
