@@ -52,7 +52,7 @@ export default function Login() {
 
                 <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />
 
-                <div className="w-full text-center text-sm md:text-base text-miau-orange hover:text-miau-green active:text-miau-light-green">
+                <div className="w-full text-center text-sm md:text-base text-miau-purple hover:text-miau-green active:text-miau-light-green">
                     <Link href="/tipo-cadastro">Ainda não possui conta? Cadastre-se!</Link>
                 </div>
 
