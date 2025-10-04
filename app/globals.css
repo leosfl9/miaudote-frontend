@@ -20,11 +20,14 @@
   --color-miau-gray: #D9D9D9;
   --color-miau-purple: #C09BD8;
   --color-input-bd: #D4D4D4;
+  --color-weak-purple: #F2F2F2;
 
   --breakpoint-sssm: 370px;
   --breakpoint-ssm: 460px;
   --breakpoint-mxl: 1136px;
   --breakpoint-lxl: 1360px;
+  --breakpoint-xxl: 1420px;
+  --breakpoint-3xl: 1680px;
 
 }
 

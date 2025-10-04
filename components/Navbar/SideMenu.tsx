@@ -3,13 +3,15 @@
 import { X } from "lucide-react";
 import Link from "next/link";
 import LinkButton from "../LinkButton";
+import MobileLinks from "./MobileLinks";
 
 interface SideMenuProps {
   open: boolean;
   onClose: () => void;
+  tipo?: string;
 }
 
-export default function SideMenu({ open, onClose }: SideMenuProps) {
+export default function SideMenu({ open, onClose, tipo }: SideMenuProps) {
   return (
     <>
       {/* Div que escurece o fundo da tela */}
@@ -17,20 +19,14 @@ export default function SideMenu({ open, onClose }: SideMenuProps) {
         open ? "opacity-100 visible" : "opacity-0 invisible"}`}/>
 
       {/* Menu lateral */}
-      <div className={`z-3 lg:hidden flex flex-col fixed top-0 right-0 h-full w-64 bg-background p-6 transition-transform duration-300 
+      <div className={`z-3 lg:hidden flex flex-col fixed top-0 right-0 h-full w-68 bg-background p-6 transition-transform duration-300 
         ${open ? "translate-x-0" : "translate-x-full"}`}>
         {/* Botão de fechar */}
         <button onClick={onClose} className="mb-6">
           <X className="text-text-black active:text-miau-green transition w-6 h-6 md:w-7 md:h-7" />
         </button>
 
-        <nav className="flex flex-col space-y-4 text-text-black text-2xl md:text-[28px]">
-          <Link className="active:text-miau-green transition" href={"/"}>Home</Link>
-          <Link className="active:text-miau-green transition" href={"/Sobre"}>Sobre</Link>
-          <Link className="active:text-miau-green transition" href={"/ONGs"}>ONGs</Link>
-        </nav>
-
-        <LinkButton href={"/Login"} text={"Login"} center={true} bottom={true} color={"green"} />
+        <MobileLinks tipo={tipo} />
       </div>
     </>
   );
