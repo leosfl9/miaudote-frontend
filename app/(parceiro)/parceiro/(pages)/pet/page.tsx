@@ -4,8 +4,12 @@ import Image from "next/image";
 
 export default function PetDetails() {
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center px-2 md:px-8 py-6 lxl:py-10 
+        <div className="flex flex-col gap-6 lxl:relative sm:gap-8 items-center justify-center px-2 md:px-8 py-8 lxl:py-10 
             bg-[url('/grafo_pets.png')] bg-no-repeat bg-cover bg-center flex-1">
+
+            <div className="w-full lxl:absolute lxl:top-10 lxl:pl-10">
+                <LinkButton href={"/parceiro/home"} text="Voltar" color="white" back={true} />
+            </div>
 
             <div className="bg-miau-orange py-6 ssm:py-8 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-16 
                 w-full max-w-7xl items-center">
@@ -14,7 +18,7 @@ export default function PetDetails() {
                 </div>
                 <div className="flex flex-col text-white gap-5 ssm:gap-7 md:gap-8 xl:gap-10">
                     <h1 className="font-bold text-4xl md:text-5xl xl:text-6xl text-center">Bolt</h1>
-                    <p className="text-xl md:text-2xl xl:text-3xl text-justify line-clamp-5">
+                    <p className="text-xl md:text-2xl xl:text-3xl text-justify sm:line-clamp-5">
                         Pipoca passou sua infância em um abrigo e após adoção conjunta com seu irmãozinho foi deixado no abrigo PetFriends. Muito brincalhão e dócil.
                         Espera uma família que possa chamar de sua, pronto para brincar e ser leal a você!
                     </p>
