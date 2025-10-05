@@ -67,6 +67,7 @@ export default function CadastroAdotante() {
         register, 
         handleSubmit, 
         setValue,
+        clearErrors,
         formState: { errors }, 
     } = useForm<CadastroForm>({ 
         resolver: zodResolver(cadastroSchema),
@@ -118,19 +119,19 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Nome completo *" maxLength={100} {...register("nome")} error={errors.nome?.message} name="nome" type="text" placeholder="Digite seu nome e sobrenome" className="mb-2" />
-                        <InputField label="CPF *" {...register("cpf")} error={errors.cpf?.message} mask={"000.000.000-00"} name="cpf" inputMode="numeric" type="text" placeholder="Digite seu CPF" className="mb-2" />
+                        <InputField label="Nome completo *" maxLength={100} {...register("nome")} onFocus={() => clearErrors("nome")} error={errors.nome?.message} name="nome" type="text" placeholder="Digite seu nome e sobrenome" className="mb-2" />
+                        <InputField label="CPF *" {...register("cpf")} error={errors.cpf?.message} onFocus={() => clearErrors("cpf")} mask={"000.000.000-00"} name="cpf" inputMode="numeric" type="text" placeholder="Digite seu CPF" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="E-mail *" maxLength={200} {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                        <InputField label="Celular / WhatsApp *" {...register("telefone")} error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
-                        <InputField label="Data de nascimento *" {...register("dataNasc")} error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
+                        <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                        <InputField label="Celular / WhatsApp *" {...register("telefone")} onFocus={() => clearErrors("telefone")} error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
+                        <InputField label="Data de nascimento *" {...register("dataNasc")} onFocus={() => clearErrors("dataNasc")} error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Senha *" maxLength={70} {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
-                        <InputField label="Confirmar senha *" {...register("confSenha")} error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha novamente" className="mb-2" />
+                        <InputField label="Senha *" maxLength={70} {...register("senha")} onFocus={() => clearErrors("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
+                        <InputField label="Confirmar senha *" {...register("confSenha")} onFocus={() => clearErrors("confSenha")} error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha novamente" className="mb-2" />
                     </div>
 
                 </div>
@@ -142,19 +143,19 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite seu CEP" className="mb-2" />
-                        <InputField label="Logradouro *" maxLength={200} {...register("logradouro")} error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
+                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} onFocus={() => clearErrors("cep")} error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite seu CEP" className="mb-2" />
+                        <InputField label="Logradouro *" maxLength={200} {...register("logradouro")} onFocus={() => clearErrors("logradouro")} error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Cidade *" maxLength={40} {...register("cidade")} error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
-                        <InputField label="Bairro *" maxLength={70} {...register("bairro")} error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
+                        <InputField label="Cidade *" maxLength={40} {...register("cidade")} onFocus={() => clearErrors("cidade")} error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
+                        <InputField label="Bairro *" maxLength={70} {...register("bairro")} onFocus={() => clearErrors("bairro")} error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Estado *" maxLength={2} {...register("estado")} error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
-                        <InputField label="Número *" maxLength={10} {...register("numero")} error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
-                        <InputField label="Complemento (opcional)" maxLength={100} {...register("complemento")} error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
+                        <InputField label="Estado *" maxLength={2} {...register("estado")} onFocus={() => clearErrors("estado")} error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
+                        <InputField label="Número *" maxLength={10} {...register("numero")} onFocus={() => clearErrors("numero")} error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
+                        <InputField label="Complemento (opcional)" maxLength={100} {...register("complemento")} onFocus={() => clearErrors("complemento")} error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
                     </div>
                 </div>
 
