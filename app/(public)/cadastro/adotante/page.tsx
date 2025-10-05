@@ -101,7 +101,8 @@ export default function CadastroAdotante() {
     };
 
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
+            bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
             </div>
@@ -129,7 +130,8 @@ export default function CadastroAdotante() {
                         <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
                             error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
                         <InputField label="Celular / WhatsApp *" {...register("telefone")} onFocus={() => clearErrors("telefone")} 
-                            error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
+                            error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" 
+                            placeholder="(00) 00000-0000" className="mb-2" />
                         <InputField label="Data de nascimento *" {...register("dataNasc")} onFocus={() => clearErrors("dataNasc")} 
                             error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
                     </div>

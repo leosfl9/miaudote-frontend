@@ -34,7 +34,8 @@ export default function Login() {
     };
 
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
+            bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
             <div className="w-full max-w-[300px] md:max-w-[340px] lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
             </div>
@@ -46,8 +47,10 @@ export default function Login() {
                 </Link>
 
                 <div className="flex flex-col gap-2 lg:gap-3 w-full">
-                    <InputField label="E-mail *" maxLength={200} {...register("email")} error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                    <InputField label="Senha *" maxLength={70} {...register("senha")} error={errors.senha?.message} name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
+                    <InputField label="E-mail *" maxLength={200} {...register("email")} error={errors.email?.message} 
+                        name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                    <InputField label="Senha *" maxLength={70} {...register("senha")} error={errors.senha?.message} 
+                        name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
                 </div>
 
                 <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />

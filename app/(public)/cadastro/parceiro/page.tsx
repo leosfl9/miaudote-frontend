@@ -97,7 +97,8 @@ export default function CadastroParceiro() {
 
 
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
+            bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
             </div>
@@ -127,11 +128,13 @@ export default function CadastroParceiro() {
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <InputField label="CNPJ ou CPF *" {...register("documento")} onFocus={() => clearErrors("documento")} 
-                            error={errors.documento?.message} mask={[{mask: "000.000.000-00", overwrite: true}, {mask: "00.000.000/0000-00", overwrite: true}]} name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
+                            error={errors.documento?.message} mask={[{mask: "000.000.000-00", overwrite: true}, {mask: "00.000.000/0000-00", overwrite: true}]} 
+                            name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
                         <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
                             error={errors.email?.message} name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
                         <InputField label="Telefone *" {...register("telefone")} onFocus={() => clearErrors("telefone")} 
-                            error={errors.telefone?.message} mask={[{mask: "(00) 0000-0000", overwrite: true}, {mask: "(00) 00000-0000", overwrite: true}]} name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
+                            error={errors.telefone?.message} mask={[{mask: "(00) 0000-0000", overwrite: true}, {mask: "(00) 00000-0000", overwrite: true}]} 
+                            name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">

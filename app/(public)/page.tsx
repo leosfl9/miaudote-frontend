@@ -9,9 +9,12 @@ export default function Home() {
         <div className="flex flex-col mxl:flex-row gap-8 mxl:gap-16 xl:gap-24"> 
           {/* texto */} 
           <div className="flex flex-col gap-8 mxl:gap-12 justify-center"> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> Adote <span className="font-semibold">amor</span>.</p> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> Transforme <span className="font-semibold">vidas</span>. </p> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl "> Viva essa <span className="font-semibold">conexão</span>.</p> 
+            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> 
+              Adote <span className="font-semibold">amor</span>.</p> 
+            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> 
+              Transforme <span className="font-semibold">vidas</span>. </p> 
+            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl "> 
+              Viva essa <span className="font-semibold">conexão</span>.</p> 
           </div> 
           {/* imagens */} 
           <div className="flex flex-col gap-16 h-full"> 
