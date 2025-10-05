@@ -33,7 +33,7 @@ export default function AnimalCard(){
                     </p>
                 </div>
 
-                <Link href={"/"} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
+                <Link href={"/parceiro/pet"} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
                     bg-miau-orange text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                     Visualizar
                 </Link>
