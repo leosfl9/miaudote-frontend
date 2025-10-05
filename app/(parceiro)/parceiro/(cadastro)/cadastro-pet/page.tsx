@@ -98,6 +98,10 @@ export default function CadastroPet() {
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
+
+
+    const [isDisabled, setIsDisabled] = useState(false);
 
     useEffect(() => {
         setValue("fotos", croppedFiles, { shouldValidate: croppedFiles.length > 0 });
@@ -111,31 +115,65 @@ export default function CadastroPet() {
 
     const handleConfirmCrop = async () => {
         if (currentCropIndex === null) return;
+        setIsDisabled(true);
 
-        const imageFile = files[currentCropIndex];
-        const croppedImage = await getCroppedImg(URL.createObjectURL(imageFile), croppedAreaPixels);
+        try {
+            const imageFile = files[currentCropIndex];
+            const src = URL.createObjectURL(imageFile);
+            const croppedImage = await getCroppedImg(src, croppedAreaPixels);
+            // revogamos a URL temporária criada
+            URL.revokeObjectURL(src);
 
-        setCroppedFiles((prev) => [...prev, croppedImage]);
-        setCurrentCropIndex(null);
+            setCroppedFiles((prev) => [...prev, croppedImage]);
+
+            // limpa URL atual e fecha modal
+            if (currentImageSrc) {
+            URL.revokeObjectURL(currentImageSrc);
+            setCurrentImageSrc(null);
+            }
+            setCurrentCropIndex(null);
+        } catch (err) {
+            console.error(err);
+            Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
+        } finally {
+            setIsDisabled(false);
+        }
     };
+
 
     // ---- Seleção de arquivos ----
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(e.target.files || []);
-        
+
         if (selected.length + files.length > 5) {
             Swal.fire({
-                position: "top",
-                icon: "error",
-                title: "Máximo de 5 imagens!",
-                showConfirmButton: false,
-                timer: 1500
+            position: "top",
+            icon: "error",
+            title: "Máximo de 5 imagens!",
+            showConfirmButton: false,
+            timer: 1500
             });
+            e.currentTarget.value = "";
             return;
         }
-        setFiles((prev) => [...prev, ...selected]);
-        setCurrentCropIndex(files.length); // abre cropper para a 1ª imagem nova
-    };
+
+        // Atualiza files e abre o cropper para a primeira imagem nova usando prev.length
+        setFiles(prev => {
+            const startIndex = prev.length; // índice da primeira imagem nova
+            const newFiles = [...prev, ...selected];
+
+            // abre o cropper para a primeira imagem nova
+            setCurrentCropIndex(startIndex);
+            // cria URL para o cropper usar imediatamente (limpeza abaixo)
+            setCurrentImageSrc(URL.createObjectURL(selected[0]));
+
+            return newFiles;
+        });
+
+        // reset do input para permitir selecionar o mesmo arquivo em seguida
+        e.currentTarget.value = "";
+        };
+
 
     // ---- Submit final ----
     const onSubmit = async (data: PetForm) => {
@@ -232,10 +270,10 @@ export default function CadastroPet() {
             </form>
 
             {/* Modal de cropper */}
-            {currentCropIndex !== null && (
+            {currentCropIndex !== null && currentImageSrc && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                     <div className="relative w-[90vw] h-[80vh] bg-white rounded-lg p-4 flex flex-col">
-                    {/* Área do cropper ocupa espaço, mas não cobre os botões */}
+                    {/* Área do cropper */}
                     <div className="relative flex-1">
                         <Cropper
                         image={URL.createObjectURL(files[currentCropIndex])}
@@ -244,25 +282,25 @@ export default function CadastroPet() {
                         aspect={1}
                         onCropChange={setCrop}
                         onZoomChange={setZoom}
-                        onCropComplete={onCropComplete}
-                        />
+                        onCropComplete={onCropComplete} />
                     </div>
 
                     {/* Botões sempre visíveis e clicáveis */}
                     <div className="flex justify-end gap-2 mt-4 z-10">
-                        <button
-                        type="button"
-                        className="px-4 py-2 bg-gray-200 rounded-md"
-                        onClick={() => setCurrentCropIndex(null)}
-                        >
-                        Cancelar
+                        <button type="button" className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md cursor-pointer font-semibold text-lg"
+                            onClick={() => {
+                                if (currentImageSrc) {
+                                    URL.revokeObjectURL(currentImageSrc);
+                                    setCurrentImageSrc(null);
+                                    }
+                                    setCurrentCropIndex(null);
+                                }} >
+                            Cancelar
                         </button>
-                        <button
-                        type="button"
-                        className="px-4 py-2 bg-green-600 text-white rounded-md"
-                        onClick={handleConfirmCrop}
-                        >
-                        Confirmar
+
+                        <button type="button" className="px-4 py-2 font-semibold text-lg bg-miau-green hover:bg-miau-green/80 active:bg-miau-green/80 
+                            text-white rounded-md cursor-pointer" onClick={handleConfirmCrop} disabled={isDisabled} >
+                            {isDisabled ? "Enviando..." : "Confirmar"}
                         </button>
                     </div>
                     </div>
