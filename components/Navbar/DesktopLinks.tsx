@@ -34,7 +34,7 @@ export default function DesktopLinks({tipo}: LinksProps) {
 
                     <li><Link className="bg-[#F5F7FF] text-text-light-gray hover:bg-miau-purple hover:text-background 
                         flex items-center gap-3 px-4 py-3 rounded-lg" 
-                        href={"/parceiro/configuracoes"}>
+                        href={"/parceiro/home"}>
                         <Settings className="w-8 h-8" />
                         <h1 className="font-semibold">Configurações</h1>
                     </Link></li>  

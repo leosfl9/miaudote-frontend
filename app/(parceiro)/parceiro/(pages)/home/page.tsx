@@ -6,8 +6,8 @@ export default function homeParceiro(){
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
             <div className="flex flex-col gap-2 text-text-light-gray">
-                <h1 className="font-bold text-3xl">Pets cadastrados</h1>
-                <h2 className="text-base">Cadastre novos pets e verifique os já cadastrados para adoção.</h2>
+                <h1 className="font-bold text-3xl 2xl:text-4xl">Pets cadastrados</h1>
+                <h2 className="text-base 2xl:text-lg">Cadastre novos pets e verifique os já cadastrados para adoção.</h2>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
