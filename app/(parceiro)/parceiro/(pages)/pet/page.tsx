@@ -10,7 +10,7 @@ export default function PetDetails() {
                 <LinkButton href={"/parceiro/home"} text="Voltar" color="white" back={true} />
             </div>
 
-            <AnimalPresentation tipo="parceiro" />
+            <AnimalPresentation tipo="parceiro" href="/parceiro/pet" />
             
             
         </div>

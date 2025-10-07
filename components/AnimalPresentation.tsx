@@ -1,11 +1,15 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 
 interface PresentationProps {
     tipo: string;
+    onOpenModal?: () => void;
+    href: string;
 }
 
-export default function AnimalPresentation ({tipo}: PresentationProps) {
+export default function AnimalPresentation ({tipo, onOpenModal, href}: PresentationProps) {
     return (
         <div className="bg-miau-orange py-6 ssm:py-8 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-16 
             w-full max-w-7xl items-center">
@@ -31,8 +35,15 @@ export default function AnimalPresentation ({tipo}: PresentationProps) {
                             <h2 className="text-xl md:text-2xl xl:text-3xl font-semibold">Observações importantes:</h2>
                             <p className="text-xl md:text-2xl xl:text-3xl">Bolt está chapado</p>
                         </div>
-                        <Link href={`${tipo == "adotante" ? "/adotante/regras" : "/parceiro/pet"}`} className={`px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
-                            bg-miau-green text-background hover:bg-miau-light-green active:bg-miau-light-green font-bold`}>
+                        <Link href={href} className={`px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
+                            bg-miau-green text-background hover:bg-miau-light-green active:bg-miau-light-green font-bold`}
+                            onClick={(e) => {
+                                if (tipo == "adotante"){
+                                    e.preventDefault();
+                                    onOpenModal?.();
+                                }
+                            }}>
+
                             {tipo == "adotante" ? "Quero adotar!" : "Editar informações"}
                         </Link>
                     </div>
