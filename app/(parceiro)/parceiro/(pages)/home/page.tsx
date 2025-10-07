@@ -18,9 +18,9 @@ export default function homeParceiro(){
                     <h3 className="font-semibold text-lg lg:text-2xl">Adicionar novo pet</h3>
                 </Link>
 
-                <AnimalCard />
-                <AnimalCard />
-                <AnimalCard />
+                <AnimalCard tipo="parceiro" />
+                <AnimalCard tipo="parceiro" />
+                <AnimalCard tipo="parceiro" />
 
             </div>
         </div>

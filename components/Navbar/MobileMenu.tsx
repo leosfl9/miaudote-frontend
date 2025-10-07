@@ -13,7 +13,7 @@ export default function MobileMenu({tipo}: MenuProps) {
 
   return (
     <>
-      <BurgerButton open={open} onClick={() => setOpen(true)} />
+      <BurgerButton open={open} onClick={() => setOpen(true)} tipo={tipo} />
       <SideMenu open={open} onClose={() => setOpen(false)} tipo={tipo} />
     </>
   );

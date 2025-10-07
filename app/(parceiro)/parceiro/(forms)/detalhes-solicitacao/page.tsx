@@ -59,8 +59,8 @@ export default function DetalhesSolicitacao() {
 
                         <div className="flex flex-col">
                             <h2 className="font-medium text-text-gray">Endereço do adotante</h2>
-                            <h3 className="font-semibold text-text-light-gray text-ellipsis overflow-clip"><span>01234-567</span>, 
-                                <span>Estrada do Campo Limpo</span>, <span>111</span> - <span>Pirajussara</span>, <span>São Paulo</span>, <span>SP</span></h3>
+                            <h3 className="font-semibold text-text-light-gray text-ellipsis overflow-clip"><span>01234-567</span>, <span>
+                                Estrada do Campo Limpo</span>, <span>111</span> - <span>Pirajussara</span>, <span>São Paulo</span>, <span>SP</span></h3>
                         </div>
                     </div>
 

@@ -15,11 +15,11 @@ export default function SideMenu({ open, onClose, tipo }: SideMenuProps) {
   return (
     <>
       {/* Div que escurece o fundo da tela */}
-      <div onClick={onClose} className={`z-2 fixed lg:hidden inset-0 bg-black/40 transition-opacity duration-300 ${
+      <div onClick={onClose} className={`z-2 fixed ${tipo == "adotante" ? "glg:hidden" : "lg:hidden"} inset-0 bg-black/40 transition-opacity duration-300 ${
         open ? "opacity-100 visible" : "opacity-0 invisible"}`}/>
 
       {/* Menu lateral */}
-      <div className={`z-3 lg:hidden flex flex-col fixed top-0 right-0 h-full w-68 bg-background p-6 transition-transform duration-300 
+      <div className={`z-3 ${tipo == "adotante" ? "glg:hidden" : "lg:hidden"} flex flex-col fixed top-0 right-0 h-full w-68 bg-background p-6 transition-transform duration-300 
         ${open ? "translate-x-0" : "translate-x-full"}`}>
         {/* Botão de fechar */}
         <button onClick={onClose} className="mb-6">
