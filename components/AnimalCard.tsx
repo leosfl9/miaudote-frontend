@@ -4,9 +4,12 @@ import Link from "next/link";
 
 interface CardProps {
     tipo: string;
+    favorito?: boolean;
 }
 
-export default function AnimalCard({tipo}: CardProps){
+export default function AnimalCard({tipo, favorito}: CardProps){
+    const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet`;
+    
     return(
         <div className="flex flex-col max-w-[380px] bg-white rounded-xl">
             <div className="relative w-full min-h-64">
@@ -15,10 +18,19 @@ export default function AnimalCard({tipo}: CardProps){
 
             <div className="flex flex-col gap-8 px-5 py-5">
                 <div className="flex flex-col gap-4">
-                    <div className="flex flex-col">
-                        <h4 className="text-text-light-gray text-2xl font-bold overflow-clip text-ellipsis">Bolt</h4>
-                        { tipo == "adotante" && (
-                            <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis">ONG Amigos dos Animais</h5>
+                    <div className="flex flex-col sssm:flex-row sssm:justify-between gap-3 sssm:gap-0 sssm:items-start">
+                        <div>
+                            <h4 className="text-text-light-gray text-2xl font-bold overflow-clip text-ellipsis">Bolt</h4>
+                            { (tipo == "adotante" || tipo == "solicitacao") && (
+                                <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis">ONG Amigos dos Animais</h5>
+                            )}
+                        </div>
+                        {tipo == "solicitacao" && (
+                            <div className="px-3 py-1 bg-miau-orange rounded-2xl w-fit mb-2">
+                                <p className="text-sm text-background font-medium">
+                                    Solicitado
+                                </p>
+                            </div>
                         )}
                     </div>
                     <div className="flex flex-wrap gap-4 text-[#7B7B7B] items-center">
@@ -43,14 +55,14 @@ export default function AnimalCard({tipo}: CardProps){
                 </div>
 
                 <div className="flex flex-row justify-between items-center">
-                    {tipo == "adotante" && (
-                        <div className="flex flex-row gap-2 text-[#7B7B7B] hover:text-[#F35D5D] cursor-pointer">
-                            <Heart className="" />
-                            <p className="font-semibold">Favoritar</p>
+                    {(tipo == "adotante" || tipo == "solicitacao") && (
+                        <div className={`flex flex-row gap-2 ${favorito ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}>
+                            <Heart className={`${favorito ? "fill-[#F35D5D]" : ""}`} />
+                            <p className={`font-semibold`}>{favorito ? "Favorito" : "Favoritar"}</p>
                         </div>
                     )}
-                    <Link href={`${tipo == "adotante" ? "/adotante/pet" : "/parceiro/pet"}`} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
-                        bg-miau-orange text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
+                    <Link href={href} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
+                        ${tipo == "solicitacao" ? "bg-miau-purple" : "bg-miau-orange"} text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                         Visualizar
                     </Link>
                 </div>
