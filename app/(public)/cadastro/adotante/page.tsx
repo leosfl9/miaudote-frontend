@@ -10,10 +10,13 @@ import FormButton from "@/components/FormButton";
 import { validaCPF } from "@/utils/validaCPF";
 import { validaIdade } from "@/utils/validaIdade";
 import { validaSenha } from "@/utils/validaSenha";
+import { formatarData } from "@/utils/formatarData"
 
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import Swal from "sweetalert2";
 
 const cadastroSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
@@ -93,11 +96,56 @@ export default function CadastroAdotante() {
         }
     };
 
+    const onSubmit = async (data: CadastroForm) => { 
+        try {
+            const payload = {
+                cpf: data.cpf.replace(/\D/g, ''),
+                dataNascimento: formatarData(data.dataNasc),
+                usuario: {
+                    nome: data.nome,
+                    email: data.email,
+                    senha: data.senha,
+                    numero: data.numero,
+                    complemento: data.complemento,
+                    telefone: data.telefone.replace(/\D/g, ''),
+                },
+            };
 
-    const onSubmit = (data: CadastroForm) => { 
-        console.log("ok", data); 
-        sessionStorage.setItem("justRegistered", "adotante");
-        router.push("/confirmacao?role=adotante")
+            console.log("Enviando dados:", payload);
+
+            const response = await fetch("http://localhost:8080/adotantes/cadastrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro ao cadastrar!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
+
+            console.log("Cadastro realizado com sucesso!");
+            sessionStorage.setItem("justRegistered", "adotante");
+            router.push("/confirmacao?role=adotante");
+
+        } catch (error) {
+            console.error("Erro ao enviar cadastro:", error);
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao cadastrar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
     };
 
     return (

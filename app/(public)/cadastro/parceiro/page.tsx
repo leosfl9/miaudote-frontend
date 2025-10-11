@@ -93,8 +93,6 @@ export default function CadastroParceiro() {
 
     const onSubmit = async (data: CadastroForm) => {
         try {
-            console.log("Enviando dados:", data);
-
             const payload = {
                 documento: data.documento.replace(/\D/g, ''),
                 tipo: data.tipo,
@@ -108,6 +106,8 @@ export default function CadastroParceiro() {
                     telefone: data.telefone.replace(/\D/g, ''),
                 },
             };
+
+            console.log("Enviando dados:", payload);
 
             const response = await fetch("http://localhost:8080/parceiros/cadastrar", {
                 method: "POST",
