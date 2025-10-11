@@ -16,6 +16,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import Swal from "sweetalert2";
+
 const cadastroSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     tipo: z.string().min(1, "Selecione o tipo"),
@@ -116,7 +118,14 @@ export default function CadastroParceiro() {
             });
 
             if (!response.ok) {
-                throw new Error(`Erro ao cadastrar: ${response.status}`);
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro ao cadastrar!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
             }
 
             console.log("Cadastro realizado com sucesso!");
@@ -125,7 +134,13 @@ export default function CadastroParceiro() {
 
         } catch (error) {
             console.error("Erro ao enviar cadastro:", error);
-            // alert("Erro ao cadastrar parceiro. Tente novamente mais tarde.");
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao cadastrar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
     };
 
