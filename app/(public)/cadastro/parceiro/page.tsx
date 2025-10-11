@@ -89,10 +89,44 @@ export default function CadastroParceiro() {
     };
 
 
-    const onSubmit = (data: CadastroForm) => { 
-        console.log("ok", data); 
-        sessionStorage.setItem("justRegistered", "parceiro");
-        router.push("/confirmacao?role=parceiro")
+    const onSubmit = async (data: CadastroForm) => {
+        try {
+            console.log("Enviando dados:", data);
+
+            const payload = {
+                documento: data.documento.replace(/\D/g, ''),
+                tipo: data.tipo,
+                site: data.site,
+                usuario: {
+                    nome: data.nome,
+                    email: data.email,
+                    senha: data.senha,
+                    numero: data.numero,
+                    complemento: data.complemento,
+                    telefone: data.telefone.replace(/\D/g, ''),
+                },
+            };
+
+            const response = await fetch("http://localhost:8080/parceiros/cadastrar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erro ao cadastrar: ${response.status}`);
+            }
+
+            console.log("Cadastro realizado com sucesso!");
+            sessionStorage.setItem("justRegistered", "parceiro");
+            router.push("/confirmacao?role=parceiro");
+
+        } catch (error) {
+            console.error("Erro ao enviar cadastro:", error);
+            // alert("Erro ao cadastrar parceiro. Tente novamente mais tarde.");
+        }
     };
 
 
