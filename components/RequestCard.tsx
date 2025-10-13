@@ -3,17 +3,17 @@ import Link from "next/link";
 
 export default function RequestCard () {
     return (
-        <div className="bg-white flex flex-col items-center gap-5 sm:gap-8 py-4 px-6 rounded-xl">
+        <div className="bg-white flex flex-col items-center gap-5 sm:gap-8 py-4 px-6 rounded-xl min-w-[220px]">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center sm:items-start sm:self-start">
                 <div className="relative w-24 h-24">
                     <Image src={"/Bolt.jpeg"} alt="Imagem do pet" className="rounded-full object-cover" fill />
                 </div>
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col text-center sm:text-start">
-                        <h1 className="text-xl font-medium text-text-light-gray">Bolt</h1>
-                        <h2 className="text-text-gray text-sm">Adotante: <span>Leonardo Flores</span></h2>
+                        <h1 className="text-xl font-medium text-text-light-gray truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">BolaiiBaaoltBoltoltBolt</h1>
+                        <h2 className="text-text-gray text-sm truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">Adotante: <span>Leonardo Flores</span></h2>
                     </div>
-                    <div className="bg-hr rounded-md px-4 py-2 w-fit self-start">
+                    <div className="bg-hr rounded-md px-4 py-2 w-fit self-center sm:self-start">
                         <p className="text-sm text-text-light-gray font-bold">Pendente</p>
                     </div>
                 </div>
