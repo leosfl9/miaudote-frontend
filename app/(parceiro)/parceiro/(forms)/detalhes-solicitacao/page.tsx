@@ -29,12 +29,12 @@ export default function DetalhesSolicitacao() {
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col">
                             <h2 className="font-medium text-text-gray">Nome do pet</h2>
-                            <h3 className="font-semibold text-text-light-gray">Bolt</h3>
+                            <h3 className="font-semibold text-text-light-gray text-ellipsis overflow-clip line-clamp-2">Bolt</h3>
                         </div>
 
                         <div className="flex flex-col">
                             <h2 className="font-medium text-text-gray">Nome do adotante</h2>
-                            <h3 className="font-semibold text-text-light-gray text-ellipsis overflow-clip">Leonardo da Silva Flores</h3>
+                            <h3 className="font-semibold text-text-light-gray text-ellipsis overflow-clip line-clamp-2">Leonardo da Silva Flores</h3>
                         </div>
 
                         <div className="flex flex-col">
