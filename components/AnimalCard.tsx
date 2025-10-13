@@ -20,10 +20,10 @@ export default function AnimalCard({tipo, favorito}: CardProps){
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col sssm:flex-row sssm:justify-between gap-3 sssm:gap-0 sssm:items-start">
                         <div className="min-w-0">
-                            <h4 className="text-text-light-gray text-2xl font-bold truncate max-w-[16ch] sssm:max-w-[20ch] ssm:max-w-none">
-                                Bolt</h4>
+                            <h4 className={`text-text-light-gray text-2xl font-bold truncate max-w-[16ch] ${tipo == "solicitacao" ? "sssm:max-w-[200px] ssm:max-w-[248px]" : "sssm:max-w-[20ch] ssm:max-w-none"}`}>
+                                BoltBoltBoltBoltaaaaaaa</h4>
                             { (tipo == "adotante" || tipo == "solicitacao") && (
-                                <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis">ONG Amigos dos Animais</h5>
+                                <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis line-clamp-1">ONG Amigos dos Animais</h5>
                             )}
                         </div>
                         {tipo == "solicitacao" && (

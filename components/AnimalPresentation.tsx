@@ -18,7 +18,7 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
         texto = "Quero adotar!"
     else if (tipo == "parceiro")
         texto = "Editar informações"
-    else texto = "Whatsapp ONG"
+    else texto = "Whatsapp parceiro"
 
     return (
         <div className="bg-miau-orange py-6 ssm:py-8 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-16 
@@ -49,7 +49,7 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
                             <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-1 max-w-[400px] xl:max-w-[480px]">Bolt está chapado Bolt está chapado Bolt está chapado</p>
                         </div>
                         <div className="flex flex-col xsm:flex-row sm:flex-col xl:flex-row gap-3">
-                            <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
+                            <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
                                 bg-miau-green text-background hover:bg-miau-light-green active:bg-miau-light-green font-bold`}
                                 onClick={(e) => {
                                     if (tipo == "adotante" || tipo == "solicitacao"){
@@ -62,7 +62,7 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
                             </Link>
                             
                             {tipo == "solicitacao" && (
-                                <button className="w-full sssm:w-[234px] xsm:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
+                                <button className="w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
                                 bg-[#F35D5D] hover:bg-[#fA7C7C] active:bg-[#fA7C7C] text-background font-bold cursor-pointer" 
                                     onClick={(e) => {onOpenModalCancela?.(); }}>
                                     Cancelar solicitação
