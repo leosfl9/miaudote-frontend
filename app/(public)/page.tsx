@@ -3,17 +3,17 @@ import Link from "next/link";
 
 export default function Home() { 
   return ( 
-    <> 
+    <div className="flex flex-col min-h-screen"> 
       <PublicNavbar /> 
-      <div className="flex items-center justify-center px-2 ssm:px-4 py-8 bg-miau-gray"> 
+      <div className="flex items-center justify-center px-2 ssm:px-4 py-8 bg-miau-gray flex-col flex-1"> 
         <div className="flex flex-col mxl:flex-row gap-8 mxl:gap-16 xl:gap-24"> 
           {/* texto */} 
-          <div className="flex flex-col gap-8 mxl:gap-12 justify-center"> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> 
+          <div className="flex flex-col gap-8 mxl:gap-12 justify-center text-5xl xl:text-[54px] 2xl:text-6xl 3xl:!text-7xl pl-2 ssm:pl-0"> 
+            <p className="text-text-black font-medium text-left"> 
               Adote <span className="font-semibold">amor</span>.</p> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl"> 
+            <p className="text-text-black font-medium text-left"> 
               Transforme <span className="font-semibold">vidas</span>. </p> 
-            <p className="text-text-black font-medium text-left text-5xl xl:text-[54px] 2xl:text-6xl "> 
+            <p className="text-text-black font-medium text-left"> 
               Viva essa <span className="font-semibold">conexão</span>.</p> 
           </div> 
           {/* imagens */} 
@@ -48,6 +48,6 @@ export default function Home() {
           </div> 
         </div> 
       </div> 
-    </> 
+    </div> 
   ); 
 }
