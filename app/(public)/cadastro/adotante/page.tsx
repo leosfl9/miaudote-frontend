@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
+import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
 import { validaCPF } from "@/utils/validaCPF";
 import { validaIdade } from "@/utils/validaIdade";
@@ -17,8 +18,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Swal from "sweetalert2";
+import { useState } from "react";
 
-const cadastroSchema = z.object({ 
+const cadastroAdotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido").refine((cpf) => 
         validaCPF(cpf), { message: "CPF inválido" }),
@@ -50,65 +52,46 @@ const cadastroSchema = z.object({
         }
     }), 
     confSenha: z.string().min(8, "As senhas devem coincidir"), 
-    cep: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido"), 
     estado: z.string().min(2, "Estado obrigatório"), 
-    bairro: z.string().min(2, "Bairro obrigatório"), 
-    cidade: z.string().min(2, "Cidade obrigatória"), 
-    logradouro: z.string().min(2, "Logradouro obrigatório"), 
-    numero: z.string().regex(/^\d+$/, "Número inválido, use apenas números"), 
-    complemento: z.string().optional(), }).refine((data) => 
+    cidade: z.string().min(2, "Cidade obrigatória"), }).refine((data) => 
         data.senha === data.confSenha, { 
             message: "As senhas não coincidem", 
             path: ["confSenha"], }); 
             
-type CadastroForm = z.infer<typeof cadastroSchema>;
+type CadastroAdotanteForm = z.infer<typeof cadastroAdotanteSchema>;
 
 export default function CadastroAdotante() {
+    const [sending, setSending] = useState(false);
+
     const router = useRouter();
 
     const { 
         register, 
         handleSubmit, 
-        setValue,
         clearErrors,
         formState: { errors }, 
-    } = useForm<CadastroForm>({ 
-        resolver: zodResolver(cadastroSchema),
-        mode: "all" 
+    } = useForm<CadastroAdotanteForm>({ 
+        resolver: zodResolver(cadastroAdotanteSchema),
+        mode: "all",
+        shouldFocusError: false,
     });
 
-    const buscarCep = async (cep: string) => {
-        const cepNumerico = cep.replace(/\D/g, "");
-        if (cepNumerico.length !== 8) return;
-
+    const onSubmit = async (data: CadastroAdotanteForm) => { 
+        console.log("Entrou no onSubmit!", data);
         try {
-            const res = await fetch(`https://viacep.com.br/ws/${cepNumerico}/json/`);
-            const data = await res.json();
+            setSending(true);
 
-            if (!data.erro) {
-            setValue("logradouro", data.logradouro || "", { shouldValidate: true });
-            setValue("bairro", data.bairro || "", { shouldValidate: true });
-            setValue("cidade", data.localidade || "", { shouldValidate: true });
-            setValue("estado", data.uf || "", { shouldValidate: true });
-            }
-        } catch (error) {
-            console.error("Erro ao buscar CEP:", error);
-        }
-    };
-
-    const onSubmit = async (data: CadastroForm) => { 
-        try {
             const payload = {
-                cpf: data.cpf.replace(/\D/g, ''),
-                dataNascimento: formatarData(data.dataNasc),
                 usuario: {
                     nome: data.nome,
                     email: data.email,
                     senha: data.senha,
-                    numero: data.numero,
-                    complemento: data.complemento,
+                    cidade: data.cidade,
+                    estado: data.estado,
                     telefone: data.telefone.replace(/\D/g, ''),
                 },
+                cpf: data.cpf.replace(/\D/g, ''),
+                dataNascimento: formatarData(data.dataNasc),
             };
 
             console.log("Enviando dados:", payload);
@@ -120,6 +103,8 @@ export default function CadastroAdotante() {
                 },
                 body: JSON.stringify(payload),
             });
+
+            setSending(false);
 
             if (!response.ok) {
                 Swal.fire({
@@ -145,6 +130,8 @@ export default function CadastroAdotante() {
                 showConfirmButton: false,
                 timer: 1500
             });
+        } finally {
+            setSending(false);
         }
     };
 
@@ -200,30 +187,44 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} onFocus={() => clearErrors("cep")} 
-                            error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite seu CEP" className="mb-2" />
-                        <InputField label="Logradouro *" maxLength={200} {...register("logradouro")} onFocus={() => clearErrors("logradouro")} 
-                            error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+                        <SelectField defaultValue={""} {...register("estado")} onFocus={() => clearErrors("estado")} 
+                            error={errors.estado?.message} label="Estado *" name="estado" className="appearance-none mb-2">
+                            <option value={""} disabled>Selecione o estado</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </SelectField>
                         <InputField label="Cidade *" maxLength={40} {...register("cidade")} onFocus={() => clearErrors("cidade")} 
                             error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
-                        <InputField label="Bairro *" maxLength={70} {...register("bairro")} onFocus={() => clearErrors("bairro")} 
-                            error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Estado *" maxLength={2} {...register("estado")} onFocus={() => clearErrors("estado")} 
-                            error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
-                        <InputField label="Número *" maxLength={10} {...register("numero")} onFocus={() => clearErrors("numero")} 
-                            error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
-                        <InputField label="Complemento (opcional)" maxLength={100} {...register("complemento")} onFocus={() => clearErrors("complemento")} 
-                            error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
-                    </div>
                 </div>
 
-                <FormButton text="Cadastrar-se" color="green" type="submit" className="mt-2" />
+                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar-se"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
 
                 <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login!</Link>

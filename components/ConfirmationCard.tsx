@@ -24,7 +24,7 @@ export default function ConfirmationCard({ role }: ConfirmationCardProps) {
             md:max-w-[400px] lg:max-w-[420px] py-14 rounded-4xl">
             <div className="flex flex-col text-center gap-8">
                 <div className="w-full flex justify-center">
-                    <CircleCheckBig className="text-green-600/50 text-7xl w-20 ssm:w-24 lg:w-28 h-20 ssm:h-24 lg:h-28" />
+                    <CircleCheckBig className="text-green-600/50 text-7xl w-20 ssm:w-24 lg:w-28 h-20 ssm:h-24 lg:h-28 animate-spin-once" />
                 </div>
 
                 <div className="flex flex-col gap-6 lg:gap-10 text-text-black">

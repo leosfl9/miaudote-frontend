@@ -110,8 +110,6 @@ export default function PerfilAdotante() {
                 body: JSON.stringify(payload),
             });
 
-            setSending(false);
-
             Swal.fire({
                 position: "top",
                 icon: "success",
@@ -140,7 +138,9 @@ export default function PerfilAdotante() {
                 showConfirmButton: false,
                 timer: 1500
             });
-        } 
+        } finally {
+            setSending(false);
+        }
     };
 
     useEffect(() => {
