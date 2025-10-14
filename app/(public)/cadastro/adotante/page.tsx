@@ -224,7 +224,8 @@ export default function CadastroAdotante() {
 
                 </div>
 
-                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar-se"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
+                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar-se"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
+                    className="mt-2" disabled={sending} />
 
                 <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login!</Link>

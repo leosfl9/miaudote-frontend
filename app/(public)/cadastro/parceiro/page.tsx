@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
@@ -47,23 +48,19 @@ const cadastroSchema = z.object({
         }
     }), 
     site: z.string().optional(),
-    cep: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido"), 
     estado: z.string().min(2, "Estado obrigatório"), 
-    bairro: z.string().min(2, "Bairro obrigatório"), 
-    cidade: z.string().min(2, "Cidade obrigatória"), 
-    logradouro: z.string().min(2, "Logradouro obrigatório"), 
-    numero: z.string().regex(/^\d+$/, "Número inválido"), 
-    complemento: z.string().optional(), });
+    cidade: z.string().min(2, "Cidade obrigatória"), });
             
 type CadastroForm = z.infer<typeof cadastroSchema>;
 
 export default function CadastroParceiro() {
+    const [sending, setSending] = useState(false);
+
     const router = useRouter();
 
     const { 
         register, 
         handleSubmit, 
-        setValue,
         clearErrors,
         formState: { errors }, 
     } = useForm<CadastroForm>({ 
@@ -71,28 +68,10 @@ export default function CadastroParceiro() {
         mode: "all" 
     });
 
-    const buscarCep = async (cep: string) => {
-        const cepNumerico = cep.replace(/\D/g, "");
-        if (cepNumerico.length !== 8) return;
-
-        try {
-            const res = await fetch(`https://viacep.com.br/ws/${cepNumerico}/json/`);
-            const data = await res.json();
-
-            if (!data.erro) {
-            setValue("logradouro", data.logradouro || "", { shouldValidate: true });
-            setValue("bairro", data.bairro || "", { shouldValidate: true });
-            setValue("cidade", data.localidade || "", { shouldValidate: true });
-            setValue("estado", data.uf || "", { shouldValidate: true });
-            }
-        } catch (error) {
-            console.error("Erro ao buscar CEP:", error);
-        }
-    };
-
-
     const onSubmit = async (data: CadastroForm) => {
         try {
+            setSending(true);
+
             const payload = {
                 documento: data.documento.replace(/\D/g, ''),
                 tipo: data.tipo,
@@ -101,8 +80,8 @@ export default function CadastroParceiro() {
                     nome: data.nome,
                     email: data.email,
                     senha: data.senha,
-                    numero: data.numero,
-                    complemento: data.complemento,
+                    estado: data.estado,
+                    cidade: data.cidade,
                     telefone: data.telefone.replace(/\D/g, ''),
                 },
             };
@@ -141,6 +120,9 @@ export default function CadastroParceiro() {
                 showConfirmButton: false,
                 timer: 1500
             });
+            
+        } finally {
+            setSending(false);
         }
     };
 
@@ -202,30 +184,46 @@ export default function CadastroParceiro() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} onFocus={() => clearErrors("cep")} 
-                            error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" placeholder="Digite o CEP" className="mb-2" />
-                        <InputField label="Logradouro *" maxLength={200} {...register("logradouro")} onFocus={() => clearErrors("logradouro")} 
-                            error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
+                        <SelectField defaultValue={""} {...register("estado")} onFocus={() => clearErrors("estado")} 
+                            error={errors.estado?.message} label="Estado *" name="estado" className="appearance-none mb-2">
+                            <option value={""} disabled>Selecione o estado</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </SelectField>
                         <InputField label="Cidade *" maxLength={40} {...register("cidade")} onFocus={() => clearErrors("cidade")} 
                             error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
-                        <InputField label="Bairro *" maxLength={70} {...register("bairro")} onFocus={() => clearErrors("bairro")} 
-                            error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Estado *" maxLength={2} {...register("estado")} onFocus={() => clearErrors("estado")} 
-                            error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
-                        <InputField label="Número *" maxLength={10} {...register("numero")} onFocus={() => clearErrors("numero")} 
-                            error={errors.numero?.message} name="numero" type="text" placeholder="Digite o número" className="mb-2" />
-                        <InputField label="Complemento (opcional)" maxLength={100} {...register("complemento")} onFocus={() => clearErrors("complemento")} 
-                            error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
-                    </div>
+                
                 </div>
 
-                <FormButton text="Confirmar cadastro" color="green" type="submit" className="mt-2" />
+                <FormButton text={`${sending ? "Cadastrando..." : "Confirmar cadastro"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
+                    className="mt-2" disabled={sending} />
 
                 <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login!</Link>
