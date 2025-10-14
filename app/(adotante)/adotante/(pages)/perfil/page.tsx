@@ -3,13 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
 import { validaSenha } from "@/utils/validaSenha";
+import mascaraTelefone from "@/utils/mascaraTelefone";
 
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
@@ -62,6 +63,8 @@ type AdotanteForm = z.infer<typeof adotanteSchema>;
 
 export default function PerfilAdotante() {
     const router = useRouter();
+
+    const [loading, setLoading] = useState(true);
     
     const { 
         register, 
@@ -79,31 +82,42 @@ export default function PerfilAdotante() {
         console.log("ok", data); 
     };
 
-    // useEffect(() => {
-    //     const fetchUsuario = async () => {
-    //         try {
-    //             const res = await fetch("http://localhost:8080/adotante/39");
-    //             if (!res.ok) throw new Error("Erro ao buscar usuário");
+    useEffect(() => {
+        const fetchUsuario = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/adotantes/39");
+                if (!res.ok) throw new Error("Erro ao buscar usuário");
 
-    //             const usuario = await res.json();
+                const usuario = await res.json();
 
-    //             // 🔽 Preenche os campos do formulário
-    //             setValue("nome", usuario.nome ?? "");
-    //             setValue("email", usuario.email ?? "");
-    //             setValue("telefone", usuario.telefone ?? "");
-    //             setValue("estado", usuario.estado ?? "");
-    //             setValue("cidade", usuario.cidade ?? "");
+                setValue("nome", usuario.nome ?? "");
+                setValue("email", usuario.email ?? "");
+                setValue("telefone", mascaraTelefone(usuario.telefone ?? ""));
+                setValue("estado", usuario.estado ?? "");
+                setValue("cidade", usuario.cidade ?? "");
 
-    //             // não setar senhas — ficam vazias
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     };
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false); // <-- termina o carregamento
+            }
+        };
 
-    //     fetchUsuario();
-    // }, [setValue]);
+        fetchUsuario();
+    }, [setValue]);
+
+    if (loading) {
+        return (
+            <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
+                <div className="w-10 h-10 border-4 border-background border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-background font-medium text-xl">Carregando...</p>
+                {/* opcional: pode trocar por um spinner bonito */}
+            </div>
+        );
+    }
     
     return (
+        
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
             <div className="flex flex-col gap-2 text-text-light-gray">
                 <h1 className="font-bold text-3xl 2xl:text-4xl">Meus perfil</h1>
