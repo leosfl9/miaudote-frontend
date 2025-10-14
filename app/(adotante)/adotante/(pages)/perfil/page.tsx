@@ -3,62 +3,62 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
+import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
-import { validaCPF } from "@/utils/validaCPF";
-import { validaIdade } from "@/utils/validaIdade";
 import { validaSenha } from "@/utils/validaSenha";
 
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-const cadastroSchema = z.object({ 
+const adotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
-    cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido").refine((cpf) => 
-        validaCPF(cpf), { message: "CPF inválido" }),
     email: z.email("E-mail inválido"), 
     telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
-    dataNasc: z.string().superRefine((val, ctx) => {
-        if (val.length < 10) {
+    senha: z.string().max(70, "Máx. 70 caracteres"), 
+    confSenha: z.string().max(70, "Máx. 70 caracteres"),  
+    estado: z.string().min(2, "Estado obrigatório"), 
+    cidade: z.string().min(2, "Cidade obrigatória"), }).superRefine((data, ctx) => {
+        const senhaPreenchida = data.senha.trim() !== "";
+        const confPreenchida = data.confSenha.trim() !== "";
+
+        if ((senhaPreenchida && !confPreenchida) || (!senhaPreenchida && confPreenchida)) {
             ctx.addIssue({
-            code: "custom",
-            message: "Data inválida",
+                code: "custom",
+                path: ["confSenha"],
+                message: "Ambos os campos de senha devem ser preenchidos",
             });
             return;
         }
-        const { valido, mensagem } = validaIdade(val, 16);
-        if (!valido) {
-        ctx.addIssue({
-            code: "custom",
-            message: mensagem ?? "Data inválida",
-        });
+
+        if (senhaPreenchida && confPreenchida) {
+            if (data.senha !== data.confSenha) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["confSenha"],
+                    message: "As senhas não coincidem",
+                });
+                return;
+            }
+
+            const {valido, mensagem} = validaSenha(data.senha, 8);
+
+            if (!valido) {
+                ctx.addIssue({
+                    code: "custom",
+                    path: ["senha"],
+                    message: mensagem ?? "Senha inválida",
+                });
+                return;
+            }
         }
-    }),
-    senha: z.string().superRefine((val, ctx) => {
-        const {valido, mensagem} = validaSenha(val, 8);
-        if (!valido) {
-            ctx.addIssue({
-                code: "custom",
-                message: mensagem ?? "Senha inválida",
-            });
-        }
-    }), 
-    confSenha: z.string().min(8, "As senhas devem coincidir"), 
-    cep: z.string().regex(/^\d{5}-\d{3}$/, "CEP inválido"), 
-    estado: z.string().min(2, "Estado obrigatório"), 
-    bairro: z.string().min(2, "Bairro obrigatório"), 
-    cidade: z.string().min(2, "Cidade obrigatória"), 
-    logradouro: z.string().min(2, "Logradouro obrigatório"), 
-    numero: z.string().regex(/^\d+$/, "Número inválido, use apenas números"), 
-    complemento: z.string().optional(), }).refine((data) => 
-        data.senha === data.confSenha, { 
-            message: "As senhas não coincidem", 
-            path: ["confSenha"], }); 
+    });
             
-type CadastroForm = z.infer<typeof cadastroSchema>;
+type AdotanteForm = z.infer<typeof adotanteSchema>;
 
 export default function PerfilAdotante() {
     const router = useRouter();
@@ -69,34 +69,39 @@ export default function PerfilAdotante() {
         setValue,
         clearErrors,
         formState: { errors }, 
-    } = useForm<CadastroForm>({ 
-        resolver: zodResolver(cadastroSchema),
-        mode: "all" 
+    } = useForm<AdotanteForm>({ 
+        resolver: zodResolver(adotanteSchema),
+        mode: "all",
+        shouldFocusError: false,
     });
 
-    const buscarCep = async (cep: string) => {
-        const cepNumerico = cep.replace(/\D/g, "");
-        if (cepNumerico.length !== 8) return;
-
-        try {
-            const res = await fetch(`https://viacep.com.br/ws/${cepNumerico}/json/`);
-            const data = await res.json();
-
-            if (!data.erro) {
-            setValue("logradouro", data.logradouro || "", { shouldValidate: true });
-            setValue("bairro", data.bairro || "", { shouldValidate: true });
-            setValue("cidade", data.localidade || "", { shouldValidate: true });
-            setValue("estado", data.uf || "", { shouldValidate: true });
-            }
-        } catch (error) {
-            console.error("Erro ao buscar CEP:", error);
-        }
-    };
-
-
-    const onSubmit = (data: CadastroForm) => { 
+    const onSubmit = (data: AdotanteForm) => { 
         console.log("ok", data); 
     };
+
+    // useEffect(() => {
+    //     const fetchUsuario = async () => {
+    //         try {
+    //             const res = await fetch("http://localhost:8080/adotante/39");
+    //             if (!res.ok) throw new Error("Erro ao buscar usuário");
+
+    //             const usuario = await res.json();
+
+    //             // 🔽 Preenche os campos do formulário
+    //             setValue("nome", usuario.nome ?? "");
+    //             setValue("email", usuario.email ?? "");
+    //             setValue("telefone", usuario.telefone ?? "");
+    //             setValue("estado", usuario.estado ?? "");
+    //             setValue("cidade", usuario.cidade ?? "");
+
+    //             // não setar senhas — ficam vazias
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     };
+
+    //     fetchUsuario();
+    // }, [setValue]);
     
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
@@ -128,15 +133,11 @@ export default function PerfilAdotante() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-3">
-                            <InputField label="Data de nascimento *" {...register("dataNasc")} onFocus={() => clearErrors("dataNasc")} 
-                                error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
-                            <InputField label="Senha *" maxLength={70} {...register("senha")} onFocus={() => clearErrors("senha")} 
-                                error={errors.senha?.message} name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
-                            <div className="sm:col-span-2 lg:col-span-1">
-                                <InputField label="Confirmar senha *" {...register("confSenha")} onFocus={() => clearErrors("confSenha")} 
-                                    error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha novamente" className="mb-2" />
-                            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-3">
+                            <InputField label="Nova senha" maxLength={70} {...register("senha")} onFocus={() => clearErrors("senha")} 
+                                error={errors.senha?.message} name="senha" type="password" placeholder="Sua nova senha" className="mb-2" />
+                            <InputField label="Confirmar nova senha" maxLength={70} {...register("confSenha")} onFocus={() => clearErrors("confSenha")} 
+                                error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Repita a nova senha" className="mb-2" />
                         </div>
 
                     </div>
@@ -147,26 +148,40 @@ export default function PerfilAdotante() {
                     </div>
 
                     <div className="flex flex-col w-full gap-2">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-3">
-                            <InputField label="CEP *" {...register("cep", {onBlur: (e) => buscarCep(e.target.value)})} onFocus={() => clearErrors("cep")} 
-                                error={errors.cep?.message} mask={"00000-000"} name="cep" type="text" inputMode="numeric" placeholder="Digite seu CEP" className="mb-2" />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-3">
+                            <SelectField defaultValue={""} {...register("estado")} onFocus={() => clearErrors("estado")} 
+                                error={errors.estado?.message} label="Estado *" name="estado" className="appearance-none mb-2">
+                                <option value={""} disabled>Selecione o estado</option>
+                                <option value="AC">Acre</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="BA">Bahia</option>
+                                <option value="CE">Ceará</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="GO">Goiás</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="PA">Pará</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="PR">Paraná</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PI">Piauí</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="RR">Roraima</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="TO">Tocantins</option>
+                            </SelectField>
                             <InputField label="Cidade *" maxLength={40} {...register("cidade")} onFocus={() => clearErrors("cidade")} 
                                 error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
-                            <div className="sm:col-span-2 lg:col-span-1">
-                                <InputField label="Logradouro *" maxLength={200} {...register("logradouro")} onFocus={() => clearErrors("logradouro")} 
-                                    error={errors.logradouro?.message} name="logradouro" type="text" placeholder="Digite o logradouro" className="mb-2" />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-2 lg:gap-3">
-                            <InputField label="Bairro *" maxLength={70} {...register("bairro")} onFocus={() => clearErrors("bairro")} 
-                                error={errors.bairro?.message} name="bairro" type="text" placeholder="Digite o bairro" className="mb-2" />
-                            <InputField label="Estado *" maxLength={2} {...register("estado")} onFocus={() => clearErrors("estado")} 
-                                error={errors.estado?.message} name="estado" type="text" placeholder="Digite o estado" className="mb-2" />
-                            <InputField label="Número *" maxLength={10} {...register("numero")} onFocus={() => clearErrors("numero")} 
-                                error={errors.numero?.message} name="numero" type="text" inputMode="numeric" placeholder="Digite o número" className="mb-2" />
-                            <InputField label="Complemento (opcional)" maxLength={100} {...register("complemento")} onFocus={() => clearErrors("complemento")} 
-                                error={errors.complemento?.message} name="complemento" type="text" placeholder="Digite o complemento" className="mb-2" />
                         </div>
                     </div>
 
