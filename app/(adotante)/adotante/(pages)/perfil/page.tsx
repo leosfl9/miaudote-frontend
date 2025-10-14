@@ -67,6 +67,7 @@ export default function PerfilAdotante() {
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
+    const [sending, setSending] = useState(false);
     
     const { 
         register, 
@@ -82,6 +83,8 @@ export default function PerfilAdotante() {
 
     const onSubmit = async (data: AdotanteForm) => { 
         try {
+            setSending(true);
+
             const payload = {
                 usuario: {
                     nome: data.nome,
@@ -107,6 +110,16 @@ export default function PerfilAdotante() {
                 body: JSON.stringify(payload),
             });
 
+            setSending(false);
+
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Alterações salvas!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+
             if (!response.ok) {
                 Swal.fire({
                     position: "top",
@@ -117,14 +130,6 @@ export default function PerfilAdotante() {
                 });
                 return;
             }
-
-            Swal.fire({
-                position: "top",
-                icon: "success",
-                title: "Alterações salvas!",
-                showConfirmButton: false,
-                timer: 1500
-            });
 
         } catch (error) {
             console.error("Erro ao editar:", error);
@@ -255,7 +260,7 @@ export default function PerfilAdotante() {
                         </div>
                     </div>
 
-                    <FormButton text="Salvar alterações" color="green" type="submit" className="mt-2" />
+                    <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
 
                 </form>
             </div>

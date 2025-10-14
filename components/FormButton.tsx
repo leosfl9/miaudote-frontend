@@ -4,7 +4,7 @@ import { ButtonHTMLAttributes } from "react";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
-  color: "green" | "orange" | "purple";
+  color: "green" | "orange" | "purple" | "disabled";
 }
 
 export default function FormButton({ text, color, onClick, className, ...props }: ButtonProps) {
@@ -16,6 +16,7 @@ export default function FormButton({ text, color, onClick, className, ...props }
         ${color == "green" && "bg-miau-green hover:bg-miau-light-green active:bg-miau-light-green"}
         ${color == "orange" && "bg-miau-orange hover:bg-miau-green active:bg-miau-light-green"}
         ${color == "purple" && "bg-miau-purple hover:bg-miau-green active:bg-miau-light-green"}
+        ${color == "disabled" && "bg-miau-green/70"}
         ${className}
       `}
       {...props}>
