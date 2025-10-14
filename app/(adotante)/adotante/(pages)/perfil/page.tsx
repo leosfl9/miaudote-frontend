@@ -16,6 +16,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import Swal from "sweetalert2";
+
 const adotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     email: z.email("E-mail inválido"), 
@@ -78,8 +80,62 @@ export default function PerfilAdotante() {
         shouldFocusError: false,
     });
 
-    const onSubmit = (data: AdotanteForm) => { 
-        console.log("ok", data); 
+    const onSubmit = async (data: AdotanteForm) => { 
+        try {
+            const payload = {
+                usuario: {
+                    nome: data.nome,
+                    email: data.email,
+                    senha: data.senha,
+                    telefone: data.telefone.replace(/\D/g, ''),
+                    estado: data.estado,
+                    cidade: data.cidade
+                }
+            };
+
+            if (data.senha.trim() !== "") {
+                payload.usuario.senha = data.senha;
+            }
+
+            console.log("Enviando dados:", payload);
+
+            const response = await fetch("http://localhost:8080/adotantes/39", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro ao editar!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return;
+            }
+
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Alterações salvas!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+        } catch (error) {
+            console.error("Erro ao editar:", error);
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao editar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } 
     };
 
     useEffect(() => {
