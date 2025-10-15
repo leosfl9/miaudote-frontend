@@ -12,7 +12,6 @@ export default function PetDetails() {
 
             <AnimalPresentation tipo="parceiro" href="/parceiro/editar-pet" />
             
-            
         </div>
     );
 }

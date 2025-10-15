@@ -91,6 +91,7 @@ export default function homeParceiro(){
                       idade={animal.idade.toString()}
                       porte={animal.porte}
                       descricao={animal.descricao}
+                      status={animal.status}
                       foto={`data:image/jpeg;base64,${animal.foto}`}
                     />
                   ))
