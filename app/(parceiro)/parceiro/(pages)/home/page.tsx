@@ -1,8 +1,38 @@
+"use client"
+
 import { CirclePlus } from "lucide-react";
 import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 
+import { useEffect, useState } from "react";
+
+interface Foto {
+  foto: string;
+}
+
 export default function homeParceiro(){
+    const [fotos, setFotos] = useState<Foto[]>([]);
+
+    useEffect(() => {
+    async function carregarFotos() {
+      try {
+        const response = await fetch(`http://localhost:8080/fotos/animal/3`);
+        if (!response.ok) throw new Error("Erro ao buscar fotos");
+
+        const data = await response.json();
+
+        console.log("Fotos recebidas:", data);
+
+        // supondo que o backend retorna uma lista de strings base64
+        setFotos(data);
+      } catch (error) {
+        console.error("Erro ao carregar fotos:", error);
+      }
+    }
+
+    carregarFotos();
+  }, []);
+
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
             <div className="flex flex-col gap-2 text-text-light-gray">
@@ -21,6 +51,19 @@ export default function homeParceiro(){
                 <AnimalCard tipo="parceiro" />
                 <AnimalCard tipo="parceiro" />
                 <AnimalCard tipo="parceiro" />
+
+                {/* {fotos.length > 0 ? (
+                    fotos.map((fotoBase64, index) => (
+                    <img
+                        key={index}
+                        src={`data:image/jpeg;base64,${fotoBase64.foto}`}
+                        alt={`Foto ${index + 1}`}
+                        className="w-40 h-40 object-cover rounded-lg shadow"
+                    />
+                    ))
+                ) : (
+                    <p>Nenhuma foto disponível</p>
+                )} */}
 
             </div>
         </div>

@@ -22,12 +22,12 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
 
     return (
         <div className="bg-miau-orange py-6 ssm:py-8 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-16 
-            w-full max-w-7xl items-center">
+            w-full max-w-[1400px] items-center">
             <div className="relative w-full max-w-[380px] min-h-64 ssm:h-80 xl:h-96 lg:order-2">
-                <Image alt="Imagem do animal" src={"/Bolt.jpeg"} className="object-cover object-center rounded-full ssm:rounded-4xl shrink-0" fill/>
+                <Image alt="Imagem do animal" src={"/Bolt.jpeg"} className="object-cover object-center rounded-4xl shrink-0" fill/>
             </div>
             <div className="flex flex-col text-white gap-5 ssm:gap-7 md:gap-8 xl:gap-10 max-w-full lg:min-w-0 lg:max-w-none">
-                <h1 className="font-bold text-4xl md:text-5xl xl:text-6xl text-center truncate">BoltBoltBoltBoltBoltBoltBoltBolt</h1>
+                <h1 className="font-bold text-4xl md:text-5xl xl:text-6xl text-center truncate">Bolt</h1>
                 {tipo == "solicitacao" && (
                     <p className="text-base text-background font-medium text-center -mt-6">Solicitado em: <span>10/02/2025</span></p>
                 )}

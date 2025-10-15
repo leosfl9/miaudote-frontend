@@ -64,15 +64,15 @@ const petSchema = z.object({
     porte: z.string().min(1, "Selecione o porte"),
     obs: z.string().optional(),
     descricao: z.string().optional(),
-    // fotos: z
-    // .custom<File[]>()
-    // .refine((files) => files && files.length > 0, {
-    //   message: "Adicione pelo menos 1 foto",
-    // })
-    // .refine((files) => files.length <= 5, {
-    //   message: "Máximo 5 fotos",
-    // }),
-    fotos: z.custom<File[]>().optional()
+    fotos: z
+    .custom<File[]>()
+    .refine((files) => files && files.length > 0, {
+      message: "Adicione pelo menos 1 foto",
+    })
+    .refine((files) => files.length <= 5, {
+      message: "Máximo 5 fotos",
+    }),
+    // fotos: z.custom<File[]>().optional()
 });
 
 type PetForm = z.infer<typeof petSchema>;
@@ -183,27 +183,21 @@ export default function CadastroPet() {
     const onSubmit = async (data: PetForm) => {
         // console.log("Dados do animal:", data);
         // console.log("Fotos cortadas:", data.fotos);
+
         try {
-            const payload = {
-                especie: data.especie,
-                nome: data.nome,
-                sexo: data.sexo,
-                porte: data.porte,
-                idade_inicial: data.idade,
-                status_ani: "Disponível",
-                obs: data.obs,
-                descricao: data.descricao,
-            };
+            const formData = new FormData();
 
-            console.log("Enviando dados:", payload);
-
-            const response = await fetch("http://localhost:8080/animais/cadastrar/4", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
+            // supondo que data.fotos seja um array de File (ex: vindo de input type="file")
+            data.fotos.forEach(foto => {
+                formData.append("file", foto); // o nome deve bater com o parâmetro @RequestParam no backend
             });
+
+            const response = await fetch("http://localhost:8080/fotos/cadastrar/3", {
+                method: "POST",
+                body: formData, // ⚠️ sem Content-Type! o browser define o boundary automaticamente
+            });
+
+            console.log(response);
 
             if (!response.ok) {
                 Swal.fire({
@@ -216,11 +210,16 @@ export default function CadastroPet() {
                 return;
             }
 
-            console.log("Cadastro realizado com sucesso!");
-            // router.push("/confirmacao?role=adotante");
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Fotos enviadas com sucesso!",
+                showConfirmButton: false,
+                timer: 1500
+            });
 
         } catch (error) {
-            console.error("Erro ao enviar cadastro:", error);
+            console.error("Erro ao enviar fotos:", error);
             Swal.fire({
                 position: "top",
                 icon: "error",
@@ -229,6 +228,54 @@ export default function CadastroPet() {
                 timer: 1500
             });
         }
+
+
+        // try {
+        //     const payload = {
+        //         especie: data.especie,
+        //         nome: data.nome,
+        //         sexo: data.sexo,
+        //         porte: data.porte,
+        //         idade_inicial: data.idade,
+        //         status_ani: "Disponível",
+        //         fotos: data.fotos,
+        //         obs: data.obs,
+        //         descricao: data.descricao,
+        //     };
+
+        //     console.log("Enviando dados:", payload);
+
+        //     const response = await fetch("http://localhost:8080/animais/cadastrar/4", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify(payload),
+        //     });
+
+        //     if (!response.ok) {
+        //         Swal.fire({
+        //             position: "top",
+        //             icon: "error",
+        //             title: "Erro ao cadastrar!",
+        //             showConfirmButton: false,
+        //             timer: 1500
+        //         });
+        //         return;
+        //     }
+
+        //     console.log("Cadastro realizado com sucesso!");
+
+        // } catch (error) {
+        //     console.error("Erro ao enviar cadastro:", error);
+        //     Swal.fire({
+        //         position: "top",
+        //         icon: "error",
+        //         title: "Erro ao cadastrar!",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        // }
     };
 
 
