@@ -21,10 +21,16 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
     else texto = "Whatsapp parceiro"
 
     return (
-        <div className="bg-miau-orange py-6 ssm:py-8 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-16 
-            w-full max-w-[1400px] items-center">
-            <div className="relative w-full max-w-[380px] min-h-64 ssm:h-80 xl:h-96 lg:order-2">
-                <Image alt="Imagem do animal" src={"/Bolt.jpeg"} className="object-cover object-center rounded-4xl shrink-0" fill/>
+        <div className="bg-miau-orange py-6 ssm:py-8 2xl:py-10 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-10 
+            w-full max-w-[1480px] items-center">
+            <div className="flex flex-col gap-2 w-full lg:order-2 items-center">
+                <img alt="Imagem do animal" src={"/Bolt.jpeg"} className="object-cover object-center rounded-2xl shrink-0 w-full max-w-[380px] h-64 ssm:h-80 xl:h-96"/>
+                <div className="grid grid-cols-3 sssm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 gap-1 2xl:gap-2">
+                    <img src={"/Céu.jpeg"} alt="" className="rounded-lg w-20 h-20 object-cover" />
+                    <img src={"/Céu.jpeg"} alt="" className="rounded-lg w-20 h-20 object-cover" />
+                    <img src={"/Céu.jpeg"} alt="" className="rounded-lg w-20 h-20 object-cover" />
+                    <img src={"/Céu.jpeg"} alt="" className="hidden sssm:inline lg:hidden xl:inline rounded-lg w-20 h-20 object-cover" />
+                </div>
             </div>
             <div className="flex flex-col text-white gap-5 ssm:gap-7 md:gap-8 xl:gap-10 max-w-full lg:min-w-0 lg:max-w-none">
                 <h1 className="font-bold text-4xl md:text-5xl xl:text-6xl text-center truncate">Bolt</h1>
@@ -35,15 +41,16 @@ export default function AnimalPresentation ({tipo, onOpenModal, onOpenModalCance
                     Pipoca passou sua infância em um abrigo e após adoção conjunta com seu irmãozinho foi deixado no abrigo PetFriends. Muito brincalhão e dócil.
                     Espera uma família que possa chamar de sua, pronto para brincar e ser leal a você!
                 </p>
-                <div className="flex flex-col sm:flex-row sm:justify-between gap-5 ssm:gap-7 sm:gap-8">
-                    <div className="flex flex-col gap-1 text-xl md:text-2xl xl:text-3xl min-w-fit">
-                        <h3 className="">Idade: <span>8 anos</span></h3>
-                        <h3 className="">Sexo: <span>Macho</span></h3>
-                        <h3 className="">Porte: <span>Grande</span></h3>
-                        <h3 className="">Local: <span>São Paulo</span></h3>
+                <div className="flex flex-col sm:flex-row sm:justify-between  gap-5 ssm:gap-7 sm:gap-8">
+                    <div className="flex flex-col gap-1 text-xl md:text-2xl xl:text-3xl sm:max-w-[40%]">
+                        <h3>Idade: <span>8 anos</span></h3>
+                        <h3>Sexo: <span>Macho</span></h3>
+                        <h3>Porte: <span>Grande</span></h3>
+                        <h3>Estado: <span>São Paulo</span></h3>
+                        <h3 title={"São José do Vale do Rio Preto"} className="truncate">Cidade: <span>São José do Vale do Rio Preto</span></h3>
                     </div>
 
-                    <div className="flex flex-col gap-5 ssm:gap-7">
+                    <div className="flex flex-col gap-5 ssm:gap-7 sm:w-[60%]">
                         <div className="flex flex-col gap-1">
                             <h2 className="text-xl md:text-2xl xl:text-3xl font-semibold">Observações importantes:</h2>
                             <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-1 max-w-[400px] xl:max-w-[480px]">Bolt está chapado Bolt está chapado Bolt está chapado</p>
