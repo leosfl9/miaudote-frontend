@@ -178,11 +178,13 @@ export default function CadastroPet() {
         e.currentTarget.value = "";
         };
 
+    const [sending, setSending] = useState(false);
 
     // ---- Submit final ----
     const onSubmit = async (data: PetForm) => {
         console.log("Dados do animal:", data);
-        // console.log("Fotos cortadas:", data.fotos);
+        
+        setSending(true);
 
         try {
             const formData = new FormData();
@@ -228,6 +230,8 @@ export default function CadastroPet() {
                 timer: 1500
             });
 
+            router.push("/parceiro/home");
+
         } catch (error) {
             console.error("Erro ao enviar fotos:", error);
             Swal.fire({
@@ -237,6 +241,9 @@ export default function CadastroPet() {
                 showConfirmButton: false,
                 timer: 1500
             });
+        } finally {
+            setSending(false);
+
         }
 
     };

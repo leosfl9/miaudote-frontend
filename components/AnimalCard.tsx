@@ -42,7 +42,10 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
                     </div>
                     <div className="flex flex-wrap gap-4 text-[#7B7B7B] items-center">
                         <div className="flex gap-[6px] items-center">
-                            <Image alt="Ícone de cachorro" src={"/icon_cao.png"} width={20} height={20} />
+                            {especie == "Cachorro" ? 
+                                <Image alt="Ícone de cachorro" src={"/icon_cao.png"} width={20} height={20} /> 
+                                : <Image alt="Ícone de gato" src={"/icon_gato.png"} width={20} height={19} />}
+                            
                             <p className="text-sm font-medium">{especie}</p>
                         </div>
 
@@ -69,7 +72,7 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
                         </div>
                     )}
                     <Link href={href} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
-                        ${tipo == "solicitacao" ? "bg-miau-purple" : "bg-miau-orange"} text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
+                        ${(tipo == "solicitacao" || especie == "Gato") ? "bg-miau-purple" : "bg-miau-orange"} text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                         Visualizar
                     </Link>
                 </div>
