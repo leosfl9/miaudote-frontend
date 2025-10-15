@@ -9,7 +9,7 @@ interface CardProps {
     especie: string,
     idade: string,
     porte: string,
-    descricao: string,
+    descricao?: string,
     foto: string
 }
 
@@ -57,7 +57,7 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
                         </div>
                     </div>
                     <p className="text-sm text-[#7B7B7B] text-justify line-clamp-3 h-[60px]">
-                        {descricao} 
+                        {descricao == "" ? "Nenhuma descrição adicionada." : descricao} 
                     </p>
                 </div>
 

@@ -20,22 +20,20 @@ interface Animal {
 }
 
 export default function homeParceiro(){
-    const [animal, setAnimal] = useState<Animal | null>(null);
+    const [animais, setAnimais] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function carregarAnimal() {
+    async function carregarAnimais() {
       try {
-        const response = await fetch(`http://localhost:8080/fotos/first_animal/3`);
+        const response = await fetch(`http://localhost:8080/fotos/parceiro/37`);
         if (!response.ok) throw new Error("Erro ao buscar dados");
 
         const data = await response.json();
         console.log("Dados recebidos:", data);
 
-        // Agora o backend retorna apenas UM objeto
-        const item = data; 
-
-        const animalData: Animal = {
+        // Agora o backend retorna um array de objetos
+        const listaAnimais: Animal[] = data.map((item: any) => ({
           id: item.animal.id,
           nome: item.animal.nome,
           idade: item.animal.idade,
@@ -46,17 +44,17 @@ export default function homeParceiro(){
           sexo: item.animal.sexo,
           status: item.animal.status,
           foto: item.foto,
-        };
+        }));
 
-        setAnimal(animalData);
+        setAnimais(listaAnimais);
       } catch (error) {
-        console.error("Erro ao carregar animal:", error);
+        console.error("Erro ao carregar animais:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    carregarAnimal();
+    carregarAnimais();
   }, []);
 
     if (loading) {
@@ -83,12 +81,24 @@ export default function homeParceiro(){
                     <h3 className="font-semibold text-lg lg:text-2xl">Adicionar novo pet</h3>
                 </Link>
 
-                {animal ? (
-                  <AnimalCard tipo="parceiro" nome={animal.nome} especie={animal.especie} idade={(animal.idade).toString()} 
-                    porte={animal.porte} descricao={animal.descricao} foto={`data:image/jpeg;base64,${animal.foto}`} />
+                {animais.length > 0 ? (
+                  animais.map((animal) => (
+                    <AnimalCard
+                      key={animal.id}
+                      tipo="parceiro"
+                      nome={animal.nome}
+                      especie={animal.especie}
+                      idade={animal.idade.toString()}
+                      porte={animal.porte}
+                      descricao={animal.descricao}
+                      foto={`data:image/jpeg;base64,${animal.foto}`}
+                    />
+                  ))
                 ) : (
                   <div className="py-8 lg:px-6">
-                    <p className="text-center text-text-light-gray font-medium text-2xl">Nenhum animal cadastrado!</p>
+                    <p className="text-center text-text-light-gray font-medium text-2xl">
+                      Nenhum animal cadastrado!
+                    </p>
                   </div>
                 )}
 
