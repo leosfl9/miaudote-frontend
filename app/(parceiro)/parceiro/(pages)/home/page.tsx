@@ -21,43 +21,43 @@ interface Animal {
 
 export default function homeParceiro(){
     const [animal, setAnimal] = useState<Animal | null>(null);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-      async function carregarAnimal() {
-        try {
-          const response = await fetch(`http://localhost:8080/fotos/first_animal/3`);
-          if (!response.ok) throw new Error("Erro ao buscar dados");
+  useEffect(() => {
+    async function carregarAnimal() {
+      try {
+        const response = await fetch(`http://localhost:8080/fotos/first_animal/3`);
+        if (!response.ok) throw new Error("Erro ao buscar dados");
 
-          const data = await response.json();
-          console.log("Dados recebidos:", data);
+        const data = await response.json();
+        console.log("Dados recebidos:", data);
 
-          // Agora o backend retorna apenas UM objeto
-          const item = data; 
+        // Agora o backend retorna apenas UM objeto
+        const item = data; 
 
-          const animalData: Animal = {
-            id: item.animal.id,
-            nome: item.animal.nome,
-            idade: item.animal.idade,
-            especie: item.animal.especie,
-            descricao: item.animal.descricao,
-            obs: item.animal.obs,
-            porte: item.animal.porte,
-            sexo: item.animal.sexo,
-            status: item.animal.status,
-            foto: item.foto,
-          };
+        const animalData: Animal = {
+          id: item.animal.id,
+          nome: item.animal.nome,
+          idade: item.animal.idade,
+          especie: item.animal.especie,
+          descricao: item.animal.descricao,
+          obs: item.animal.obs,
+          porte: item.animal.porte,
+          sexo: item.animal.sexo,
+          status: item.animal.status,
+          foto: item.foto,
+        };
 
-          setAnimal(animalData);
-        } catch (error) {
-          console.error("Erro ao carregar animal:", error);
-        } finally {
-          setLoading(false);
-        }
+        setAnimal(animalData);
+      } catch (error) {
+        console.error("Erro ao carregar animal:", error);
+      } finally {
+        setLoading(false);
       }
+    }
 
-      carregarAnimal();
-    }, []);
+    carregarAnimal();
+  }, []);
 
     if (loading) {
         return (

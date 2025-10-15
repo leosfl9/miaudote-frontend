@@ -181,23 +181,33 @@ export default function CadastroPet() {
 
     // ---- Submit final ----
     const onSubmit = async (data: PetForm) => {
-        // console.log("Dados do animal:", data);
+        console.log("Dados do animal:", data);
         // console.log("Fotos cortadas:", data.fotos);
 
         try {
             const formData = new FormData();
 
-            // supondo que data.fotos seja um array de File (ex: vindo de input type="file")
-            data.fotos.forEach(foto => {
-                formData.append("files", foto); // o nome deve bater com o parâmetro @RequestParam no backend
+            // Campos simples — cada um em texto plano
+            formData.append("parceiroId", "37"); // ou variável dinâmica
+            formData.append("especie", data.especie);
+            formData.append("nome", data.nome);
+            formData.append("sexo", data.sexo);
+            formData.append("porte", data.porte);
+            formData.append("status", "Disponível"); // valor fixo ou dinâmico
+            formData.append("idadeInicial", data.idade);
+            formData.append("obs", data.obs || "");
+            formData.append("descricao", data.descricao || "");
+
+            // Arquivos — mesmo nome que no DTO (provavelmente "fotos")
+            data.fotos.forEach((foto) => {
+            formData.append("fotos", foto);
             });
 
-            const response = await fetch("http://localhost:8080/fotos/cadastrar/3", {
-                method: "POST",
-                body: formData, // ⚠️ sem Content-Type! o browser define o boundary automaticamente
+            // Envio do FormData (sem header Content-Type!)
+            const response = await fetch("http://localhost:8080/animais/cadastrar", {
+            method: "POST",
+            body: formData,
             });
-
-            console.log(response);
 
             if (!response.ok) {
                 Swal.fire({
@@ -213,7 +223,7 @@ export default function CadastroPet() {
             Swal.fire({
                 position: "top",
                 icon: "success",
-                title: "Fotos enviadas com sucesso!",
+                title: "Animal cadastrado com sucesso!",
                 showConfirmButton: false,
                 timer: 1500
             });
@@ -229,53 +239,6 @@ export default function CadastroPet() {
             });
         }
 
-
-        // try {
-        //     const payload = {
-        //         especie: data.especie,
-        //         nome: data.nome,
-        //         sexo: data.sexo,
-        //         porte: data.porte,
-        //         idade_inicial: data.idade,
-        //         status_ani: "Disponível",
-        //         fotos: data.fotos,
-        //         obs: data.obs,
-        //         descricao: data.descricao,
-        //     };
-
-        //     console.log("Enviando dados:", payload);
-
-        //     const response = await fetch("http://localhost:8080/animais/cadastrar/4", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(payload),
-        //     });
-
-        //     if (!response.ok) {
-        //         Swal.fire({
-        //             position: "top",
-        //             icon: "error",
-        //             title: "Erro ao cadastrar!",
-        //             showConfirmButton: false,
-        //             timer: 1500
-        //         });
-        //         return;
-        //     }
-
-        //     console.log("Cadastro realizado com sucesso!");
-
-        // } catch (error) {
-        //     console.error("Erro ao enviar cadastro:", error);
-        //     Swal.fire({
-        //         position: "top",
-        //         icon: "error",
-        //         title: "Erro ao cadastrar!",
-        //         showConfirmButton: false,
-        //         timer: 1500
-        //     });
-        // }
     };
 
 
@@ -395,8 +358,9 @@ export default function CadastroPet() {
                             Cancelar
                         </button>
 
-                        <button type="button" className="px-4 py-2 font-semibold text-lg bg-miau-green hover:bg-miau-green/80 active:bg-miau-green/80 
-                            text-white rounded-md cursor-pointer" onClick={handleConfirmCrop} disabled={isDisabled} >
+                        <button type="button" className={`px-4 py-2 font-semibold text-lg text-white
+                            ${isDisabled ? "bg-miau-green/70" : "bg-miau-green hover:bg-miau-green/80 active:bg-miau-green/80"} rounded-md cursor-pointer`} 
+                            onClick={handleConfirmCrop} disabled={isDisabled} >
                             {isDisabled ? "Enviando..." : "Confirmar"}
                         </button>
                     </div>
