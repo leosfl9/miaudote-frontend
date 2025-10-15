@@ -11,11 +11,11 @@ export default function homeAdotante(){
             </div>
 
             <div className="flex flex-col plg:flex-row plg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* <AnimalCard tipo="adotante" favorito />
                 <AnimalCard tipo="adotante" favorito />
                 <AnimalCard tipo="adotante" favorito />
                 <AnimalCard tipo="adotante" favorito />
-                <AnimalCard tipo="adotante" favorito />
-                <AnimalCard tipo="adotante" favorito />
+                <AnimalCard tipo="adotante" favorito /> */}
 
             </div>
         </div>

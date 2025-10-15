@@ -64,11 +64,11 @@ export default function homeAdotante(){
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
 
+                {/* <AnimalCard tipo="adotante" />
                 <AnimalCard tipo="adotante" />
                 <AnimalCard tipo="adotante" />
                 <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" />
+                <AnimalCard tipo="adotante" /> */}
 
             </div>
         </div>
