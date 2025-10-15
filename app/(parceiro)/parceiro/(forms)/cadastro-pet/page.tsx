@@ -189,7 +189,7 @@ export default function CadastroPet() {
 
             // supondo que data.fotos seja um array de File (ex: vindo de input type="file")
             data.fotos.forEach(foto => {
-                formData.append("file", foto); // o nome deve bater com o parâmetro @RequestParam no backend
+                formData.append("files", foto); // o nome deve bater com o parâmetro @RequestParam no backend
             });
 
             const response = await fetch("http://localhost:8080/fotos/cadastrar/3", {

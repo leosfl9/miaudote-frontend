@@ -172,7 +172,6 @@ export default function PerfilAdotante() {
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
                 <div className="w-10 h-10 border-4 border-background border-t-transparent rounded-full animate-spin"></div>
                 <p className="text-background font-medium text-xl">Carregando...</p>
-                {/* opcional: pode trocar por um spinner bonito */}
             </div>
         );
     }

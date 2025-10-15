@@ -6,32 +6,67 @@ import AnimalCard from "@/components/AnimalCard";
 
 import { useEffect, useState } from "react";
 
-interface Foto {
+interface Animal {
+  id: number;
+  nome: string;
+  idade: number;
+  especie: string;
+  descricao: string;
+  obs: string;
+  porte: string;
+  sexo: string;
+  status: string;
   foto: string;
 }
 
 export default function homeParceiro(){
-    const [fotos, setFotos] = useState<Foto[]>([]);
+    const [animal, setAnimal] = useState<Animal | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-    async function carregarFotos() {
-      try {
-        const response = await fetch(`http://localhost:8080/fotos/animal/3`);
-        if (!response.ok) throw new Error("Erro ao buscar fotos");
+      async function carregarAnimal() {
+        try {
+          const response = await fetch(`http://localhost:8080/fotos/first_animal/3`);
+          if (!response.ok) throw new Error("Erro ao buscar dados");
 
-        const data = await response.json();
+          const data = await response.json();
+          console.log("Dados recebidos:", data);
 
-        console.log("Fotos recebidas:", data);
+          // Agora o backend retorna apenas UM objeto
+          const item = data; 
 
-        // supondo que o backend retorna uma lista de strings base64
-        setFotos(data);
-      } catch (error) {
-        console.error("Erro ao carregar fotos:", error);
+          const animalData: Animal = {
+            id: item.animal.id,
+            nome: item.animal.nome,
+            idade: item.animal.idade,
+            especie: item.animal.especie,
+            descricao: item.animal.descricao,
+            obs: item.animal.obs,
+            porte: item.animal.porte,
+            sexo: item.animal.sexo,
+            status: item.animal.status,
+            foto: item.foto,
+          };
+
+          setAnimal(animalData);
+        } catch (error) {
+          console.error("Erro ao carregar animal:", error);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
 
-    carregarFotos();
-  }, []);
+      carregarAnimal();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
+                <div className="w-10 h-10 border-4 border-background border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-background font-medium text-xl">Carregando...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
@@ -48,22 +83,14 @@ export default function homeParceiro(){
                     <h3 className="font-semibold text-lg lg:text-2xl">Adicionar novo pet</h3>
                 </Link>
 
-                <AnimalCard tipo="parceiro" />
-                <AnimalCard tipo="parceiro" />
-                <AnimalCard tipo="parceiro" />
-
-                {/* {fotos.length > 0 ? (
-                    fotos.map((fotoBase64, index) => (
-                    <img
-                        key={index}
-                        src={`data:image/jpeg;base64,${fotoBase64.foto}`}
-                        alt={`Foto ${index + 1}`}
-                        className="w-40 h-40 object-cover rounded-lg shadow"
-                    />
-                    ))
+                {animal ? (
+                  <AnimalCard tipo="parceiro" nome={animal.nome} especie={animal.especie} idade={(animal.idade).toString()} 
+                    porte={animal.porte} descricao={animal.descricao} foto={`data:image/jpeg;base64,${animal.foto}`} />
                 ) : (
-                    <p>Nenhuma foto disponível</p>
-                )} */}
+                  <div className="py-8 lg:px-6">
+                    <p className="text-center text-text-light-gray font-medium text-2xl">Nenhum animal cadastrado!</p>
+                  </div>
+                )}
 
             </div>
         </div>

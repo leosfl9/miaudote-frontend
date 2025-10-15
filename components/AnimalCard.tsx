@@ -5,15 +5,21 @@ import Link from "next/link";
 interface CardProps {
     tipo: string;
     favorito?: boolean;
+    nome: string,
+    especie: string,
+    idade: string,
+    porte: string,
+    descricao: string,
+    foto: string
 }
 
-export default function AnimalCard({tipo, favorito}: CardProps){
+export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto}: CardProps){
     const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet`;
     
     return(
-        <div className="flex flex-col max-w-[380px] bg-white rounded-xl">
-            <div className="relative w-full min-h-64">
-                <Image alt="Imagem do animal" src={"/Bolt.jpeg"} className="rounded-t-xl object-cover object-center" fill/>
+        <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
+            <div className="relative w-full">
+                <img alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center h-64 w-full"/>
             </div>
 
             <div className="flex flex-col gap-8 px-5 py-5">
@@ -21,7 +27,7 @@ export default function AnimalCard({tipo, favorito}: CardProps){
                     <div className="flex flex-col sssm:flex-row sssm:justify-between gap-3 sssm:gap-0 sssm:items-start">
                         <div className="min-w-0">
                             <h4 className={`text-text-light-gray text-2xl font-bold truncate max-w-[16ch] ${tipo == "solicitacao" ? "sssm:max-w-[200px] ssm:max-w-[248px]" : "sssm:max-w-[20ch] ssm:max-w-none"}`}>
-                                BoltBoltBoltBoltaaaaaaa</h4>
+                                {nome}</h4>
                             { (tipo == "adotante" || tipo == "solicitacao") && (
                                 <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis line-clamp-1">ONG Amigos dos Animais</h5>
                             )}
@@ -37,21 +43,21 @@ export default function AnimalCard({tipo, favorito}: CardProps){
                     <div className="flex flex-wrap gap-4 text-[#7B7B7B] items-center">
                         <div className="flex gap-[6px] items-center">
                             <Image alt="Ícone de cachorro" src={"/icon_cao.png"} width={20} height={20} />
-                            <p className="text-sm font-medium">Cão</p>
+                            <p className="text-sm font-medium">{especie}</p>
                         </div>
 
                         <div className="flex gap-[6px] items-center">
                             <CalendarDays className="w-5 h-5" />
-                            <p className="text-sm font-medium">6 anos</p>
+                            <p className="text-sm font-medium"><span>{idade}</span> ano<span>{parseInt(idade) > 1 ? "s" : ""}</span></p>
                         </div>
 
                         <div className="flex gap-[6px] items-center">
                             <Ruler className="w-5 h-5" />
-                            <p className="text-sm font-medium">Pequeno</p>
+                            <p className="text-sm font-medium">{porte}</p>
                         </div>
                     </div>
-                    <p className="text-sm text-[#7B7B7B] text-justify line-clamp-3">
-                        Thor é um cachorro muito brincalhão e cheio de energia. Adora passeios e se dá bem com crianças e outros animais. 
+                    <p className="text-sm text-[#7B7B7B] text-justify line-clamp-3 h-[60px]">
+                        {descricao} 
                     </p>
                 </div>
 
