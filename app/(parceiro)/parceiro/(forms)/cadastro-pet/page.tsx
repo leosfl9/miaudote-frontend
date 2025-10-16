@@ -207,8 +207,8 @@ export default function CadastroPet() {
 
             // Envio do FormData (sem header Content-Type!)
             const response = await fetch("http://localhost:8080/animais/cadastrar", {
-            method: "POST",
-            body: formData,
+                method: "POST",
+                body: formData,
             });
 
             if (!response.ok) {
