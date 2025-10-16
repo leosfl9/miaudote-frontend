@@ -3,7 +3,7 @@
 import LinkButton from "@/components/LinkButton";
 import AnimalPresentation from "@/components/AnimalPresentation";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 interface Animal {
   id: number;
@@ -25,7 +25,9 @@ interface Animal {
   };
 }
 
-export default function PetDetails() {
+export default function PetDetails({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+
     const [animal, setAnimal] = useState<Animal | null>(null);
     const [fotos, setFotos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function PetDetails() {
     useEffect(() => {
         async function carregarAnimal() {
             try {
-            const response = await fetch(`http://localhost:8080/fotos/animal/15`);
+            const response = await fetch(`http://localhost:8080/fotos/animal/${id}`);
             if (!response.ok) throw new Error("Erro ao buscar dados");
 
             const data = await response.json();
@@ -56,7 +58,7 @@ export default function PetDetails() {
         }
 
         carregarAnimal();
-    }, []);
+    }, [id]);
 
     if (loading) {
         return (

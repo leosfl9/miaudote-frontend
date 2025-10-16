@@ -68,17 +68,17 @@ export default function AnimalPresentation ({
                 </p>
                 <div id="teste" className="flex flex-col sm:flex-row sm:justify-between w-full gap-5 ssm:gap-7 sm:gap-8">
                     <div className="flex flex-col gap-1 text-xl md:text-2xl xl:text-3xl w-full text-left sm:max-w-[35%] self-start">
-                        <p>Idade: <span>{idade}</span> ano<span>{(idade > 1) ? "s" : ""}</span></p>
-                        <h3>Sexo: <span>{sexo}</span></h3>
-                        <h3>Porte: <span>{porte}</span></h3>
-                        <h3>Estado: <span>{estado}</span></h3>
-                        <h3 title={cidade} className="truncate">Cidade: <span>{cidade}</span></h3>
+                        <h3 className="font-semibold">Idade: <span className="font-normal">{idade}</span > <span className="font-normal">ano</span><span className="font-normal">{(idade > 1) ? "s" : ""}</span></h3>
+                        <h3 className="font-semibold">Sexo: <span className="font-normal">{sexo}</span></h3>
+                        <h3 className="font-semibold">Porte: <span className="font-normal">{porte}</span></h3>
+                        <h3 className="font-semibold">Estado: <span className="font-normal">{estado}</span></h3>
+                        <h3 title={cidade} className="truncate font-semibold">Cidade: <span className="font-normal">{cidade}</span></h3>
                     </div>
 
                     <div className="flex flex-col gap-5 ssm:gap-7 sm:w-[65%]">
                         <div className="flex flex-col gap-1">
                             <h2 className="text-xl md:text-2xl xl:text-3xl font-semibold">Observações importantes:</h2>
-                            <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-1 max-w-[400px] xl:max-w-none" title={obs}>{obs}</p>
+                            <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-2 max-w-[400px] xl:max-w-none" title={obs}>{obs}</p>
                         </div>
                         <div className="flex flex-col xsm:flex-row sm:flex-col xl:flex-row gap-3">
                             <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
