@@ -20,7 +20,7 @@ interface Animal {
 }
 
 export default function homeParceiro(){
-    const [animais, setAnimais] = useState<Animal[]>([]);
+  const [animais, setAnimais] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
