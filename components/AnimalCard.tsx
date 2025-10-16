@@ -12,10 +12,12 @@ interface CardProps {
     descricao?: string,
     foto: string,
     status?: string
+    href?: string;
+    idPet: number;
 }
 
-export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status}: CardProps){
-    const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet`;
+export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet}: CardProps){
+    const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet/${idPet}`;
     
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">

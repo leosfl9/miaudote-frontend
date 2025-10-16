@@ -85,6 +85,7 @@ export default function homeParceiro(){
                   animais.map((animal) => (
                     <AnimalCard
                       key={animal.id}
+                      idPet={animal.id}
                       tipo="parceiro"
                       nome={animal.nome}
                       especie={animal.especie}

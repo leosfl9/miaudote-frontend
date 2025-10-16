@@ -79,7 +79,7 @@ export default function PetDetails({ params }: { params: Promise<{ id: string }>
 
             {animal ? 
                 <AnimalPresentation tipo="parceiro" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
-                porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} qtdFotos={fotos.length}
+                porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
                 fotos={fotos} href="/parceiro/editar-pet" /> : 
                 ""}
             

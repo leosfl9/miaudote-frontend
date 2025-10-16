@@ -8,19 +8,19 @@ interface PresentationProps {
     onOpenModalCancela?: () => void;
     href: string;
     nome: string;
-    descricao: string;
+    especie: string;
+    descricao?: string;
     idade: number;
-    obs: string;
+    obs?: string;
     sexo: string;
     porte: string;
     estado: string;
     cidade: string;
-    qtdFotos: number;
     fotos: string[];
 }
 
 export default function AnimalPresentation ({
-    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, sexo, estado, cidade, qtdFotos, fotos}: PresentationProps) {
+    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, sexo, estado, cidade, fotos, especie}: PresentationProps) {
     let texto = ""
 
     if (tipo == "adotante") 
@@ -30,8 +30,8 @@ export default function AnimalPresentation ({
     else texto = "Whatsapp parceiro"
 
     return (
-        <div className="bg-miau-orange py-6 ssm:py-8 2xl:py-10 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-10 
-            w-full max-w-[1480px] items-center">
+        <div className={`${especie == "Gato" ? "bg-miau-purple" : "bg-miau-orange"} py-6 ssm:py-8 2xl:py-10 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-10 
+            w-full max-w-[1480px] items-center`}>
             <div className="flex flex-col gap-2 w-full lg:order-2 items-center lg:w-[30vw]">
                 {fotos.length > 0 ? (
                     <img
@@ -63,8 +63,9 @@ export default function AnimalPresentation ({
                 {tipo == "solicitacao" && (
                     <p className="text-base text-background font-medium text-center -mt-6">Solicitado em: <span>10/02/2025</span></p>
                 )}
-                <p className="text-xl md:text-2xl xl:text-3xl text-justify sm:line-clamp-5 lg:h-[160px] xl:h-[180px]" title={descricao}>
-                    {descricao}
+                <p className="text-xl md:text-2xl xl:text-3xl text-justify sm:line-clamp-5 lg:h-[160px] xl:h-[180px]" 
+                    title={descricao ? descricao : "Nenhuma descrição adicionada"}>
+                    {descricao ? descricao : "Nenhuma descrição adicionada."}
                 </p>
                 <div id="teste" className="flex flex-col sm:flex-row sm:justify-between w-full gap-5 ssm:gap-7 sm:gap-8">
                     <div className="flex flex-col gap-1 text-xl md:text-2xl xl:text-3xl w-full text-left sm:max-w-[35%] self-start">
@@ -78,7 +79,8 @@ export default function AnimalPresentation ({
                     <div className="flex flex-col gap-5 ssm:gap-7 sm:w-[65%]">
                         <div className="flex flex-col gap-1">
                             <h2 className="text-xl md:text-2xl xl:text-3xl font-semibold">Observações importantes:</h2>
-                            <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-2 max-w-[400px] xl:max-w-none" title={obs}>{obs}</p>
+                            <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-2 max-w-[400px] xl:max-w-none" 
+                            title={obs ? obs : "Nenhuma observação adicionada"}>{obs ? obs : "Nenhuma observação adicionada."}</p>
                         </div>
                         <div className="flex flex-col xsm:flex-row sm:flex-col xl:flex-row gap-3">
                             <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
