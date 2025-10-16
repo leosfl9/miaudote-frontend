@@ -56,7 +56,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         const fetchAnimal = async () => {
             try {
                 const res = await fetch(`http://localhost:8080/animais/${id}`);
-                if (!res.ok) throw new Error("Erro ao buscar usuário");
+                if (!res.ok) throw new Error("Erro ao buscar animal");
 
                 const animal = await res.json();
                 console.log(animal);
@@ -73,7 +73,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false); // <-- termina o carregamento
+                setLoading(false);
             }
         };
 
