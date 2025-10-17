@@ -26,21 +26,26 @@ export default function SolicitacoesAdocao(){
             const data = await response.json();
             console.log("Dados recebidos:", data);
 
-            const listaSolicitacoes: Solicitacao[] = data.map((item: any) => ({
-                id: item.id,
-                idPet: item.foto.animal.id,
-                idAdotante: item.adotante.id,
-                nomePet: item.foto.animal.nome,
-                nomeAdotante: item.adotante.nome,
-                // data: item.data,
-                status: item.status,
-                foto: item.foto.foto,
-            }));
+            const listaSolicitacoes: Solicitacao[] = data.map((item: any) => {
+                const [ano, mes, dia] = item.adocao.dataCadastro.split("-");
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                return {
+                    id: item.adocao.id,
+                    idPet: item.adocao.animal.id,
+                    idAdotante: item.adocao.adotante.id,
+                    nomePet: item.adocao.animal.nome,
+                    nomeAdotante: item.adocao.adotante.nome,
+                    data: dataFormatada,
+                    status: item.adocao.status,
+                    foto: item.foto.foto,
+                };
+            });
 
             setSolitacoes(listaSolicitacoes);
 
             } catch (error) {
-            console.error("Erro ao carregar solicitações:", error);
+                console.error("Erro ao carregar solicitações:", error);
             } finally {
                 setLoading(false);
             }
@@ -74,6 +79,7 @@ export default function SolicitacoesAdocao(){
                             nome={solicitacao.nomePet}
                             adotante={solicitacao.nomeAdotante}
                             status={solicitacao.status}
+                            data={solicitacao.data}
                             foto={`data:image/jpeg;base64,${solicitacao.foto}`} 
                         />
                     ))

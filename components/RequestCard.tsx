@@ -4,7 +4,7 @@ import Link from "next/link";
 interface RequestProps {
     nome: string;
     adotante: string;
-    data?: string;
+    data: string;
     status: string;
     foto: string;
 }
@@ -25,7 +25,7 @@ export default function RequestCard ({nome, adotante, data, status, foto}: Reque
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 sm:items-center text-center pb-1">
-                <h2 className="text-text-gray text-sm">Solicitado em: <span>11/02/2025</span></h2>
+                <h2 className="text-text-gray text-sm">Solicitado em: <span>{data}</span></h2>
                 <Link href={"/parceiro/detalhes-solicitacao"} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-full sm:w-fit
                 bg-miau-orange text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                     Ver detalhes

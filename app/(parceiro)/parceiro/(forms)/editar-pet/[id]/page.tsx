@@ -22,7 +22,7 @@ import { useRouter } from "next/navigation";
 const petSchema = z.object({
     nome: z.string().min(2, "Nome é obrigatório"),
     especie: z.string().min(1, "Selecione a espécie"),
-    idade: z.string().min(1, "Idade é obrigatória"),
+    idade: z.number().min(1, "Idade é obrigatória"),
     sexo: z.string().min(1, "Selecione o sexo"),
     porte: z.string().min(1, "Selecione o porte"),
     status: z.string().min(1, "Selecione o status"),
