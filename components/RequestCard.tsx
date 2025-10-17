@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface RequestProps {
+    id: number;
     nome: string;
     adotante: string;
     data: string;
@@ -9,7 +10,7 @@ interface RequestProps {
     foto: string;
 }
 
-export default function RequestCard ({nome, adotante, data, status, foto}: RequestProps) {
+export default function RequestCard ({id, nome, adotante, data, status, foto}: RequestProps) {
     return (
         <div className="bg-white flex flex-col items-center gap-5 sm:gap-8 py-4 px-6 rounded-xl min-w-[220px]">
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-center sm:items-start sm:self-start">
@@ -26,7 +27,7 @@ export default function RequestCard ({nome, adotante, data, status, foto}: Reque
             </div>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 sm:items-center text-center pb-1">
                 <h2 className="text-text-gray text-sm">Solicitado em: <span>{data}</span></h2>
-                <Link href={"/parceiro/detalhes-solicitacao"} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-full sm:w-fit
+                <Link href={`/parceiro/detalhes-solicitacao/${id}`} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-full sm:w-fit
                 bg-miau-orange text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                     Ver detalhes
                 </Link>

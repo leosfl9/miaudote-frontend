@@ -76,6 +76,7 @@ export default function SolicitacoesAdocao(){
                     solicitacoes.map((solicitacao) => (
                         <RequestCard 
                             key={solicitacao.id}
+                            id={solicitacao.id}
                             nome={solicitacao.nomePet}
                             adotante={solicitacao.nomeAdotante}
                             status={solicitacao.status}
