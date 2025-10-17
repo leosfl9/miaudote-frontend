@@ -77,7 +77,7 @@ export default function AnimalPresentation ({
                 {tipo == "solicitacao" && (
                     <p className="text-base text-background font-medium text-center -mt-6">Solicitado em: <span>10/02/2025</span></p>
                 )}
-                <p className="text-xl md:text-2xl xl:text-3xl text-justify sm:line-clamp-5 lg:h-[160px] xl:h-[180px]" 
+                <p className="text-xl md:text-2xl xl:text-3xl text-justify line-clamp-7 sm:line-clamp-4 lg:h-[128px] xl:h-fit" 
                     title={descricao ? descricao : "Nenhuma descrição adicionada"}>
                     {descricao ? descricao : "Nenhuma descrição adicionada."}
                 </p>
