@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link";
+import { useState } from "react";
 
 interface PresentationProps {
     tipo: string;
@@ -20,7 +21,7 @@ interface PresentationProps {
 }
 
 export default function AnimalPresentation ({
-    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, sexo, estado, cidade, fotos, especie}: PresentationProps) {
+    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, sexo, estado, cidade, fotos: fotosIniciais, especie}: PresentationProps) {
     let texto = ""
 
     if (tipo == "adotante") 
@@ -29,19 +30,31 @@ export default function AnimalPresentation ({
         texto = "Editar informações"
     else texto = "Whatsapp parceiro"
 
+    const [fotos, setFotos] = useState(fotosIniciais);
+
+    const trocarPrincipal = (index: number) => {
+        if (index === 0) return;
+        
+        const novasFotos = [...fotos];
+        const temp = novasFotos[0];
+        novasFotos[0] = novasFotos[index];
+        novasFotos[index] = temp;
+        setFotos(novasFotos);
+    };
+
     return (
         <div className={`${especie == "Gato" ? "bg-miau-purple" : "bg-miau-orange"} py-6 ssm:py-8 2xl:py-10 px-6 sm:px-12 md:px-20 lg:pr-4 rounded-4xl flex flex-col lg:flex-row gap-4 md:gap-8 lg:gap-10 
             w-full max-w-[1480px] items-center`}>
             <div className="flex flex-col gap-2 w-full lg:order-2 items-center lg:w-[30vw]">
                 {fotos.length > 0 ? (
                     <img
-                    alt={`Foto principal de ${nome}`}
+                    alt={`Foto principal do ${nome}`}
                     src={`data:image/jpeg;base64,${fotos[0]}`}
                     className="object-cover object-center rounded-2xl shrink-0 w-full max-w-[380px] h-64 ssm:h-80 xl:h-96"
                     />
                 ) : (
                     <div className="w-full max-w-[380px] h-64 ssm:h-80 xl:h-96 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-500">
-                    Sem foto
+                        Sem foto
                     </div>
                 )}
 
@@ -51,7 +64,8 @@ export default function AnimalPresentation ({
                         key={i}
                         src={`data:image/jpeg;base64,${foto}`}
                         alt={`Foto ${i + 2} de ${nome}`}
-                        className={`rounded-lg w-20 h-20 object-cover ${
+                        onClick={() => trocarPrincipal(i + 1)}
+                        className={`rounded-lg w-20 h-20 object-cover cursor-pointer ${
                             i === 3 ? "hidden ssm:inline lg:hidden lxl:!inline" : ""
                         }`}
                         />
@@ -80,7 +94,7 @@ export default function AnimalPresentation ({
                         <div className="flex flex-col gap-1">
                             <h2 className="text-xl md:text-2xl xl:text-3xl font-semibold">Observações importantes:</h2>
                             <p className="text-xl md:text-2xl xl:text-3xl overflow-hidden text-ellipsis line-clamp-2 max-w-[400px] xl:max-w-none" 
-                            title={obs ? obs : "Nenhuma observação adicionada"}>{obs ? obs : "Nenhuma observação adicionada."}</p>
+                                title={obs ? obs : "Nenhuma observação adicionada"}>{obs ? obs : "Nenhuma observação adicionada."}</p>
                         </div>
                         <div className="flex flex-col xsm:flex-row sm:flex-col xl:flex-row gap-3">
                             <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
