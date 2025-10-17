@@ -17,18 +17,20 @@ export default function RequestCard ({id, nome, adotante, data, status, foto}: R
                 <img src={foto} alt="Imagem do pet" className="rounded-full object-cover w-24 h-24" />
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col text-center sm:text-start">
-                        <h1 className="text-xl font-semibold text-text-light-gray truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">{nome}</h1>
-                        <h2 className="text-text-gray text-sm truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">Adotante: <span>{adotante}</span></h2>
+                        <h1 className="text-xl font-semibold text-text-light-gray truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">
+                            {nome}</h1>
+                        <h2 className="text-text-gray text-sm truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">
+                            Adotante: <span>{adotante}</span></h2>
                     </div>
-                    <div className="bg-hr rounded-md px-4 py-2 w-fit self-center sm:self-start">
-                        <p className="text-sm text-text-light-gray font-bold">{status}</p>
+                    <div className={`${status == "Em Aberto" ? "bg-miau-green text-background" : "bg-hr text-text-light-gray"} rounded-md px-4 py-2 w-fit self-center sm:self-start`}>
+                        <p className="text-sm font-bold">{status}</p>
                     </div>
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-8 sm:items-center text-center pb-1">
                 <h2 className="text-text-gray text-sm">Solicitado em: <span>{data}</span></h2>
                 <Link href={`/parceiro/detalhes-solicitacao/${id}`} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-full sm:w-fit
-                bg-miau-orange text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
+                bg-miau-purple text-background hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                     Ver detalhes
                 </Link>
             </div>
