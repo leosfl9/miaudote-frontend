@@ -21,7 +21,7 @@ import Swal from "sweetalert2";
 const parceiroSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     email: z.email("E-mail inválido"), 
-    telefone: z.string().regex(/^\(\d{2}\)\s(9\d{4}-\d{4}|\d{4}-\d{4})$/, "Telefone inválido"), 
+    telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
     senha: z.string().max(70, "Máx. 70 caracteres"), 
     confSenha: z.string().max(70, "Máx. 70 caracteres"), 
     site: z.string().optional(), 
@@ -201,13 +201,12 @@ export default function Configuracoes() {
                     <div className="flex flex-col w-full gap-2">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-3">
                             <InputField label="Nome da ONG/Protetor *" maxLength={100} {...register("nome")} onFocus={() => clearErrors("nome")} 
-                                error={errors.nome?.message} name="nome" type="text" placeholder="Digite seu nome e sobrenome" className="mb-2" />
-                            <InputField label="Telefone *" {...register("telefone")} onFocus={() => clearErrors("telefone")} 
-                                error={errors.telefone?.message} name="telefone" mask={[{mask: "(00) 0000-0000", overwrite: true}, {mask: "(00) 00000-0000", overwrite: true}]}
-                                type="text" inputMode="numeric" placeholder="(00) 00000-0000" className="mb-2" />
+                                error={errors.nome?.message} name="nome" type="text" placeholder="Digite o nome" className="mb-2" />
+                            <InputField label="Celular / Whatsapp *" {...register("telefone")} onFocus={() => clearErrors("telefone")} error={errors.telefone?.message} 
+                                name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="Digite um número para contato" className="mb-2" />
                             <div className="sm:col-span-2 lg:col-span-1">
                                 <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
-                                    error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
+                                    error={errors.email?.message} name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
                             </div>
                         </div>
 
@@ -218,7 +217,7 @@ export default function Configuracoes() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 lg:gap-3">
                             <InputField label="Nova senha" maxLength={70} {...register("senha")} onFocus={() => clearErrors("senha")} 
-                                error={errors.senha?.message} name="senha" type="password" placeholder="Sua nova senha" className="mb-2" />
+                                error={errors.senha?.message} name="senha" type="password" placeholder="Nova senha" className="mb-2" />
                             <InputField label="Confirmar nova senha" maxLength={70} {...register("confSenha")} onFocus={() => clearErrors("confSenha")} 
                                 error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Repita a nova senha" className="mb-2" />
                         </div>

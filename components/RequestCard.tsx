@@ -16,7 +16,7 @@ export default function RequestCard ({nome, adotante, data, status, foto}: Reque
                 <img src={foto} alt="Imagem do pet" className="rounded-full object-cover w-24 h-24" />
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-col text-center sm:text-start">
-                        <h1 className="text-xl font-medium text-text-light-gray truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">{nome}</h1>
+                        <h1 className="text-xl font-semibold text-text-light-gray truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">{nome}</h1>
                         <h2 className="text-text-gray text-sm truncate overflow-hidden whitespace-nowrap max-w-[170px] sm:max-w-[206px]">Adotante: <span>{adotante}</span></h2>
                     </div>
                     <div className="bg-hr rounded-md px-4 py-2 w-fit self-center sm:self-start">

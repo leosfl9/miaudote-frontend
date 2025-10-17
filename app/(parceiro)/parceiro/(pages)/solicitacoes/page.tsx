@@ -20,7 +20,7 @@ export default function SolicitacoesAdocao(){
     useEffect(() => {
         async function carregarSolicitacoes() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/parceiro/38`);
+            const response = await fetch(`http://localhost:8080/adocoes/parceiro/37`);
             if (!response.ok) throw new Error("Erro ao buscar dados");
 
             const data = await response.json();

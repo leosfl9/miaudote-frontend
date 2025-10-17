@@ -37,7 +37,7 @@ const cadastroSchema = z.object({
             });
         }
     }),
-    telefone: z.string().regex(/^\(\d{2}\)\s(9\d{4}-\d{4}|\d{4}-\d{4})$/, "Telefone inválido"), 
+    telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
     senha: z.string().superRefine((val, ctx) => {
         const {valido, mensagem} = validaSenha(val, 8);
         if (!valido) {
@@ -163,9 +163,8 @@ export default function CadastroParceiro() {
                             name="documento" type="text" placeholder="Digite o CNPJ ou CPF" className="mb-2" />
                         <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
                             error={errors.email?.message} name="email" type="text" placeholder="Digite o e-mail" className="mb-2" />
-                        <InputField label="Telefone *" {...register("telefone")} onFocus={() => clearErrors("telefone")} 
-                            error={errors.telefone?.message} mask={[{mask: "(00) 0000-0000", overwrite: true}, {mask: "(00) 00000-0000", overwrite: true}]} 
-                            name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
+                        <InputField label="Telefone *" {...register("telefone")} onFocus={() => clearErrors("telefone")} error={errors.telefone?.message} 
+                            mask={"(00) 00000-0000"} name="telefone" type="text" placeholder="Digite o telefone" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
