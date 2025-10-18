@@ -19,6 +19,7 @@ interface Animal {
   parceiro: string;
   estado: string;
   favorito: boolean;
+  favoritoId: number | null;
 }
 
 export default function homeAdotante(){
@@ -91,6 +92,7 @@ export default function homeAdotante(){
           parceiro: item.animal.parceiro.nome,
           estado: item.animal.parceiro.estado,
           favorito: item.favorito,
+          favoritoId: item.favoritoId,
         }));
 
         setAnimais(listaAnimais);
@@ -102,42 +104,44 @@ export default function homeAdotante(){
       }
     }
 
-    async function handleFavorito(idPet: number, favorito: boolean) {
+    async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
         try {
             setLoading(true);
 
-            if (favorito) {
-                const response = await fetch(`http://localhost:8080/favoritos/${idPet}`, {
-                    method: "DELETE",
-                });
-                if (!response.ok) throw new Error("Erro ao remover favorito");
+            if (favorito && favoritoId !== null) {
+            // 🔥 Remover dos favoritos
+            const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) throw new Error("Erro ao remover favorito");
 
-                setAnimais((prev) =>
-                    prev.map((animal) =>
-                        animal.id === idPet ? { ...animal, favorito: false } : animal
-                    )
-                );
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet ? { ...animal, favorito: false, favoritoId: null } : animal
+                )
+            );
             } else {
-                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        adotanteId: 36, 
-                        animalId: idPet,
-                    }),
-                });
-                if (!response.ok) throw new Error("Erro ao adicionar favorito");
+            // 💚 Adicionar aos favoritos
+            const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                adotanteId: 36, // seu ID de adotante fixo
+                animalId: idPet,
+                }),
+            });
+            if (!response.ok) throw new Error("Erro ao adicionar favorito");
 
-                setAnimais((prev) =>
-                    prev.map((animal) =>
-                        animal.id === idPet ? { ...animal, favorito: true } : animal
-                    )
-                );
+            const novoFav = await response.json(); // backend retorna o id do favorito
+
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet
+                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                    : animal
+                )
+            );
             }
-
-          await carregarAnimais();
 
         } catch (error) {
             console.error(error);
@@ -146,6 +150,7 @@ export default function homeAdotante(){
             setLoading(false);
         }
     }
+
 
     if (loading) {
         return (
@@ -236,6 +241,7 @@ export default function homeAdotante(){
                         status={animal.status}
                         foto={`data:image/jpeg;base64,${animal.foto}`}
                         favorito={animal.favorito}
+                        favoritoId={animal.favoritoId}
                         onToggleFavorito={handleFavorito}
                     />
                     ))

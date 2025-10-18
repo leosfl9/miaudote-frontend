@@ -6,6 +6,7 @@ import { useState } from "react";
 interface CardProps {
     tipo: string;
     favorito?: boolean;
+    favoritoId?: number | null;
     nome: string,
     especie: string,
     idade: string,
@@ -18,10 +19,10 @@ interface CardProps {
     idPet: number;
     parceiro?: string;
     estado?: string;
-    onToggleFavorito?: (idPet: number, favorito: boolean) => void;
+    onToggleFavorito?: (idPet: number, favorito: boolean, favoritoId: number | null) => void;
 }
 
-export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito}: CardProps){
+export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId}: CardProps){
     const [isFavorito, setIsFavorito] = useState(!!favorito);
     const [sending, setSending] = useState(false);
     
@@ -29,7 +30,7 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
 
     const handleClick = () => {
         setSending(true);
-        onToggleFavorito?.(idPet, isFavorito);
+        onToggleFavorito?.(idPet, isFavorito, favoritoId ?? null);
         setIsFavorito(!isFavorito);
     };
     
