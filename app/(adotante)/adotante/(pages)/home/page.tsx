@@ -35,7 +35,14 @@ export default function homeAdotante(){
     const [filtroSexo, setFiltroSexo] = useState("");
     const [filtrosAplicados, setFiltrosAplicados] = useState(false);
 
-    function aplicarFiltros() {
+    function limparFiltros() {
+        setFiltroEspecie("");
+        setFiltroEstado("");
+        setFiltroSexo("");
+        setAnimaisFiltrados(animais);
+    }
+
+    useEffect(() => {
         let filtrados = animais;
 
         if (filtroEspecie) {
@@ -57,7 +64,7 @@ export default function homeAdotante(){
         }
 
         setAnimaisFiltrados(filtrados);
-    }
+    }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
 
     useEffect(() => {
         carregarAnimais();
@@ -217,9 +224,9 @@ export default function homeAdotante(){
                     </SelectField>
                 </div>
 
-                <button onClick={aplicarFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
+                <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
                     shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
-                    Aplicar filtros
+                    Limpar filtros
                 </button>
             </div>
 
