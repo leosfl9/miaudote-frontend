@@ -55,9 +55,10 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
                             )}
                         </div>
                         {tipo == "solicitacao" && (
-                            <div className="px-3 py-1 bg-miau-orange rounded-2xl w-fit mb-2">
-                                <p className="text-sm text-background font-medium">
-                                    Solicitado
+                            <div className={`px-3 py-1 rounded-2xl w-fit mb-2
+                                ${status == "Em Aberto" ? "bg-miau-green text-background" : "bg-hr text-text-light-gray"}`}>
+                                <p className="text-sm font-medium">
+                                    {status}
                                 </p>
                             </div>
                         )}
@@ -88,7 +89,7 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
                 </div>
 
                 <div className="flex flex-row justify-between items-center">
-                    {(tipo == "adotante" || tipo == "solicitacao") && (
+                    {(tipo == "adotante") && (
                         <button onClick={handleClick} 
                             className={`flex flex-row gap-2 ${favorito == true ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}
                             disabled={sending}>

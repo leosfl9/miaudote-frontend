@@ -23,7 +23,7 @@ export default function RequestCard ({id, nome, adotante, data, status, foto}: R
                             Adotante: <span>{adotante}</span></h2>
                     </div>
                     <div className={`${status == "Em Aberto" ? "bg-miau-green text-background" : "bg-hr text-text-light-gray"} rounded-md px-4 py-2 w-fit self-center sm:self-start`}>
-                        <p className="text-sm font-bold">{status}</p>
+                        <p className="text-sm font-semibold">{status}</p>
                     </div>
                 </div>
             </div>
