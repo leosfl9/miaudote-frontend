@@ -36,8 +36,8 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
     
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
-            <div className="relative w-full">
-                <img loading="lazy" alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center h-64 w-full"/>
+            <div className="relative h-64 w-full">
+                <Image alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center" fill/>
             </div>
 
             <div className="flex flex-col gap-8 px-5 py-5">

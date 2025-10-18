@@ -33,7 +33,6 @@ export default function homeAdotante(){
     const [filtroEspecie, setFiltroEspecie] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("");
     const [filtroSexo, setFiltroSexo] = useState("");
-    const [filtrosAplicados, setFiltrosAplicados] = useState(false);
 
     function limparFiltros() {
         setFiltroEspecie("");
@@ -69,6 +68,7 @@ export default function homeAdotante(){
     useEffect(() => {
         carregarAnimais();
     }, [paginaAtual]);
+    
 
     async function carregarAnimais() {
       try {
@@ -103,7 +103,6 @@ export default function homeAdotante(){
         }));
 
         setAnimais(listaAnimais);
-        setAnimaisFiltrados(listaAnimais);
       } catch (error) {
         console.error("Erro ao carregar animais:", error);
       } finally {
@@ -116,39 +115,39 @@ export default function homeAdotante(){
             setLoading(true);
 
             if (favorito && favoritoId !== null) {
-            // 🔥 Remover dos favoritos
-            const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
-                method: "DELETE",
-            });
-            if (!response.ok) throw new Error("Erro ao remover favorito");
+                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                    method: "DELETE",
+                });
+                if (!response.ok) throw new Error("Erro ao remover favorito");
 
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet ? { ...animal, favorito: false, favoritoId: null } : animal
-                )
-            );
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                    animal.id === idPet ? { ...animal, favorito: false, favoritoId: null } : animal
+                    )
+                );
             } else {
-            // 💚 Adicionar aos favoritos
-            const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                adotanteId: 36, // seu ID de adotante fixo
-                animalId: idPet,
-                }),
-            });
-            if (!response.ok) throw new Error("Erro ao adicionar favorito");
+                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                    adotanteId: 36,
+                    animalId: idPet,
+                    }),
+                });
+                if (!response.ok) throw new Error("Erro ao adicionar favorito");
 
-            const novoFav = await response.json(); // backend retorna o id do favorito
+                const novoFav = await response.json(); // backend retorna o id do favorito
 
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet
-                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
-                    : animal
-                )
-            );
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                    animal.id === idPet
+                        ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                        : animal
+                    )
+                );
             }
+
+            await carregarAnimais();
 
         } catch (error) {
             console.error(error);
@@ -254,9 +253,9 @@ export default function homeAdotante(){
                     ))
                 ) : (
                     <div className="py-8 lg:px-6">
-                    <p className="text-center text-text-light-gray font-medium text-2xl">
-                        Nenhum animal cadastrado no sistema!
-                    </p>
+                        <p className="text-center text-text-light-gray font-medium text-2xl">
+                            Nenhum animal encontrado!
+                        </p>
                     </div>
                 )}
             </div>
