@@ -24,6 +24,7 @@ export default function homeAdotante(){
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [loading, setLoading] = useState(true);
     const [paginaAtual, setPaginaAtual] = useState(1);
+    const [totalPaginas, setTotalPaginas] = useState(1);
 
     useEffect(() => {
         async function carregarAnimais() {
@@ -35,7 +36,11 @@ export default function homeAdotante(){
     
             const data = await response.json();
             console.log("Dados recebidos:", data);
-    
+
+            if (data.length > 0) {
+                setTotalPaginas(data[0].totalPaginas);
+            }
+                
             // Agora o backend retorna um array de objetos
             const listaAnimais: Animal[] = data.map((item: any) => ({
               id: item.animal.id,
@@ -167,12 +172,14 @@ export default function homeAdotante(){
             </div>
 
             <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
-                <button onClick={() => setPaginaAtual(1)} className="w-8 h-8 font-semibold bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 
-                    rounded-lg text-center cursor-pointer">1</button>
-                <button onClick={() => setPaginaAtual(2)} className="w-8 h-8 font-semibold bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 
-                    rounded-lg text-center cursor-pointer">2</button>
-                <button onClick={() => setPaginaAtual(3)} className="w-8 h-8 font-semibold bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 
-                    rounded-lg text-center cursor-pointer">3</button>
+                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                    <button key={num} onClick={() => setPaginaAtual(num)}
+                        className={`w-8 h-8 font-semibold rounded-lg text-center cursor-pointer
+                        ${paginaAtual === num ? "bg-miau-orange text-white" 
+                        : "bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 text-background"}`}>
+                        {num}
+                    </button>
+                ))}
             </div>
         </div>
     );
