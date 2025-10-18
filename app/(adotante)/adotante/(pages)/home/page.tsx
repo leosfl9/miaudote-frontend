@@ -18,6 +18,7 @@ interface Animal {
   foto: string;
   parceiro: string;
   estado: string;
+  favorito: boolean;
 }
 
 export default function homeAdotante(){
@@ -58,47 +59,93 @@ export default function homeAdotante(){
     }
 
     useEffect(() => {
-        async function carregarAnimais() {
-          try {
-            setLoading(true);
-
-            const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}`);
-            if (!response.ok) throw new Error("Erro ao buscar dados");
-    
-            const data = await response.json();
-            console.log("Dados recebidos:", data);
-
-            if (data.length > 0) {
-                setTotalPaginas(data[0].totalPaginas);
-            }
-                
-            // Agora o backend retorna um array de objetos
-            const listaAnimais: Animal[] = data.map((item: any) => ({
-              id: item.animal.id,
-              nome: item.animal.nome,
-              idade: item.animal.idade,
-              especie: item.animal.especie,
-              descricao: item.animal.descricao,
-              obs: item.animal.obs,
-              porte: item.animal.porte,
-              sexo: item.animal.sexo,
-              status: item.animal.status,
-              foto: item.foto,
-              parceiro: item.animal.parceiro.nome,
-              estado: item.animal.parceiro.estado,
-            }));
-    
-            setAnimais(listaAnimais);
-            setAnimaisFiltrados(listaAnimais);
-          } catch (error) {
-            console.error("Erro ao carregar animais:", error);
-          } finally {
-            setLoading(false);
-          }
-        }
-    
         carregarAnimais();
     }, [paginaAtual]);
+
+    async function carregarAnimais() {
+      try {
+        setLoading(true);
+
+        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/36`);
+        if (!response.ok) throw new Error("Erro ao buscar dados");
+
+        const data = await response.json();
+        console.log("Dados recebidos:", data);
+
+        if (data.length > 0) {
+            setTotalPaginas(data[0].totalPaginas);
+        }
+            
+        // Agora o backend retorna um array de objetos
+        const listaAnimais: Animal[] = data.map((item: any) => ({
+          id: item.animal.id,
+          nome: item.animal.nome,
+          idade: item.animal.idade,
+          especie: item.animal.especie,
+          descricao: item.animal.descricao,
+          obs: item.animal.obs,
+          porte: item.animal.porte,
+          sexo: item.animal.sexo,
+          status: item.animal.status,
+          foto: item.foto,
+          parceiro: item.animal.parceiro.nome,
+          estado: item.animal.parceiro.estado,
+          favorito: item.favorito,
+        }));
+
+        setAnimais(listaAnimais);
+        setAnimaisFiltrados(listaAnimais);
+      } catch (error) {
+        console.error("Erro ao carregar animais:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function handleFavorito(idPet: number, favorito: boolean) {
+        try {
+            setLoading(true);
+
+            if (favorito) {
+                const response = await fetch(`http://localhost:8080/favoritos/${idPet}`, {
+                    method: "DELETE",
+                });
+                if (!response.ok) throw new Error("Erro ao remover favorito");
+
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet ? { ...animal, favorito: false } : animal
+                    )
+                );
+            } else {
+                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        adotanteId: 36, 
+                        animalId: idPet,
+                    }),
+                });
+                if (!response.ok) throw new Error("Erro ao adicionar favorito");
+
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet ? { ...animal, favorito: true } : animal
+                    )
+                );
+            }
+
+          await carregarAnimais();
+
+        } catch (error) {
+            console.error(error);
+            alert("Não foi possível atualizar os favoritos.");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     if (loading) {
         return (
@@ -172,13 +219,6 @@ export default function homeAdotante(){
             </div>
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
-
-                {/* <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" />
-                <AnimalCard tipo="adotante" /> */}
-
                 {animaisFiltrados.length > 0 ? (
                     animaisFiltrados.map((animal) => (
                     <AnimalCard
@@ -195,6 +235,8 @@ export default function homeAdotante(){
                         descricao={animal.descricao}
                         status={animal.status}
                         foto={`data:image/jpeg;base64,${animal.foto}`}
+                        favorito={animal.favorito}
+                        onToggleFavorito={handleFavorito}
                     />
                     ))
                 ) : (

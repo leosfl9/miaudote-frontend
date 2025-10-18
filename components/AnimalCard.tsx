@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { CalendarDays, Ruler, Heart } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface CardProps {
     tipo: string;
@@ -17,15 +18,25 @@ interface CardProps {
     idPet: number;
     parceiro?: string;
     estado?: string;
+    onToggleFavorito?: (idPet: number, favorito: boolean) => void;
 }
 
-export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro}: CardProps){
+export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito}: CardProps){
+    const [isFavorito, setIsFavorito] = useState(!!favorito);
+    const [sending, setSending] = useState(false);
+    
     const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet/${idPet}`;
+
+    const handleClick = () => {
+        setSending(true);
+        onToggleFavorito?.(idPet, isFavorito);
+        setIsFavorito(!isFavorito);
+    };
     
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
             <div className="relative w-full">
-                <img alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center h-64 w-full"/>
+                <img loading="lazy" alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center h-64 w-full"/>
             </div>
 
             <div className="flex flex-col gap-8 px-5 py-5">
@@ -77,10 +88,12 @@ export default function AnimalCard({tipo, favorito, nome, especie, idade, porte,
 
                 <div className="flex flex-row justify-between items-center">
                     {(tipo == "adotante" || tipo == "solicitacao") && (
-                        <div className={`flex flex-row gap-2 ${favorito ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}>
-                            <Heart className={`${favorito ? "fill-[#F35D5D]" : ""}`} />
-                            <p className={`font-semibold`}>{favorito ? "Favorito" : "Favoritar"}</p>
-                        </div>
+                        <button onClick={handleClick} 
+                            className={`flex flex-row gap-2 ${favorito == true ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}
+                            disabled={sending}>
+                            <Heart className={`${favorito == true ? "fill-[#F35D5D]" : ""}`} />
+                            <p className={`font-semibold`}>{favorito == true ? "Favorito" : "Favoritar"}</p>
+                        </button>
                     )}
                     <Link href={href} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
                         ${(tipo == "solicitacao" || especie == "Gato") ? "bg-miau-purple" : "bg-miau-orange"} text-background 
