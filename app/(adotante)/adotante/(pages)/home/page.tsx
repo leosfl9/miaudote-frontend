@@ -22,9 +22,40 @@ interface Animal {
 
 export default function homeAdotante(){
     const [animais, setAnimais] = useState<Animal[]>([]);
+    const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
+
+    const [filtroEspecie, setFiltroEspecie] = useState("");
+    const [filtroEstado, setFiltroEstado] = useState("");
+    const [filtroSexo, setFiltroSexo] = useState("");
+    const [filtrosAplicados, setFiltrosAplicados] = useState(false);
+
+    function aplicarFiltros() {
+        let filtrados = animais;
+
+        if (filtroEspecie) {
+            filtrados = filtrados.filter((a) =>
+            a.especie.toLowerCase() === filtroEspecie.toLowerCase()
+            );
+        }
+
+        if (filtroEstado) {
+            filtrados = filtrados.filter((a) =>
+            a.estado.toLowerCase() === filtroEstado.toLowerCase()
+            );
+        }
+
+        if (filtroSexo) {
+            filtrados = filtrados.filter((a) =>
+            a.sexo.toLowerCase() === filtroSexo.toLowerCase()
+            );
+        }
+
+        setAnimaisFiltrados(filtrados);
+    }
 
     useEffect(() => {
         async function carregarAnimais() {
@@ -58,6 +89,7 @@ export default function homeAdotante(){
             }));
     
             setAnimais(listaAnimais);
+            setAnimaisFiltrados(listaAnimais);
           } catch (error) {
             console.error("Erro ao carregar animais:", error);
           } finally {
@@ -86,13 +118,15 @@ export default function homeAdotante(){
             <div className="flex flex-col plg:flex-row justify-between items-center plg:gap-2 lg:gap-4 mb-4">
                 <div className="flex flex-col xsm:flex-row gap-1 xsm:gap-2 lg:gap-4 w-full">
 
-                    <SelectField defaultValue={""} name="filtroEspecie" label="Espécie" className="appearance-none mb-2" >
+                    <SelectField name="filtroEspecie" label="Espécie" className="appearance-none mb-2"
+                        value={filtroEspecie} onChange={(e) => setFiltroEspecie(e.target.value)} >
                         <option value={""} disabled>Pesquise por espécie</option>
                         <option value="Cachorro">Cão</option>
                         <option value="Gato">Gato</option>
                     </SelectField>
 
-                    <SelectField defaultValue={""} name="filtroEstado" label="Estado" className="appearance-none mb-2" >
+                    <SelectField name="filtroEstado" label="Estado" className="appearance-none mb-2"
+                        value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} >
                         <option value={""} disabled>Pesquise por estado</option>
                         <option value="AC">Acre</option>
                         <option value="AL">Alagoas</option>
@@ -123,14 +157,15 @@ export default function homeAdotante(){
                         <option value="TO">Tocantins</option>
                     </SelectField>
 
-                    <SelectField defaultValue={""} name="filtroSexo" label="Sexo" className="appearance-none mb-2" >
+                    <SelectField name="filtroSexo" label="Sexo" className="appearance-none mb-2"
+                        value={filtroSexo} onChange={(e) => setFiltroSexo(e.target.value)} >
                         <option value={""} disabled>Pesquise por sexo</option>
                         <option value="Macho">Macho</option>
                         <option value="Fêmea">Fêmea</option>
                     </SelectField>
                 </div>
 
-                <button className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
+                <button onClick={aplicarFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
                     shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
                     Aplicar filtros
                 </button>
@@ -144,8 +179,8 @@ export default function homeAdotante(){
                 <AnimalCard tipo="adotante" />
                 <AnimalCard tipo="adotante" /> */}
 
-                {animais.length > 0 ? (
-                    animais.map((animal) => (
+                {animaisFiltrados.length > 0 ? (
+                    animaisFiltrados.map((animal) => (
                     <AnimalCard
                         key={animal.id}
                         idPet={animal.id}
