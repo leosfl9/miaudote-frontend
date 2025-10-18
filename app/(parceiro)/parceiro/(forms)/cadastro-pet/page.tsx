@@ -333,7 +333,7 @@ export default function CadastroPet() {
 
                 </div>
 
-                <FormButton text="Cadastrar Pet" color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2 mb-2" disabled={sending} />
+                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar Pet"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2 mb-2" disabled={sending} />
             </form>
 
             {/* Modal de cropper */}
