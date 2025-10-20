@@ -34,6 +34,7 @@ interface Animal {
 export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [openCancela, setOpenCancela] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
 
     const [animal, setAnimal] = useState<Animal | null>(null);
     const [status, setStatus] = useState(undefined);
@@ -125,6 +126,8 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
 
                             <button onClick={async () => {
                                 try {
+                                    setCancelling(true);
+
                                     const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
@@ -156,11 +159,15 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                         showConfirmButton: false,
                                         timer: 1500,
                                     });
-                                } 
+                                } finally {
+                                    setCancelling(false);
+                                }
                             }}
-                                className={`w-fit self-center text-lg ssm:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
-                                shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
-                                Confirmar <span className="hidden sm:inline">cancelamento</span> 
+                                className={`w-fit self-center text-lg ssm:text-xl px-8 py-1 rounded-[48px] transition-colors  
+                                shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 text-white font-semibold cursor-pointer
+                                ${cancelling ? "bg-miau-purple/70" : "bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green"}`}
+                                disabled={cancelling}>
+                                {cancelling ? "Cancelando..." : (<p>Confirmar <span className="hidden sm:inline">cancelamento</span></p>)}
                             </button>
                         </div>
                     </div>

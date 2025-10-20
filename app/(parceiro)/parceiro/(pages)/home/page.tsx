@@ -32,12 +32,15 @@ export default function homeParceiro(){
 
     async function carregarAnimais() {
       try {
+        const start = performance.now();
         setLoading(true);
 
         const response = await fetch(`http://localhost:8080/fotos/parceiro/37/pagina/${paginaAtual}`);
+        const mid = performance.now();
         if (!response.ok) throw new Error("Erro ao buscar dados");
 
         const data = await response.json();
+        const end = performance.now();
         console.log("Dados recebidos:", data);
 
         if (data.length > 0) {
@@ -59,6 +62,13 @@ export default function homeParceiro(){
         }));
 
         setAnimais(listaAnimais);
+
+        console.log(`
+          Tempo total: ${(end - start).toFixed(2)} ms
+          - Fetch: ${(mid - start).toFixed(2)} ms
+          - JSON parse: ${(end - mid).toFixed(2)} ms
+          - Tamanho resposta: ${(JSON.stringify(data).length / 1024).toFixed(1)} KB
+        `);
       } catch (error) {
         console.error("Erro ao carregar animais:", error);
       } finally {
