@@ -10,6 +10,8 @@ import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
 import FormButton from "@/components/FormButton";
 
+import { X } from "lucide-react";
+
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -248,6 +250,10 @@ export default function CadastroPet() {
 
     };
 
+    const handleRemoveImage = (index: number) => {
+        setCroppedFiles((prev) => prev.filter((_, i) => i !== index));
+        setFiles((prev) => prev.filter((_, i) => i !== index));
+    };
 
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
@@ -283,14 +289,13 @@ export default function CadastroPet() {
                     {croppedFiles.length > 0 && (
                         <div className="place-items-center grid grid-cols-3 ssm:grid-cols-4 sm:grid-cols-5 gap-2 mb-2">
                             {croppedFiles.map((file, idx) => (
-                                <NextImage 
-                                    key={idx} 
-                                    src={URL.createObjectURL(file)} 
-                                    alt={`foto-${idx}`} 
-                                    width={100} 
-                                    height={100} 
-                                    className="object-cover rounded-md"
-                                />
+                                <div key={idx} className="relative group">
+                                    <NextImage src={URL.createObjectURL(file)} alt={`foto-${idx}`}
+                                    width={100} height={100} className="object-cover rounded-md" />
+                                    <button type="button" onClick={() => handleRemoveImage(idx)}
+                                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center
+                                    opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group"><X className="w-4 h-4 hover:text-[#F35D5D]"/></button>
+                                </div>
                             ))}
                         </div>
                     )}
