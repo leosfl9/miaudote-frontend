@@ -24,7 +24,7 @@ export default function SolicitacoesAdocao(){
     useEffect(() => {
         async function carregarAnimais() {
             try {
-                const response = await fetch(`http://localhost:8080/adocoes/adotante/51`);
+                const response = await fetch(`http://localhost:8080/adocoes/adotante/36`);
                 if (!response.ok) throw new Error("Erro ao buscar dados");
 
                 const data = await response.json();
@@ -76,7 +76,8 @@ export default function SolicitacoesAdocao(){
                     animais.map((animal) => (
                     <AnimalCard
                         key={animal.id}
-                        idPet={animal.id}
+                        idSolicitacao={animal.id}
+                        idPet={animal.idPet}
                         tipo="solicitacao"
                         nome={animal.nome}
                         especie={animal.especie}

@@ -17,16 +17,18 @@ interface CardProps {
     status?: string
     href?: string;
     idPet: number;
+    idSolicitacao?: number;
     parceiro?: string;
     estado?: string;
     onToggleFavorito?: (idPet: number, favorito: boolean, favoritoId: number | null) => void;
 }
 
-export default function AnimalCard({tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId}: CardProps){
+export default function AnimalCard({
+    tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId, idSolicitacao}: CardProps){
     const [isFavorito, setIsFavorito] = useState(!!favorito);
     const [sending, setSending] = useState(false);
     
-    const href = tipo === "solicitacao" ? "/adotante/detalhes-solicitacao" : `/${tipo}/pet/${idPet}`;
+    const href = tipo === "solicitacao" ? `/adotante/detalhes-solicitacao/${idSolicitacao}` : `/${tipo}/pet/${idPet}`;
 
     const handleClick = () => {
         setSending(true);

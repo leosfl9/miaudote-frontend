@@ -6,10 +6,40 @@ import LinkButton from "@/components/LinkButton";
 import AnimalPresentation from "@/components/AnimalPresentation";
 import { X } from "lucide-react";
 
-import { useState, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 
-export default function PetPresentation() {
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+
+interface Animal {
+    id: number;
+    nome: string;
+    especie: string;
+    idade: number;
+    descricao: string;
+    porte: string;
+    sexo: string;
+    status: string;
+    obs: string;
+    parceiro: {
+        id: number;
+        nome: string;
+        email: string;
+        telefone: string;
+        cidade: string;
+        estado: string;
+    };
+}
+
+export default function PetPresentation({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     const [open, setOpen] = useState(false);
+
+    const [animal, setAnimal] = useState<Animal | null>(null);
+    const [fotos, setFotos] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const router = useRouter();
 
     useEffect(() => {
         if (open) {
@@ -22,6 +52,42 @@ export default function PetPresentation() {
         };
     }, [open]);
 
+    useEffect(() => {
+        async function carregarAnimal() {
+            try {
+            const response = await fetch(`http://localhost:8080/fotos/animal/${id}`);
+            if (!response.ok) throw new Error("Erro ao buscar dados");
+
+            const data = await response.json();
+            console.log("Dados recebidos:", data);
+
+            const animal = data[0]?.animal;
+            const fotos = data.map((item: { foto: string; }) => item.foto);
+
+            console.log("Animal:", animal);
+            console.log("Fotos:", fotos);
+
+            setAnimal(animal);
+            setFotos(fotos);
+
+            } catch (error) {
+            console.error("Erro ao carregar animal:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        carregarAnimal();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
+                <div className="w-10 h-10 border-4 border-background border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-background font-medium text-xl">Carregando...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6 lxl:relative sm:gap-8 items-center justify-center px-2 md:px-8 py-8 lxl:py-10 
@@ -31,7 +97,11 @@ export default function PetPresentation() {
                 <LinkButton href={"/adotante/home"} text="Voltar" color="white" back={true} />
             </div>
 
-            <AnimalPresentation tipo="adotante" href="#" onOpenModal={() => setOpen(true)} />
+            {animal ? 
+                <AnimalPresentation tipo="adotante" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
+                porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
+                fotos={fotos} href="#" onOpenModal={() => setOpen(true)} /> : 
+                ""}
 
             {open && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setOpen(false)}>
@@ -94,7 +164,47 @@ export default function PetPresentation() {
                                 </div>
                             </div>
 
-                            <button className={`w-fit self-center text-lg xl:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
+                            <button onClick={async () => {
+                                try {
+                                    const payload = {
+                                        adotanteId: 36,
+                                        animalId: id,
+                                    };
+
+                                    const response = await fetch(`http://localhost:8080/adocoes/cadastrar`, {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify(payload),
+                                    });
+
+                                    if (!response.ok) {
+                                        throw new Error("Erro ao solicitar adoção");
+                                    }
+
+                                    Swal.fire({
+                                        position: "top",
+                                        icon: "success",
+                                        title: "Solicitação enviada com sucesso!",
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                    });
+
+                                    router.push("/adotante/solicitacoes");
+
+                                } catch (error) {
+                                    console.error(error);
+                                    Swal.fire({
+                                        position: "top",
+                                        icon: "error",
+                                        title: "Erro ao solicitar adoção!",
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                    });
+                                } 
+                            }}
+                                className={`w-fit self-center text-lg xl:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
                                 shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 bg-miau-green hover:bg-miau-light-green active:bg-miau-light-green`}>
                                 Confirmar
                             </button>
