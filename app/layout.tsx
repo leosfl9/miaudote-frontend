@@ -8,7 +8,7 @@ const fredoka = Fredoka({
 });
 
 export const metadata: Metadata = {
-  title: "Miaudote",
+  title: "MiAudote",
   description: "Plataforma de adoção de animais",
 };
 
