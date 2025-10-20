@@ -38,7 +38,7 @@ export default function SolicitacoesAdocao(){
                     nomeAdotante: item.adocao.adotante.nome,
                     data: dataFormatada,
                     status: item.adocao.status,
-                    foto: item.foto.foto,
+                    foto: item.fotos[0].foto,
                 };
             });
 

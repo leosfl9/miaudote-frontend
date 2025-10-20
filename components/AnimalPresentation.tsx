@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { formatarData } from "@/utils/formatarData";
+
 interface PresentationProps {
     tipo: string;
     onOpenModal?: () => void;
@@ -17,11 +19,19 @@ interface PresentationProps {
     porte: string;
     estado: string;
     cidade: string;
+    status?: string;
+    dataAdocao?: string;
     fotos: string[];
 }
 
 export default function AnimalPresentation ({
-    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, sexo, estado, cidade, fotos: fotosIniciais, especie}: PresentationProps) {
+    tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, 
+    sexo, estado, cidade, fotos: fotosIniciais, especie, status, dataAdocao}: PresentationProps) {
+        
+    const dataFormatada = new Date(dataAdocao!).toLocaleDateString("pt-BR", {
+        timeZone: "UTC",
+    });
+
     let texto = ""
 
     if (tipo == "adotante") 
@@ -75,7 +85,7 @@ export default function AnimalPresentation ({
             <div className="flex flex-col text-white gap-5 ssm:gap-7 md:gap-8 xl:gap-10 w-full lg:min-w-0 lg:max-w-none lg:w-[70vw]">
                 <h1 className="font-bold text-4xl md:text-5xl xl:text-6xl text-center truncate" title={nome}>{nome}</h1>
                 {tipo == "solicitacao" && (
-                    <p className="text-base text-background font-medium text-center -mt-6">Solicitado em: <span>10/02/2025</span></p>
+                    <p className="text-base text-background font-medium text-center -mt-6">Solicitado em: <span>{dataFormatada}</span></p>
                 )}
                 <p className="text-xl md:text-2xl xl:text-3xl text-justify line-clamp-7 sm:line-clamp-4 lg:h-[128px] xl:h-fit" 
                     title={descricao ? descricao : "Nenhuma descrição adicionada"}>
@@ -109,7 +119,7 @@ export default function AnimalPresentation ({
                                 {texto}
                             </Link>
                             
-                            {tipo == "solicitacao" && (
+                            {(tipo == "solicitacao" && status != "Encerrada") && (
                                 <button className="w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
                                 bg-[#F35D5D] hover:bg-[#fA7C7C] active:bg-[#fA7C7C] text-background font-bold cursor-pointer" 
                                     onClick={(e) => {onOpenModalCancela?.(); }}>

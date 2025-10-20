@@ -18,6 +18,8 @@ interface Animal {
     porte: string;
     sexo: string;
     status: string;
+    statusAdocao: string;
+    dataAdocao: string;
     obs: string;
     parceiro: {
         id: number;
@@ -34,6 +36,8 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
     const [openCancela, setOpenCancela] = useState(false);
 
     const [animal, setAnimal] = useState<Animal | null>(null);
+    const [status, setStatus] = useState(undefined);
+    const [dataAdocao, setDataAdocao] = useState(undefined);
     const [fotos, setFotos] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -50,33 +54,37 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
         };
     }, [openCancela]);
 
-    // useEffect(() => {
-    //     async function carregarAnimal() {
-    //         try {
-    //         const response = await fetch(`http://localhost:8080/adocoes/${id}`);
-    //         if (!response.ok) throw new Error("Erro ao buscar dados");
+    useEffect(() => {
+        async function carregarAnimal() {
+            try {
+            const response = await fetch(`http://localhost:8080/adocoes/${id}`);
+            if (!response.ok) throw new Error("Erro ao buscar dados");
 
-    //         const data = await response.json();
-    //         console.log("Dados recebidos:", data);
+            const data = await response.json();
+            console.log("Dados recebidos:", data);
 
-    //         const animal = data.adocao.animal;
-    //         const fotos = data.map((item: { foto: string; }) => item.foto);
+            const statusAdocao = data.adocao.status;
+            const dataAdocao = data.adocao.dataCadastro;
+            const animal = data.adocao.animal;
+            const fotos = data.fotos.map((item: { foto: string; }) => item.foto);
 
-    //         console.log("Animal:", animal);
-    //         console.log("Fotos:", fotos);
+            console.log("Animal:", animal);
+            console.log("Fotos:", fotos);
 
-    //         setAnimal(animal);
-    //         setFotos(fotos);
+            setAnimal(animal);
+            setStatus(statusAdocao);
+            setDataAdocao(dataAdocao);
+            setFotos(fotos);
 
-    //         } catch (error) {
-    //         console.error("Erro ao carregar animal:", error);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     }
+            } catch (error) {
+            console.error("Erro ao carregar animal:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
 
-    //     carregarAnimal();
-    // }, [id]);
+        carregarAnimal();
+    }, [id]);
 
     if (loading) {
         return (
@@ -98,7 +106,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
             {animal ? 
                 <AnimalPresentation tipo="solicitacao" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
                 porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
-                fotos={fotos} href="#" onOpenModalCancela={() => setOpenCancela(true)} /> : 
+                fotos={fotos} href="#" onOpenModalCancela={() => setOpenCancela(true)} status={status} dataAdocao={dataAdocao} /> : 
                 ""}
 
             {openCancela && (

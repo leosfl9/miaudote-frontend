@@ -41,7 +41,7 @@ export default function SolicitacoesAdocao(){
                     porte: item.adocao.animal.porte,
                     sexo: item.adocao.animal.sexo,
                     status: item.adocao.status,
-                    foto: item.foto.foto,
+                    foto: item.fotos[0].foto,
                 }));
 
                 setAnimais(listaAnimais);
