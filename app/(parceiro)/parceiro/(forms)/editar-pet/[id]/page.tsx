@@ -14,10 +14,48 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// import { Pencil } from "lucide-react";
-// import Cropper from "react-easy-crop";
+import { Pencil } from "lucide-react";
+import Cropper from "react-easy-crop";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+
+import { X } from "lucide-react";
+
+// função utilitária do cropper
+async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.src = imageSrc;
+    image.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject("Canvas context error");
+
+      canvas.width = pixelCrop.width;
+      canvas.height = pixelCrop.height;
+
+      ctx.drawImage(
+        image,
+        pixelCrop.x,
+        pixelCrop.y,
+        pixelCrop.width,
+        pixelCrop.height,
+        0,
+        0,
+        pixelCrop.width,
+        pixelCrop.height
+      );
+
+      canvas.toBlob((blob) => {
+        if (!blob) return reject("Erro ao cortar imagem");
+        const file = new File([blob], "cropped.jpeg", { type: "image/jpeg" });
+        resolve(file);
+      }, "image/jpeg");
+    };
+    image.onerror = (err) => reject(err);
+  });
+}
+
 
 const petSchema = z.object({
     nome: z.string().min(2, "Nome é obrigatório"),
@@ -28,6 +66,14 @@ const petSchema = z.object({
     status: z.string().min(1, "Selecione o status"),
     obs: z.string().optional(),
     descricao: z.string().optional(),
+    fotos: z
+    .array(z.instanceof(File))
+    .refine((files) => files && files.length > 0, {
+      message: "Adicione pelo menos 1 foto",
+    })
+    .refine((files) => files.length <= 5, {
+      message: "Máximo 5 fotos",
+    }),
 });
 
 type PetForm = z.infer<typeof petSchema>;
@@ -36,6 +82,21 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     const { id } = use(params);
 
     const router = useRouter();
+
+    // imagens existentes
+    const [fotos, setFotos] = useState<{ id: number; foto: string }[]>([]);
+
+    // imagens novas
+    const [files, setFiles] = useState<File[]>([]);
+    const [croppedFiles, setCroppedFiles] = useState<File[]>([]);
+
+    // controles do crop 
+    const [currentCropIndex, setCurrentCropIndex] = useState<number | null>(null);
+    const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [isDisabled, setIsDisabled] = useState(false);
 
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
@@ -55,11 +116,15 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     useEffect(() => {
         const fetchAnimal = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/animais/${id}`);
+                const res = await fetch(`http://localhost:8080/fotos/animal/${id}`);
                 if (!res.ok) throw new Error("Erro ao buscar animal");
 
-                const animal = await res.json();
-                console.log(animal);
+                const data = await res.json();
+                console.log(data);
+
+                const animal = data[0]?.animal;
+
+                if (!animal) throw new Error("Animal não encontrado");
 
                 setValue("nome", animal.nome ?? "");
                 setValue("especie", animal.especie ?? "");
@@ -70,6 +135,13 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 setValue("obs", animal.obs ?? "");
                 setValue("descricao", animal.descricao ?? "");
 
+                const imagens = data.map((item: any) => ({
+                    id: item.id,       
+                    foto: item.foto,   
+                }));
+
+                setFotos(imagens);
+
             } catch (error) {
                 console.error(error);
             } finally {
@@ -79,6 +151,35 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
 
         fetchAnimal();
     }, [setValue]);
+
+    const onCropComplete = (_: any, croppedArea: any) => {
+        setCroppedAreaPixels(croppedArea);
+    };
+
+    const handleConfirmCrop = async () => {
+        if (currentCropIndex === null) return;
+        setIsDisabled(true);
+
+        try {
+            const imageFile = files[currentCropIndex];
+            const src = URL.createObjectURL(imageFile);
+            const croppedImage = await getCroppedImg(src, croppedAreaPixels);
+            URL.revokeObjectURL(src);
+
+            setCroppedFiles((prev) => [...prev, croppedImage]);
+
+            if (currentImageSrc) {
+            URL.revokeObjectURL(currentImageSrc);
+            setCurrentImageSrc(null);
+            }
+            setCurrentCropIndex(null);
+        } catch (err) {
+            console.error(err);
+            Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
+        } finally {
+            setIsDisabled(false);
+        }
+    };
 
     const onSubmit = async (data: PetForm) => {
         try {
@@ -139,6 +240,86 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selected = Array.from(e.target.files || []);
+        const total = fotos.length + croppedFiles.length + selected.length;
+
+        if (total > 5) {
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Máximo de 5 imagens!",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+            e.currentTarget.value = "";
+            return;
+        }
+
+        setFiles(prev => {
+            const startIndex = prev.length;
+            const newFiles = [...prev, ...selected];
+            setCurrentCropIndex(startIndex);
+            setCurrentImageSrc(URL.createObjectURL(selected[0]));
+            return newFiles;
+        });
+
+        e.currentTarget.value = "";
+    };
+
+    const handleRemoveExistingFoto = async (fotoId: number) => {
+        const confirm = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Essa imagem será removida permanentemente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#1B998B",
+            cancelButtonColor: "#F35D5D",
+            confirmButtonText: "Sim, excluir",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/fotos/${fotoId}/animal/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error("Erro ao excluir imagem");
+            }
+
+            Swal.fire({
+                icon: "success",
+                title: "Imagem excluída!",
+                showConfirmButton: false,
+                timer: 1200,
+            });
+
+            setFotos((prev) => prev.filter((foto) => foto.id !== fotoId));
+
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Erro ao excluir imagem!",
+                timer: 1200,
+            });
+        }
+    };
+
+    const handleRemoveNewImage = (index: number) => {
+        setCroppedFiles(prev => prev.filter((_, i) => i !== index));
+        setFiles(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleFormSubmit = () => {
+        const totalFotos = fotos.length + croppedFiles.length;
+        setValue("fotos", Array(totalFotos).fill(new File([], "dummy.jpg")), { shouldValidate: true });
+        handleSubmit(onSubmit)();
+    };
+
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -156,7 +337,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 <LinkButton href={"/parceiro/home"} text="Voltar" color="white" back={true} />
             </div>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full max-w-[640px] px-3 md:px-6 lg:px-12 py-6 rounded-4xl">
+            <form onSubmit={(e) => {e.preventDefault(); handleFormSubmit();}} className="bg-white flex flex-col gap-3 items-center w-full max-w-[640px] px-3 md:px-6 lg:px-12 py-6 rounded-4xl">
                 <Link href={"/parceiro/home"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <NextImage src="/logo-main.png" alt="Cadastro de parceiro" fill />
                 </Link>
@@ -164,6 +345,48 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     Editar Pet</h1>
 
                 <div className="flex flex-col w-full gap-2">
+                    
+                    <div className="flex flex-col">
+                        <label htmlFor="fotos" className={`flex flex-col gap-5 border-1 
+                            ${errors.fotos ? "border-red-500 text-red-500" : "border-input-bd text-text-gray"}  items-center py-3 rounded-md cursor-pointer mb-2`}>
+                            <Pencil className="w-6 h-6" />
+                            <p className="text-sm ssm:text-base">Clique para adicionar fotos (5 máx.)</p>
+                        </label>
+                        {errors.fotos && (
+                            <p className="text-red-500 text-sm">{errors.fotos.message}</p>
+                        )}
+                    </div>
+
+                    <input id="fotos" type="file" hidden multiple accept="image/*" onChange={handleFileChange} />
+
+                    {(fotos.length > 0 || croppedFiles.length > 0) && (
+                        <div className="grid grid-cols-3 ssm:grid-cols-4 sm:grid-cols-5 gap-2 mb-2">
+                            {fotos.map((foto, idx) => (
+                                <div key={`foto-${foto.id}`} className="relative group">
+                                    <NextImage src={`data:image/jpeg;base64,${foto.foto}`} alt={`foto-${idx}`}
+                                        width={100} height={100} className="object-cover rounded-md" />
+                                    <button type="button" onClick={() => handleRemoveExistingFoto(foto.id)}
+                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center 
+                                        opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group" >
+                                        <X className="w-4 h-4 hover:text-[#F35D5D]" />
+                                    </button>
+                                </div>
+                            ))}
+
+                            {croppedFiles.map((file, idx) => (
+                                <div key={`new-${idx}`} className="relative group">
+                                    <NextImage src={URL.createObjectURL(file)} alt={`new-${idx}`}
+                                    width={100} height={100} className="object-cover rounded-md" />
+                                    <button type="button" onClick={() => handleRemoveNewImage(idx)}
+                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center 
+                                        opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group" >
+                                        <X className="w-4 h-4 hover:text-[#F35D5D]" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
 
                     <div className="flex flex-col ssm:flex-row gap-2 lg:gap-3">
                         <InputField label="Nome do pet *" maxLength={100} {...register("nome")} onFocus={() => clearErrors("nome")} 
@@ -194,7 +417,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         </SelectField>
                     </div>
 
-                    <div>
+                    <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
                         <SelectField defaultValue={""} {...register("status")} onFocus={() => clearErrors("status")}
                             error={errors.status?.message} label="Status do pet *" name="status" className="appearance-none mb-2">
                             <option value={""} disabled>Selecione uma opção</option>
@@ -202,19 +425,49 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                             <option value="Adotado">Adotado</option>
                             <option value="Indisponível">Indisponível</option>
                         </SelectField>
-                    </div>
-
-                    <div className="flex flex-col gap-2 lg:gap-3">
                         <InputField label="Observações importantes" {...register("obs")} onFocus={() => clearErrors("obs")}  
                             error={errors.obs?.message} name="obs" type="text" placeholder="Ex.: FIV/FELV positivo, castrado..." className="mb-2" />
+                    </div>
+
+                    <div>
                         <TextAreaField label="Descrição do pet" rows={5} {...register("descricao")} onFocus={() => clearErrors("descricao")}
                             error={errors.descricao?.message} name="descricao" placeholder="Descreva brevemente o comportamento do pet" className="mb-2" />
                     </div>
 
                 </div>
 
-                <FormButton text="Salvar alterações" color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2 mb-2" disabled={sending} />
+                <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
+                    className="mt-2 mb-2" disabled={sending} />
             </form>
+
+            {currentCropIndex !== null && currentImageSrc && (
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                    <div className="relative w-[90vw] h-[80vh] bg-white rounded-lg p-4 flex flex-col">
+                        <div className="relative flex-1">
+                            <Cropper image={URL.createObjectURL(files[currentCropIndex])} crop={crop} zoom={zoom}
+                                aspect={1} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4 z-10">
+                            <button type="button" className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md cursor-pointer font-semibold text-lg"
+                                onClick={() => {
+                                    if (currentImageSrc) {
+                                    URL.revokeObjectURL(currentImageSrc);
+                                    setCurrentImageSrc(null);
+                                    }
+                                    setCurrentCropIndex(null);
+                                }} >
+                                Cancelar
+                            </button>
+
+                            <button type="button" className={`px-4 py-2 font-semibold text-lg text-white rounded-md cursor-pointer
+                            ${isDisabled ? "bg-miau-green/70" : "bg-miau-green hover:bg-miau-green/80"}`} onClick={handleConfirmCrop} disabled={isDisabled} >
+                                {isDisabled ? "Enviando..." : "Confirmar"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

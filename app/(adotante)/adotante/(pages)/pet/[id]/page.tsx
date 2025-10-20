@@ -34,6 +34,7 @@ interface Animal {
 export default function PetPresentation({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [open, setOpen] = useState(false);
+    const [confirming, setConfirming] = useState(false);
 
     const [animal, setAnimal] = useState<Animal | null>(null);
     const [fotos, setFotos] = useState([]);
@@ -166,6 +167,8 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
 
                             <button onClick={async () => {
                                 try {
+                                    setConfirming(true);
+
                                     const payload = {
                                         adotanteId: 36,
                                         animalId: id,
@@ -202,11 +205,15 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                         showConfirmButton: false,
                                         timer: 1500,
                                     });
-                                } 
+                                } finally {
+                                    setConfirming(false);
+                                }
                             }}
-                                className={`w-fit self-center text-lg xl:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
-                                shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 bg-miau-green hover:bg-miau-light-green active:bg-miau-light-green`}>
-                                Confirmar
+                                className={`w-fit self-center text-lg xl:text-xl px-8 py-1 rounded-[48px] 
+                                shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 transition-colors text-white font-semibold cursor-pointer
+                                ${confirming ? "bg-miau-green/70" : "bg-miau-green hover:bg-miau-light-green active:bg-miau-light-green"}`}
+                                disabled={confirming}>
+                                {confirming ? "Confirmando..." : "Confirmar"}
                             </button>
                         </div>
                     </div>
