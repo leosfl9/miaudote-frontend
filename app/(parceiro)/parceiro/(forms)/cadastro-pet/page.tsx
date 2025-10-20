@@ -245,9 +245,7 @@ export default function CadastroPet() {
             });
         } finally {
             setSending(false);
-
         }
-
     };
 
     const handleRemoveImage = (index: number) => {

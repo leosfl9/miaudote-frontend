@@ -83,6 +83,8 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
 
     const router = useRouter();
 
+    const [deleting, setDeleting] = useState(false);
+
     // imagens existentes
     const [fotos, setFotos] = useState<{ id: number; foto: string }[]>([]);
 
@@ -286,6 +288,16 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     };
 
     const handleRemoveExistingFoto = async (fotoId: number) => {
+        if (fotos.length === 1 && croppedFiles.length === 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Não é possível remover!",
+                text: "O pet precisa ter pelo menos uma foto previamente cadastrada.",
+                confirmButtonColor: "#1B998B",
+            });
+            return;
+        }
+
         const confirm = await Swal.fire({
             title: "Tem certeza?",
             text: "Essa imagem será removida permanentemente.",
@@ -300,6 +312,8 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         if (!confirm.isConfirmed) return;
 
         try {
+            setDeleting(true);
+
             const response = await fetch(`http://localhost:8080/fotos/${fotoId}/animal/${id}`, {
                 method: "DELETE",
             });
@@ -324,10 +338,25 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 title: "Erro ao excluir imagem!",
                 timer: 1200,
             });
+        } finally {
+            setDeleting(false);
         }
     };
 
-    const handleRemoveNewImage = (index: number) => {
+    const handleRemoveNewImage = async (index: number) => {
+        const confirm = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Deseja mesmo remover a nova imagem?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#1B998B",
+            cancelButtonColor: "#F35D5D",
+            confirmButtonText: "Sim, remover",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (!confirm.isConfirmed) return;
+        
         setCroppedFiles(prev => prev.filter((_, i) => i !== index));
         setFiles(prev => prev.filter((_, i) => i !== index));
     };
@@ -383,9 +412,9 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                                 <div key={`foto-${foto.id}`} className="relative group">
                                     <NextImage src={`data:image/jpeg;base64,${foto.foto}`} alt={`foto-${idx}`}
                                         width={100} height={100} className="object-cover rounded-md" />
-                                    <button type="button" onClick={() => handleRemoveExistingFoto(foto.id)}
-                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center 
-                                        opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group" >
+                                    <button type="button" onClick={() => handleRemoveExistingFoto(foto.id)} disabled={deleting}
+                                        className={`${deleting ? "hidden" : "absolute"} top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center 
+                                        justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group`} >
                                         <X className="w-4 h-4 hover:text-[#F35D5D]" />
                                     </button>
                                 </div>
@@ -395,9 +424,9 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                                 <div key={`new-${idx}`} className="relative group">
                                     <NextImage src={URL.createObjectURL(file)} alt={`new-${idx}`}
                                     width={100} height={100} className="object-cover rounded-md" />
-                                    <button type="button" onClick={() => handleRemoveNewImage(idx)}
-                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center 
-                                        opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group" >
+                                    <button type="button" onClick={() => handleRemoveNewImage(idx)} disabled={deleting}
+                                        className={`${deleting ? "hidden" : "absolute"} top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center 
+                                        justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group`} >
                                         <X className="w-4 h-4 hover:text-[#F35D5D]" />
                                     </button>
                                 </div>
