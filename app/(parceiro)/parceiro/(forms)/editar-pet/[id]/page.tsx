@@ -205,6 +205,24 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 body: JSON.stringify(payload),
             });
 
+            if (croppedFiles.length > 0) {
+                const formData = new FormData();
+
+                croppedFiles.forEach((file) => {
+                    formData.append("files", file);
+                });
+
+                const uploadResponse = await fetch(`http://localhost:8080/fotos/cadastrar/${id}`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error("Erro ao enviar imagens");
+                }
+            }
+
+
             Swal.fire({
                 position: "top",
                 icon: "success",

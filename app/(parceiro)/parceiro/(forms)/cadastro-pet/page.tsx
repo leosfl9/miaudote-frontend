@@ -204,7 +204,7 @@ export default function CadastroPet() {
 
             // Arquivos — mesmo nome que no DTO (provavelmente "fotos")
             data.fotos.forEach((foto) => {
-            formData.append("fotos", foto);
+                formData.append("fotos", foto);
             });
 
             // Envio do FormData (sem header Content-Type!)
