@@ -5,6 +5,7 @@ import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 interface Animal {
     id: number;
@@ -20,6 +21,9 @@ interface Animal {
 }
 
 export default function homeParceiro(){
+    const token = Cookies.get("token");
+    const id = Cookies.get("userId");
+
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,20 +31,23 @@ export default function homeParceiro(){
     const [totalPaginas, setTotalPaginas] = useState(1);
 
     useEffect(() => {
-      carregarAnimais();
+      if (token && id) carregarAnimais();
     }, [paginaAtual]);
 
     async function carregarAnimais() {
       try {
-        const start = performance.now();
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/fotos/parceiro/37/pagina/${paginaAtual}`);
-        const mid = performance.now();
+        const response = await fetch(`http://localhost:8080/fotos/parceiro/${id}/pagina/${paginaAtual}`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",}
+        });
+
         if (!response.ok) throw new Error("Erro ao buscar dados");
 
         const data = await response.json();
-        const end = performance.now();
         console.log("Dados recebidos:", data);
 
         if (data.length > 0) {
@@ -62,12 +69,6 @@ export default function homeParceiro(){
 
         setAnimais(listaAnimais);
 
-        console.log(`
-          Tempo total: ${(end - start).toFixed(2)} ms
-          - Fetch: ${(mid - start).toFixed(2)} ms
-          - JSON parse: ${(end - mid).toFixed(2)} ms
-          - Tamanho resposta: ${(JSON.stringify(data).length / 1024).toFixed(1)} KB
-        `);
       } catch (error) {
         console.error("Erro ao carregar animais:", error);
       } finally {

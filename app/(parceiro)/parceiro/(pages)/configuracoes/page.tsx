@@ -1,11 +1,8 @@
 "use client"
 
-import Link from "next/link";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
-import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
@@ -65,7 +62,8 @@ const parceiroSchema = z.object({
 type ParceiroForm = z.infer<typeof parceiroSchema>;
 
 export default function Configuracoes() {
-    const router = useRouter();
+    const token = Cookies.get("token");
+    const id = Cookies.get("userId");
 
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
@@ -104,9 +102,10 @@ export default function Configuracoes() {
 
             console.log("Enviando dados:", payload);
 
-            const response = await fetch("http://localhost:8080/parceiros/37", {
+            const response = await fetch(`http://localhost:8080/parceiros/${id}`, {
                 method: "PATCH",
                 headers: {
+                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(payload),
@@ -146,9 +145,21 @@ export default function Configuracoes() {
     };
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+        
         const fetchParceiro = async () => {
             try {
-                const res = await fetch("http://localhost:8080/parceiros/37");
+                const res = await fetch(`http://localhost:8080/parceiros/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    }
+                });
+
                 if (!res.ok) throw new Error("Erro ao buscar usuário");
 
                 const parceiro = await res.json();
@@ -164,12 +175,44 @@ export default function Configuracoes() {
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false); // <-- termina o carregamento
+                setLoading(false); // termina o carregamento
             }
         };
 
         fetchParceiro();
     }, [setValue]);
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch("/api/logout", { method: "POST" });
+
+            if (res.ok) {
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Deslogado com sucesso!",
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            // Espera o swal terminar antes de redirecionar
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1000);
+            } else {
+                throw new Error("Falha ao deslogar");
+            }
+        } catch (err) {
+            console.error("Erro ao deslogar:", err);
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao deslogar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    };
 
     if (loading) {
         return (
@@ -188,7 +231,7 @@ export default function Configuracoes() {
                 <h2 className="text-base 2xl:text-lg">Configurações do perfil de parceiro</h2>
             </div>
 
-            <div className="w-full items-center justify-center flex">
+            <div className="w-full items-center justify-center flex flex-col gap-6">
 
                 <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full px-3 ssm:px-8 sm:px-12 xl:px-24 pt-6 pb-10 rounded-4xl">
                     <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
@@ -270,6 +313,13 @@ export default function Configuracoes() {
                     <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
 
                 </form>
+
+                <div className="w-full flex justify-center">
+                    <button onClick={handleLogout} className="border-2 border-[#F35D5D] hover:bg-[#F35D5D] active:bg-[#F35D5D] px-12 py-2 rounded-lg 
+                        text-[#F35D5D] hover:text-background active:text-background font-medium cursor-pointer">
+                        Sair
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -4,6 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import Swal from "sweetalert2";
+import { useState } from "react";
+import Cookies from "js-cookie";
+
 import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import FormButton from "@/components/FormButton";
@@ -22,6 +26,10 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+    const [sending, setSending] = useState(false);
+
+    const router = useRouter();
+
     // variáveis do react hook form
     const { 
         register, 
@@ -31,8 +39,97 @@ export default function Login() {
         resolver: zodResolver(loginSchema),
     });
 
-    const onSubmit = (data: LoginForm) => { 
-        console.log("ok", data); 
+    const onSubmit = async (data: LoginForm) => { 
+        try {
+            setSending(true);
+
+            // formata o objeto json que será enviado para o backend
+            const payload = {
+                email: data.email,
+                senha: data.senha,
+            };
+
+            // chama a API e armazena a resposta recebida
+            const response = await fetch("http://localhost:8080/usuarios/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            // remove do json e armazena em uma variável a resposta em caso de erro
+            if (!response.ok) {
+                let errorMsg = "Erro ao cadastrar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
+
+            // lê o corpo da resposta como JSON
+            const dataResponse = await response.json();
+
+            // extrai o token, id e tipo do usuário
+            const token = dataResponse.token;
+            const userId = dataResponse.id;
+            const tipo = dataResponse.tipo;
+
+            // seta os cookies
+            Cookies.set("token", token, { expires: 7, path: "/"  });
+            Cookies.set("userId", userId, { expires: 7, path: "/"  });
+            Cookies.set("tipo", tipo, { expires: 7, path: "/"  });
+
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Seja bem-vindo!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            // redireciona baseado no tipo de usuário
+            if (tipo === "parceiro") {
+                router.push("/parceiro/home");
+            } else {
+                router.push("/adotante/home");
+            }
+        } catch (error) {
+            // envia um alerta para o usuário caso não haja conexão com o servidor
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro de conexão com o servidor!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } finally {
+            setSending(false);
+        }
     };
 
     return (
@@ -58,7 +155,7 @@ export default function Login() {
                 </div>
 
                 {/* botão de envio */}
-                <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />
+                <FormButton text={`${sending ? "Entrando..." : "Entrar"}`} color={`${sending ? "disabled" : "purple"}`} type="submit" disabled={sending} className="mt-2" />
 
                 {/* link para o cadastro */}
                 <div className="w-full text-center text-sm md:text-base text-miau-purple hover:text-miau-green active:text-miau-light-green">

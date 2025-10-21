@@ -18,7 +18,7 @@ export default function MobileLinks({tipo}: LinksProps){
                         <Link className="active:text-miau-green transition" href={"/"}>ONGs</Link>
                     </nav>
 
-                    <LinkButton href={"/Login"} text={"Login"} center={true} bottom={true} color={"green"} />
+                    <LinkButton href={"/login"} text={"Login"} center={true} bottom={true} color={"green"} />
                 </>
             )
         // links da sidebar do parceiro

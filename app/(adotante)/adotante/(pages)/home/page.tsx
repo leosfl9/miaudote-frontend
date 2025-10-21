@@ -138,7 +138,7 @@ export default function homeAdotante(){
             );
             }
 
-            // 🔥 Cria um AbortController para poder cancelar o fetch se desmontar
+            // Cria um AbortController para poder cancelar o fetch se desmontar
             const controller = new AbortController();
 
             // Cancela o fetch se a página for recarregada ou o componente desmontar
