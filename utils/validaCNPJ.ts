@@ -1,8 +1,11 @@
 export function validaCNPJ(cnpj: string): boolean {
+  // remove tudo que não é número do cnpj
   cnpj = cnpj.replace(/[^\d]+/g, "");
 
+  // se o tamanho for diferente de 14, retorna false
   if (cnpj.length !== 14) return false;
-  if (/^(\d)\1{13}$/.test(cnpj)) return false; // todos os dígitos iguais
+  // se todos os dígitos forem iguais, retorna false
+  if (/^(\d)\1{13}$/.test(cnpj)) return false; 
 
   // cálculo do primeiro dígito verificador
   let tamanho = 12;
@@ -33,5 +36,6 @@ export function validaCNPJ(cnpj: string): boolean {
   resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
   if (resultado !== parseInt(digitos.charAt(1))) return false;
 
+  // retorna true se nenhuma validação retornar false
   return true;
 }
