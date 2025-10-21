@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { PawPrint, HandHeart, Settings, Home, Heart, User } from "lucide-react";
 
+// tipagem da prop dos links de desktop
 interface LinksProps {
     tipo?: string;
 }
 
 export default function DesktopLinks({tipo}: LinksProps) {
     switch (tipo) {
+        // links da navbar pública
         case undefined: 
             return (
                 <ul className="hidden lg:flex justify-between w-fit gap-16">
@@ -15,6 +17,7 @@ export default function DesktopLinks({tipo}: LinksProps) {
                     <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/"}>ONGs</Link></li>
                 </ul>
             )
+        // links do parceiro
         case "parceiro":
             return (
                 <ul className="hidden lg:flex items-center justify-between w-fit gap-4 mxl:gap-8 3xl:gap-16">
@@ -40,7 +43,7 @@ export default function DesktopLinks({tipo}: LinksProps) {
                     </Link></li>  
                 </ul>
             )
-
+        // links do adotante
         case "adotante":
             return (
                 <ul className="hidden glg:flex items-center justify-between w-fit gap-4 mxl:gap-8 3xl:gap-16">

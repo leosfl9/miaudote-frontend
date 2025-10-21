@@ -3,6 +3,7 @@ import { CalendarDays, Ruler, Heart } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+// tipagem das props do card de animal
 interface CardProps {
     tipo: string;
     favorito?: boolean;
@@ -25,11 +26,12 @@ interface CardProps {
 
 export default function AnimalCard({
     tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId, idSolicitacao}: CardProps){
-    const [isFavorito, setIsFavorito] = useState(!!favorito);
-    const [sending, setSending] = useState(false);
+    const [isFavorito, setIsFavorito] = useState(!!favorito); // se está favoritado ou não
+    const [sending, setSending] = useState(false); // se está sendo favoritado ou não
     
-    const href = tipo === "solicitacao" ? `/adotante/detalhes-solicitacao/${idSolicitacao}` : `/${tipo}/pet/${idPet}`;
+    const href = tipo === "solicitacao" ? `/adotante/detalhes-solicitacao/${idSolicitacao}` : `/${tipo}/pet/${idPet}`; // link dinâmico
 
+    // ao clicar para favoritar ou desfavoritar um animal, seu estado tem que ser o contrário do armazenado
     const handleClick = () => {
         setSending(true);
         onToggleFavorito?.(idPet, isFavorito, favoritoId ?? null);
@@ -38,6 +40,7 @@ export default function AnimalCard({
     
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
+            {/* foto principal do animal */}
             <div className="relative h-64 w-full">
                 <Image alt="Imagem do animal" src={foto} className="rounded-t-xl object-cover object-center" fill/>
             </div>
@@ -46,16 +49,21 @@ export default function AnimalCard({
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col sssm:flex-row sssm:justify-between gap-3 sssm:gap-0 sssm:items-start">
                         <div className="min-w-0">
+                            {/* nome do animal */}
                             <h4 className={`text-text-light-gray text-2xl font-bold truncate max-w-[16ch] 
                                 ${(tipo == "solicitacao") ? "sssm:max-w-[200px] ssm:max-w-[248px]" : ""}
                                 ${(tipo == "parceiro") ? "sssm:max-w-[20ch] ssm:max-w-none" : ""}
                                 ${(tipo == "adotante") ? "sssm:max-w-[20ch] ssm:max-w-none" : ""}`}
                                 title={nome}>
-                                {nome}</h4>
+                                {nome}
+                            </h4>
+                            {/* nome do parceiro, para adotantes apenas */}
                             { (tipo == "adotante" || tipo == "solicitacao") && (
                                 <h5 className="text-[#7B7B7B] text-sm font-medium overflow-clip text-ellipsis line-clamp-1">{parceiro}</h5>
                             )}
                         </div>
+
+                        {/* status da solicitação */}
                         {tipo == "solicitacao" && (
                             <div className={`px-3 py-1 rounded-2xl w-fit mb-2
                                 ${status == "Em Aberto" ? "bg-miau-green text-background" : "bg-hr text-text-light-gray"}`}>
@@ -64,33 +72,40 @@ export default function AnimalCard({
                                 </p>
                             </div>
                         )}
-
                     </div>
+
+                    {/* informações básicas do animal */}
                     <div className="flex flex-wrap gap-4 text-[#7B7B7B] items-center">
+                        {/* espécie do animal com ícone dinâmico */}
                         <div className="flex gap-[6px] items-center">
-                            {especie == "Cachorro" ? 
-                                <img alt="Ícone de cachorro" src={"/icon_cao2.png"} className="w-7 h-5" /> 
-                                : <img alt="Ícone de gato" src={"/icon_gato.png"} className="w-6 h-5" />}
-                            
+                            {especie == "Cachorro" 
+                                ? <img alt="Ícone de cachorro" src={"/icon_cao2.png"} className="w-7 h-5" /> 
+                                : <img alt="Ícone de gato" src={"/icon_gato.png"} className="w-6 h-5" />
+                            }
                             <p className="text-sm font-medium">{especie}</p>
                         </div>
 
+                        {/* idade do animal */}
                         <div className="flex gap-[6px] items-center">
                             <CalendarDays className="w-5 h-5" />
                             <p className="text-sm font-medium"><span>{idade}</span> ano<span>{parseInt(idade) > 1 ? "s" : ""}</span></p>
                         </div>
 
+                        {/* porte do animal */}
                         <div className="flex gap-[6px] items-center">
                             <Ruler className="w-5 h-5" />
                             <p className="text-sm font-medium">{porte}</p>
                         </div>
                     </div>
+                    {/* breve descrição do animal */}
                     <p title={descricao} className="text-sm text-[#7B7B7B] text-justify line-clamp-3 h-[60px]">
                         {descricao == "" ? "Nenhuma descrição adicionada." : descricao} 
                     </p>
                 </div>
 
+                {/* botões */}
                 <div className="flex flex-row justify-between items-center">
+                    {/* botão de favoritar */}
                     {(tipo == "adotante") && (
                         <button onClick={handleClick} 
                             className={`flex flex-row gap-2 ${favorito == true ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}
@@ -99,12 +114,14 @@ export default function AnimalCard({
                             <p className={`font-semibold`}>{favorito == true ? "Favorito" : "Favoritar"}</p>
                         </button>
                     )}
+                    {/* link para visualizar as informações do pet ou solicitação de adoção */}
                     <Link href={href} className={`px-4 py-2 rounded-4xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition w-fit 
                         ${(tipo == "solicitacao" || especie == "Gato") ? "bg-miau-purple" : "bg-miau-orange"} text-background 
                         hover:bg-miau-green active:bg-miau-light-green font-bold`}>
                         Visualizar
                     </Link>
 
+                    {/* status do pet, para parceiros apenas */}
                     {tipo == "parceiro" && (
                         <p className={`text-sm font-medium 
                             ${status == "Disponível" ? "text-miau-green" : ""}

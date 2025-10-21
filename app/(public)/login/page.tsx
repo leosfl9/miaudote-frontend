@@ -38,7 +38,6 @@ export default function Login() {
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
             bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
-
             {/* link para a home */}
             <div className="w-full max-w-[300px] md:max-w-[340px] lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
@@ -65,7 +64,6 @@ export default function Login() {
                 <div className="w-full text-center text-sm md:text-base text-miau-purple hover:text-miau-green active:text-miau-light-green">
                     <Link href="/tipo-cadastro">Ainda não possui conta? Cadastre-se!</Link>
                 </div>
-
             </form>
         </div>
     );

@@ -6,7 +6,6 @@ export default function TipoCadastro() {
   return (
     <div className="flex flex-col gap-10 sm:gap-8 px-3 md:px-8 items-center justify-center min-h-screen py-8 
         bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
-            
             {/* link para a home */}
             <div className="w-full max-w-4xl lg:absolute lg:top-10 xl:top-24 lg:left-10 xl:left-18">
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
@@ -43,7 +42,6 @@ export default function TipoCadastro() {
                     </Link>
                 </div>
             </div>
-        
     </div>
   );
 }

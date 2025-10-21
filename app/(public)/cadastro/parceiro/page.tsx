@@ -56,11 +56,9 @@ const cadastroSchema = z.object({
 type CadastroForm = z.infer<typeof cadastroSchema>;
 
 export default function CadastroParceiro() {
-    // estado para verificar se função iniciada por botão está sendo realizada, permitindo o bloqueio do botão
-    const [sending, setSending] = useState(false);
+    const [sending, setSending] = useState(false); // estado para verificar se função iniciada por botão está sendo realizada, permitindo o bloqueio do botão
 
-    // hook para enviar usuário para outra página
-    const router = useRouter();
+    const router = useRouter(); // hook para enviar usuário para outra página
 
     // variáveis do react hook form
     const { 
@@ -75,8 +73,7 @@ export default function CadastroParceiro() {
     // função de envio de formulário
     const onSubmit = async (data: CadastroForm) => {
         try {
-            // desabilita o botão de envio
-            setSending(true);
+            setSending(true); // desabilita o botão de envio
 
             // formata o objeto json que será enviado para o backend
             const payload = {
@@ -135,11 +132,8 @@ export default function CadastroParceiro() {
                 return;
             }
 
-            // armazena na sessão o estado do usuário recém-cadastrado
-            sessionStorage.setItem("justRegistered", "parceiro");
-            // envia o usuário para a tela de confirmação de cadastro, indicando que é um parceiro
-            router.push("/confirmacao?role=parceiro");
-
+            sessionStorage.setItem("justRegistered", "parceiro"); // armazena na sessão o estado do usuário recém-cadastrado
+            router.push("/confirmacao?role=parceiro"); // envia o usuário para a tela de confirmação de cadastro, indicando que é um parceiro
         } catch (error) {
             // envia um alerta para o usuário caso não haja conexão com o servidor
             Swal.fire({
@@ -151,8 +145,7 @@ export default function CadastroParceiro() {
             });
             
         } finally {
-            // habilita novamente o botão
-            setSending(false);
+            setSending(false); // habilita novamente o botão
         }
     };
 
@@ -160,7 +153,6 @@ export default function CadastroParceiro() {
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
             bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
-
             {/* link para a página de tipo de cadastro */}
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
@@ -260,7 +252,6 @@ export default function CadastroParceiro() {
                 <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login!</Link>
                 </div>
-
             </form>
         </div>
     );
