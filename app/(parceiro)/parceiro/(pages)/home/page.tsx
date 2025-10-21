@@ -47,7 +47,6 @@ export default function homeParceiro(){
           setTotalPaginas(data[0].totalPaginas);
         }
 
-        // Agora o backend retorna um array de objetos
         const listaAnimais: Animal[] = data.map((item: any) => ({
           id: item.animal.id,
           nome: item.animal.nome,

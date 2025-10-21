@@ -12,18 +12,20 @@ import { useForm } from "react-hook-form";
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
 
+// objeto do zod para validação de campos do formulário de login
 const loginSchema = z.object({
     email: z.email("E-mail inválido"),
     senha: z.string().min(1, "Senha obrigatória")
 })
 
+// utiliza os tipos definidos no schema do zod
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
+    // variáveis do react hook form
     const { 
         register, 
         handleSubmit, 
-        setValue,
         formState: { errors }, 
     } = useForm<LoginForm>({ 
         resolver: zodResolver(loginSchema),
@@ -36,10 +38,13 @@ export default function Login() {
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
             bg-[url('/grafo_fundo.png')] bg-no-repeat bg-cover bg-center">
+
+            {/* link para a home */}
             <div className="w-full max-w-[300px] md:max-w-[340px] lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/"} text="Voltar" color="white" back={true} />
             </div>
             
+            {/* formulário de login */}
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-4 xl:gap-6 items-center
                 w-full max-w-[300px] md:max-w-[340px] 2xl:max-w-[380px] px-5 md:px-6 lg:px-8 py-6 rounded-4xl ">
                 <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
@@ -53,8 +58,10 @@ export default function Login() {
                         name="senha" type="password" placeholder="Digite sua senha" className="mb-2" />
                 </div>
 
+                {/* botão de envio */}
                 <FormButton text="Entrar" color="purple" type="submit" className="mt-2" />
 
+                {/* link para o cadastro */}
                 <div className="w-full text-center text-sm md:text-base text-miau-purple hover:text-miau-green active:text-miau-light-green">
                     <Link href="/tipo-cadastro">Ainda não possui conta? Cadastre-se!</Link>
                 </div>

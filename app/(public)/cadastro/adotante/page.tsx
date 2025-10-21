@@ -20,6 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Swal from "sweetalert2";
 import { useState } from "react";
 
+// objeto do zod para validação de campos do formulário de cadastro de adotantes
 const cadastroAdotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido").refine((cpf) => 
@@ -57,18 +58,21 @@ const cadastroAdotanteSchema = z.object({
         data.senha === data.confSenha, { 
             message: "As senhas não coincidem", 
             path: ["confSenha"], }); 
-            
+
+// utiliza os tipos definidos no schema do zod
 type CadastroAdotanteForm = z.infer<typeof cadastroAdotanteSchema>;
 
 export default function CadastroAdotante() {
+    // estado para verificar se função iniciada por botão está sendo realizada, permitindo o bloqueio do botão
     const [sending, setSending] = useState(false);
 
+    // hook para enviar usuário para outra página
     const router = useRouter();
 
+    // variáveis do react hook form
     const { 
         register, 
         handleSubmit, 
-        clearErrors,
         formState: { errors }, 
     } = useForm<CadastroAdotanteForm>({ 
         resolver: zodResolver(cadastroAdotanteSchema),
@@ -76,11 +80,13 @@ export default function CadastroAdotante() {
         shouldFocusError: false,
     });
 
+    // função de envio de formulário
     const onSubmit = async (data: CadastroAdotanteForm) => { 
-        console.log("Entrou no onSubmit!", data);
         try {
+            // desabilita o botão de envio
             setSending(true);
 
+            // formata o objeto json que será enviado para o backend
             const payload = {
                 usuario: {
                     nome: data.nome,
@@ -94,8 +100,7 @@ export default function CadastroAdotante() {
                 dataNascimento: formatarData(data.dataNasc),
             };
 
-            console.log("Enviando dados:", payload);
-
+            // chama a API e armazena a resposta recebida
             const response = await fetch("http://localhost:8080/adotantes/cadastrar", {
                 method: "POST",
                 headers: {
@@ -104,33 +109,55 @@ export default function CadastroAdotante() {
                 body: JSON.stringify(payload),
             });
 
-            setSending(false);
-
+            // remove do json e armazena em uma variável a resposta em caso de erro
             if (!response.ok) {
+                let errorMsg = "Erro ao cadastrar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
+                // exibe o erro recebido
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: "Erro ao cadastrar!",
+                    title: errorMsg,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500,
                 });
                 return;
             }
 
-            console.log("Cadastro realizado com sucesso!");
+            // armazena na sessão o estado do usuário recém-cadastrado
             sessionStorage.setItem("justRegistered", "adotante");
+            // envia o usuário para a tela de confirmação de cadastro, indicando que é um adotante
             router.push("/confirmacao?role=adotante");
 
         } catch (error) {
-            console.error("Erro ao enviar cadastro:", error);
+            // envia um alerta para o usuário caso não haja conexão com o servidor
             Swal.fire({
                 position: "top",
                 icon: "error",
-                title: "Erro ao cadastrar!",
+                title: "Erro de conexão com o servidor!",
                 showConfirmButton: false,
                 timer: 1500
             });
         } finally {
+            // habilita novamente o botão
             setSending(false);
         }
     };
@@ -138,10 +165,13 @@ export default function CadastroAdotante() {
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
             bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
+
+            {/* link para a página de tipo de cadastro */}
             <div className="w-full max-w-4xl lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
                 <LinkButton href={"/tipo-cadastro"} text="Voltar" color="white" back={true} />
             </div>
             
+            {/* formulário de cadastro de adotante */}
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full max-w-4xl px-3 md:px-6 lg:px-12 py-6 rounded-4xl">
                 <Link href={"/"} className="relative w-40 h-14 md:w-48 md:h-18 lg:w-56 lg:h-20 xl:w-64 xl:h-22">
                     <Image src="/logo-main.png" alt="Cadastro de parceiro" fill />
@@ -155,26 +185,26 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Nome completo *" maxLength={100} {...register("nome")} onFocus={() => clearErrors("nome")} 
+                        <InputField label="Nome completo *" maxLength={100} {...register("nome")}
                             error={errors.nome?.message} name="nome" type="text" placeholder="Digite seu nome e sobrenome" className="mb-2" />
-                        <InputField label="CPF *" {...register("cpf")} onFocus={() => clearErrors("cpf")} 
+                        <InputField label="CPF *" {...register("cpf")}
                             error={errors.cpf?.message} mask={"000.000.000-00"} name="cpf" inputMode="numeric" type="text" placeholder="Digite seu CPF" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="E-mail *" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
+                        <InputField label="E-mail *" maxLength={200} {...register("email")} 
                             error={errors.email?.message} name="email" type="text" placeholder="Digite seu e-mail" className="mb-2" />
-                        <InputField label="Celular / WhatsApp *" {...register("telefone")} onFocus={() => clearErrors("telefone")} 
+                        <InputField label="Celular / WhatsApp *" {...register("telefone")}
                             error={errors.telefone?.message} name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" 
                             placeholder="(00) 00000-0000" className="mb-2" />
-                        <InputField label="Data de nascimento *" {...register("dataNasc")} onFocus={() => clearErrors("dataNasc")} 
+                        <InputField label="Data de nascimento *" {...register("dataNasc")}
                             error={errors.dataNasc?.message} mask={"00/00/0000"} name="dataNasc" type="text" placeholder="Digite sua data de nascimento" className="mb-2" />
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <InputField label="Senha *" maxLength={70} {...register("senha")} onFocus={() => clearErrors("senha")} 
+                        <InputField label="Senha *" maxLength={70} {...register("senha")}
                             error={errors.senha?.message} name="senha" type="password" placeholder="Crie uma senha" className="mb-2" />
-                        <InputField label="Confirmar senha *" {...register("confSenha")} onFocus={() => clearErrors("confSenha")} 
+                        <InputField label="Confirmar senha *" {...register("confSenha")} 
                             error={errors.confSenha?.message} name="confSenha" type="password" placeholder="Digite a senha novamente" className="mb-2" />
                     </div>
 
@@ -187,7 +217,7 @@ export default function CadastroAdotante() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 lg:gap-3">
-                        <SelectField defaultValue={""} {...register("estado")} onFocus={() => clearErrors("estado")} 
+                        <SelectField defaultValue={""} {...register("estado")} 
                             error={errors.estado?.message} label="Estado *" name="estado" className="appearance-none mb-2">
                             <option value={""} disabled>Selecione o estado</option>
                             <option value="AC">Acre</option>
@@ -218,15 +248,17 @@ export default function CadastroAdotante() {
                             <option value="SE">Sergipe</option>
                             <option value="TO">Tocantins</option>
                         </SelectField>
-                        <InputField label="Cidade *" maxLength={40} {...register("cidade")} onFocus={() => clearErrors("cidade")} 
+                        <InputField label="Cidade *" maxLength={40} {...register("cidade")} 
                             error={errors.cidade?.message} name="cidade" type="text" placeholder="Digite a cidade" className="mb-2" />
                     </div>
 
                 </div>
 
+                {/* botão de envio */}
                 <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar-se"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
                     className="mt-2" disabled={sending} />
 
+                {/* link para o login */}
                 <div className="w-full text-center text-miau-orange hover:text-miau-green active:text-miau-light-green">
                     <Link href="/login">Já possui uma conta? Faça login!</Link>
                 </div>
