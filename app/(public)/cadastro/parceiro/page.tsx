@@ -97,12 +97,32 @@ export default function CadastroParceiro() {
             });
 
             if (!response.ok) {
+                let errorMsg = "Erro ao cadastrar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    console.error("Erro ao cadastrar:", error);
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: "Erro ao cadastrar!",
+                    title: errorMsg,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500,
                 });
                 return;
             }
@@ -116,7 +136,7 @@ export default function CadastroParceiro() {
             Swal.fire({
                 position: "top",
                 icon: "error",
-                title: "Erro ao cadastrar!",
+                title: "Erro de conexão com o servidor!",
                 showConfirmButton: false,
                 timer: 1500
             });

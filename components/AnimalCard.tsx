@@ -69,8 +69,8 @@ export default function AnimalCard({
                     <div className="flex flex-wrap gap-4 text-[#7B7B7B] items-center">
                         <div className="flex gap-[6px] items-center">
                             {especie == "Cachorro" ? 
-                                <Image alt="Ícone de cachorro" src={"/icon_cao.png"} width={20} height={20} /> 
-                                : <Image alt="Ícone de gato" src={"/icon_gato.png"} width={20} height={19} />}
+                                <img alt="Ícone de cachorro" src={"/icon_cao2.png"} className="w-7 h-5" /> 
+                                : <img alt="Ícone de gato" src={"/icon_gato.png"} className="w-6 h-5" />}
                             
                             <p className="text-sm font-medium">{especie}</p>
                         </div>

@@ -5,17 +5,20 @@
   --foreground: #171717;
 }
 
-@keyframes spin-once {
-  from {
-    transform: rotate(0deg);
+@keyframes bounce-once {
+  0%, 100% {
+    transform: translateY(0);
   }
-  to {
-    transform: rotate(360deg);
+  30% {
+    transform: translateY(-15px);
+  }
+  60% {
+    transform: translateY(0);
   }
 }
 
-.animate-spin-once {
-  animation: spin-once 0.8s ease-in-out 1;
+.animate-bounce-once {
+  animation: bounce-once 0.8s ease-in-out;
 }
 
 @theme inline {
