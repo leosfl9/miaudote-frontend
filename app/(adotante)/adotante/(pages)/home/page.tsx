@@ -123,31 +123,43 @@ export default function homeAdotante(){
     const [favoritandoId, setFavoritandoId] = useState<number | null>(null);
 
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
-        try {
-            setFavoritandoId(idPet); // desabilita o botão desse pet
+        let isMounted = true;
+        setFavoritandoId(idPet);
 
-            // Atualiza localmente antes da requisição (feedback rápido)
+        try {
+            // Atualização otimista
+            if (isMounted) {
             setAnimais((prev) =>
-            prev.map((animal) =>
+                prev.map((animal) =>
                 animal.id === idPet
-                ? { ...animal, favorito: !favorito }
-                : animal
-            )
+                    ? { ...animal, favorito: !favorito }
+                    : animal
+                )
             );
+            }
+
+            // 🔥 Cria um AbortController para poder cancelar o fetch se desmontar
+            const controller = new AbortController();
+
+            // Cancela o fetch se a página for recarregada ou o componente desmontar
+            window.addEventListener("beforeunload", () => controller.abort());
 
             if (favorito && favoritoId !== null) {
             const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
                 method: "DELETE",
+                signal: controller.signal,
             });
             if (!response.ok) throw new Error("Erro ao remover favorito");
 
-            setAnimais((prev) =>
+            if (isMounted) {
+                setAnimais((prev) =>
                 prev.map((animal) =>
-                animal.id === idPet
+                    animal.id === idPet
                     ? { ...animal, favorito: false, favoritoId: null }
                     : animal
                 )
-            );
+                );
+            }
             } else {
             const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
                 method: "POST",
@@ -156,35 +168,47 @@ export default function homeAdotante(){
                 adotanteId: 36,
                 animalId: idPet,
                 }),
+                signal: controller.signal,
             });
             if (!response.ok) throw new Error("Erro ao adicionar favorito");
 
             const novoFav = await response.json();
 
+            if (isMounted) {
+                setAnimais((prev) =>
+                prev.map((animal) =>
+                    animal.id === idPet
+                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                    : animal
+                )
+                );
+            }
+            }
+        } catch (error: any) {
+            if (error.name === "AbortError") {
+            console.log("Requisição cancelada pelo usuário (recarregou a página).");
+            return; // apenas ignora
+            }
+
+            console.error(error);
+            alert("Não foi possível atualizar os favoritos.");
+
+            if (isMounted) {
+            // Reverte o estado apenas se ainda estiver montado
             setAnimais((prev) =>
                 prev.map((animal) =>
                 animal.id === idPet
-                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                    ? { ...animal, favorito, favoritoId }
                     : animal
                 )
             );
             }
-        } catch (error) {
-            console.error(error);
-            alert("Não foi possível atualizar os favoritos.");
-
-            // Reverte se der erro
-            setAnimais((prev) =>
-            prev.map((animal) =>
-                animal.id === idPet
-                ? { ...animal, favorito, favoritoId }
-                : animal
-            )
-            );
         } finally {
-            setFavoritandoId(null); // reabilita o botão
+            if (isMounted) setFavoritandoId(null);
+            isMounted = false;
         }
     }
+
 
     if (loading) {
         return (
