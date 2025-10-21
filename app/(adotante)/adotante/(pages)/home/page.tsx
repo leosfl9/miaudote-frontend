@@ -120,53 +120,71 @@ export default function homeAdotante(){
       }
     }
 
+    const [favoritandoId, setFavoritandoId] = useState<number | null>(null);
+
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
         try {
-            setLoading(true);
+            setFavoritandoId(idPet); // desabilita o botão desse pet
+
+            // Atualiza localmente antes da requisição (feedback rápido)
+            setAnimais((prev) =>
+            prev.map((animal) =>
+                animal.id === idPet
+                ? { ...animal, favorito: !favorito }
+                : animal
+            )
+            );
 
             if (favorito && favoritoId !== null) {
-                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
-                    method: "DELETE",
-                });
-                if (!response.ok) throw new Error("Erro ao remover favorito");
+            const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) throw new Error("Erro ao remover favorito");
 
-                setAnimais((prev) =>
-                    prev.map((animal) =>
-                    animal.id === idPet ? { ...animal, favorito: false, favoritoId: null } : animal
-                    )
-                );
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet
+                    ? { ...animal, favorito: false, favoritoId: null }
+                    : animal
+                )
+            );
             } else {
-                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                    adotanteId: 36,
-                    animalId: idPet,
-                    }),
-                });
-                if (!response.ok) throw new Error("Erro ao adicionar favorito");
+            const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                adotanteId: 36,
+                animalId: idPet,
+                }),
+            });
+            if (!response.ok) throw new Error("Erro ao adicionar favorito");
 
-                const novoFav = await response.json(); // backend retorna o id do favorito
+            const novoFav = await response.json();
 
-                setAnimais((prev) =>
-                    prev.map((animal) =>
-                    animal.id === idPet
-                        ? { ...animal, favorito: true, favoritoId: novoFav.id }
-                        : animal
-                    )
-                );
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet
+                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                    : animal
+                )
+            );
             }
-
-            await carregarAnimais();
-
         } catch (error) {
             console.error(error);
             alert("Não foi possível atualizar os favoritos.");
+
+            // Reverte se der erro
+            setAnimais((prev) =>
+            prev.map((animal) =>
+                animal.id === idPet
+                ? { ...animal, favorito, favoritoId }
+                : animal
+            )
+            );
         } finally {
-            setLoading(false);
+            setFavoritandoId(null); // reabilita o botão
         }
     }
-
 
     if (loading) {
         return (
@@ -259,6 +277,7 @@ export default function homeAdotante(){
                         favorito={animal.favorito}
                         favoritoId={animal.favoritoId}
                         onToggleFavorito={handleFavorito}
+                        disabled={favoritandoId === animal.id}
                     />
                     ))
                 ) : (

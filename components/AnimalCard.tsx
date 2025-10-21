@@ -22,21 +22,23 @@ interface CardProps {
     parceiro?: string;
     estado?: string;
     onToggleFavorito?: (idPet: number, favorito: boolean, favoritoId: number | null) => void;
+    disabled?: boolean;
 }
 
 export default function AnimalCard({
-    tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId, idSolicitacao}: CardProps){
-    const [isFavorito, setIsFavorito] = useState(!!favorito); // se está favoritado ou não
+    tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId, idSolicitacao, disabled}: CardProps){
     const [sending, setSending] = useState(false); // se está sendo favoritado ou não
     
     const href = tipo === "solicitacao" ? `/adotante/detalhes-solicitacao/${idSolicitacao}` : `/${tipo}/pet/${idPet}`; // link dinâmico
 
     // ao clicar para favoritar ou desfavoritar um animal, seu estado tem que ser o contrário do armazenado
+
     const handleClick = () => {
-        setSending(true);
-        onToggleFavorito?.(idPet, isFavorito, favoritoId ?? null);
-        setIsFavorito(!isFavorito);
+        if (onToggleFavorito) {
+            onToggleFavorito(idPet, favorito ?? false, favoritoId ?? null);
+        }
     };
+
     
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
@@ -108,10 +110,11 @@ export default function AnimalCard({
                     {/* botão de favoritar */}
                     {(tipo == "adotante") && (
                         <button onClick={handleClick} 
-                            className={`flex flex-row gap-2 ${favorito == true ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} cursor-pointer`}
-                            disabled={sending}>
-                            <Heart className={`${favorito == true ? "fill-[#F35D5D]" : ""}`} />
-                            <p className={`font-semibold`}>{favorito == true ? "Favorito" : "Favoritar"}</p>
+                            className={`flex flex-row gap-2 ${favorito ? "text-[#F35D5D]" : "text-[#7B7B7B] hover:text-[#F35D5D]"} 
+                            ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"} cursor-pointer `}
+                            disabled={disabled}>
+                            <Heart className={`${favorito ? "fill-[#F35D5D]" : ""}`} />
+                            <p className={`font-semibold`}>{disabled ? "Salvando..." : favorito ? "Favorito" : "Favoritar"}</p>
                         </button>
                     )}
                     {/* link para visualizar as informações do pet ou solicitação de adoção */}
