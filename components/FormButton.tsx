@@ -5,7 +5,7 @@ import { ButtonHTMLAttributes } from "react";
 // tipagem das props do botão de formulário
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
-  color: "green" | "orange" | "purple" | "disabled";
+  color: "green" | "orange" | "purple" | "disabled" | "disabled-purple";
 }
 
 export default function FormButton({ text, color, onClick, className, ...props }: ButtonProps) {
@@ -17,6 +17,7 @@ export default function FormButton({ text, color, onClick, className, ...props }
         ${color == "orange" && "bg-miau-orange hover:bg-miau-green active:bg-miau-light-green"}
         ${color == "purple" && "bg-miau-purple hover:bg-miau-green active:bg-miau-light-green"}
         ${color == "disabled" && "bg-miau-green/70"}
+        ${color == "disabled-purple" && "bg-miau-purple/70"}
         ${className}`}
       {...props}>
       {text}

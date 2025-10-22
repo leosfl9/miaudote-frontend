@@ -100,8 +100,6 @@ export default function Configuracoes() {
                 payload.usuario.senha = data.senha;
             }
 
-            console.log("Enviando dados:", payload);
-
             const response = await fetch(`http://localhost:8080/parceiros/${id}`, {
                 method: "PATCH",
                 headers: {
@@ -131,7 +129,6 @@ export default function Configuracoes() {
             }
 
         } catch (error) {
-            console.error("Erro ao editar:", error);
             Swal.fire({
                 position: "top",
                 icon: "error",

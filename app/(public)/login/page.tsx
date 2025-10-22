@@ -155,7 +155,7 @@ export default function Login() {
                 </div>
 
                 {/* botão de envio */}
-                <FormButton text={`${sending ? "Entrando..." : "Entrar"}`} color={`${sending ? "disabled" : "purple"}`} type="submit" disabled={sending} className="mt-2" />
+                <FormButton text={`${sending ? "Entrando..." : "Entrar"}`} color={`${sending ? "disabled-purple" : "purple"}`} type="submit" disabled={sending} className="mt-2" />
 
                 {/* link para o cadastro */}
                 <div className="w-full text-center text-sm md:text-base text-miau-purple hover:text-miau-green active:text-miau-light-green">
