@@ -124,7 +124,7 @@ export default function AnimalPresentation ({
                             </Link>
                             
                             {/* botão para encerrar solicitação de adoção */}
-                            {(tipo == "solicitacao" && status != "Encerrada") && (
+                            {(tipo == "solicitacao" && (status != "Encerrada" && status != "Cancelada")) && (
                                 <button className="w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
                                 bg-[#F35D5D] hover:bg-[#fA7C7C] active:bg-[#fA7C7C] text-background font-bold cursor-pointer" 
                                     onClick={(e) => {onOpenModalCancela?.(); }}>

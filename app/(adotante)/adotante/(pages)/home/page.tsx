@@ -26,7 +26,7 @@ interface Animal {
 
 export default function homeAdotante(){
     const token = Cookies.get("token");
-    const id = Cookies.get("userId");
+    const userId = Cookies.get("userId");
 
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
@@ -71,7 +71,7 @@ export default function homeAdotante(){
     }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
 
     useEffect(() => {
-        if (token && id) carregarAnimais();
+        if (token && userId) carregarAnimais();
     }, [paginaAtual]);
     
 
@@ -79,7 +79,7 @@ export default function homeAdotante(){
       try {
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/36`, {
+        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/${userId}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -180,9 +180,43 @@ export default function homeAdotante(){
             if (favorito && favoritoId !== null) {
             const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
                 method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
                 signal: controller.signal,
             });
-            if (!response.ok) throw new Error("Erro ao remover favorito");
+
+            if (!response.ok) {
+                let errorMsg = "Erro ao remover favorito!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
 
             if (isMounted) {
                 setAnimais((prev) =>
@@ -196,14 +230,48 @@ export default function homeAdotante(){
             } else {
             const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Authorization": `Bearer ${token}`, 
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({
-                adotanteId: 36,
-                animalId: idPet,
+                    adotanteId: userId,
+                    animalId: idPet,
                 }),
                 signal: controller.signal,
             });
-            if (!response.ok) throw new Error("Erro ao adicionar favorito");
+
+            if (!response.ok) {
+                let errorMsg = "Erro ao adicionar favorito!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
 
             const novoFav = await response.json();
 
@@ -241,7 +309,6 @@ export default function homeAdotante(){
             isMounted = false;
         }
     }
-
 
     if (loading) {
         return (

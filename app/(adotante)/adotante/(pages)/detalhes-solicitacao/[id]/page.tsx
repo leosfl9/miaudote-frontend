@@ -5,6 +5,7 @@ import AnimalPresentation from "@/components/AnimalPresentation";
 
 import { X } from "lucide-react";
 
+import Cookies from "js-cookie";
 import { useState, useEffect, use } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
@@ -32,6 +33,9 @@ interface Animal {
 }
 
 export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: string }> }) {
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const { id } = use(params);
     const [openCancela, setOpenCancela] = useState(false);
     const [cancelling, setCancelling] = useState(false);
@@ -56,10 +60,52 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
     }, [openCancela]);
 
     useEffect(() => {
-        async function carregarAnimal() {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
+        async function carregarSolicitacao() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/${id}`);
-            if (!response.ok) throw new Error("Erro ao buscar dados");
+            const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
+            
+            if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
 
             const data = await response.json();
             console.log("Dados recebidos:", data);
@@ -84,7 +130,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
             }
         }
 
-        carregarAnimal();
+        carregarSolicitacao();
     }, [id]);
 
     if (loading) {
@@ -131,13 +177,42 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
+                                            "Authorization": `Bearer ${token}`,
                                             "Content-Type": "application/json",
                                         },
                                         body: JSON.stringify({ status: "Finalizada por desistência do adotante" }),
                                     });
 
                                     if (!response.ok) {
-                                        throw new Error("Erro ao atualizar status da adoção");
+                                        let errorMsg = "Erro ao remover favorito!";
+                                        try {
+                                            const text = await response.text();
+                                            try {
+                                            const json = JSON.parse(text);
+                                            errorMsg = json.message || JSON.stringify(json);
+                                            } catch {
+                                            errorMsg = text;
+                                            }
+                                        } catch (error) {
+                                            // envia um alerta para o usuário caso não haja conexão com o servidor
+                                            Swal.fire({
+                                                position: "top",
+                                                icon: "error",
+                                                title: "Erro de conexão com o servidor!",
+                                                showConfirmButton: false,
+                                                timer: 2000,
+                                            });
+                                        }
+                            
+                                        // exibe o erro recebido
+                                        Swal.fire({
+                                            position: "top",
+                                            icon: "error",
+                                            title: errorMsg,
+                                            showConfirmButton: false,
+                                            timer: 2500,
+                                        });
+                                        return;
                                     }
 
                                     Swal.fire({

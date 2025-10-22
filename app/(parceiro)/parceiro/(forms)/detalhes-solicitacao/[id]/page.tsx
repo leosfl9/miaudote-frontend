@@ -163,7 +163,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                 try {
                                     setSendingFinalizar(true);
 
-                                    const response = await fetch(`http://localhost:8080/adocoes/10`, {
+                                    const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
                                             "Authorization": `Bearer ${token}`,
@@ -173,7 +173,35 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     });
 
                                     if (!response.ok) {
-                                        throw new Error("Erro ao atualizar status da adoção");
+                                        let errorMsg = "Erro ao editar!";
+                                        try {
+                                            const text = await response.text();
+                                            try {
+                                            const json = JSON.parse(text);
+                                            errorMsg = json.message || JSON.stringify(json);
+                                            } catch {
+                                            errorMsg = text;
+                                            }
+                                        } catch (error) {
+                                            // envia um alerta para o usuário caso não haja conexão com o servidor
+                                            Swal.fire({
+                                                position: "top",
+                                                icon: "error",
+                                                title: "Erro de conexão com o servidor!",
+                                                showConfirmButton: false,
+                                                timer: 2000,
+                                            });
+                                        }
+                            
+                                        // exibe o erro recebido
+                                        Swal.fire({
+                                            position: "top",
+                                            icon: "error",
+                                            title: errorMsg,
+                                            showConfirmButton: false,
+                                            timer: 2500,
+                                        });
+                                        return;
                                     }
 
                                     Swal.fire({
@@ -210,7 +238,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     try {
                                         setSendingCancelar(true);
 
-                                        const response = await fetch(`http://localhost:8080/adocoes/10`, {
+                                        const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
                                             method: "PATCH",
                                             headers: {
                                                 "Authorization": `Bearer ${token}`,
@@ -220,7 +248,35 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                         });
 
                                         if (!response.ok) {
-                                            throw new Error("Erro ao atualizar status da adoção");
+                                            let errorMsg = "Erro ao editar!";
+                                            try {
+                                                const text = await response.text();
+                                                try {
+                                                const json = JSON.parse(text);
+                                                errorMsg = json.message || JSON.stringify(json);
+                                                } catch {
+                                                errorMsg = text;
+                                                }
+                                            } catch (error) {
+                                                // envia um alerta para o usuário caso não haja conexão com o servidor
+                                                Swal.fire({
+                                                    position: "top",
+                                                    icon: "error",
+                                                    title: "Erro de conexão com o servidor!",
+                                                    showConfirmButton: false,
+                                                    timer: 2000,
+                                                });
+                                            }
+                                
+                                            // exibe o erro recebido
+                                            Swal.fire({
+                                                position: "top",
+                                                icon: "error",
+                                                title: errorMsg,
+                                                showConfirmButton: false,
+                                                timer: 2500,
+                                            });
+                                            return;
                                         }
 
                                         Swal.fire({

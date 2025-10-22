@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
 import LinkButton from "@/components/LinkButton";
@@ -64,6 +65,9 @@ const adotanteSchema = z.object({
 type AdotanteForm = z.infer<typeof adotanteSchema>;
 
 export default function PerfilAdotante() {
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const router = useRouter();
 
     const [loading, setLoading] = useState(true);
@@ -102,9 +106,10 @@ export default function PerfilAdotante() {
 
             console.log("Enviando dados:", payload);
 
-            const response = await fetch("http://localhost:8080/adotantes/39", {
+            const response = await fetch(`http://localhost:8080/adotantes/${userId}`, {
                 method: "PATCH",
                 headers: {
+                    "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(payload),
@@ -119,12 +124,33 @@ export default function PerfilAdotante() {
             });
 
             if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: "Erro ao editar!",
+                    title: errorMsg,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500,
                 });
                 return;
             }
@@ -144,10 +170,52 @@ export default function PerfilAdotante() {
     };
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
         const fetchUsuario = async () => {
             try {
-                const res = await fetch("http://localhost:8080/adotantes/39");
-                if (!res.ok) throw new Error("Erro ao buscar usuário");
+                const res = await fetch(`http://localhost:8080/adotantes/${userId}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    }
+                });
+
+                if (!res.ok) {
+                    let errorMsg = "Erro ao editar!";
+                    try {
+                        const text = await res.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+        
+                    // exibe o erro recebido
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: errorMsg,
+                        showConfirmButton: false,
+                        timer: 2500,
+                    });
+                    return;
+                }
 
                 const usuario = await res.json();
 
@@ -160,12 +228,44 @@ export default function PerfilAdotante() {
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false); // <-- termina o carregamento
+                setLoading(false); // termina o carregamento
             }
         };
 
         fetchUsuario();
     }, [setValue]);
+
+    const handleLogout = async () => {
+        try {
+            const res = await fetch("/api/logout", { method: "POST" });
+
+            if (res.ok) {
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Deslogado com sucesso!",
+                showConfirmButton: false,
+                timer: 1000
+            });
+
+            // Espera o swal terminar antes de redirecionar
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1000);
+            } else {
+                throw new Error("Falha ao deslogar");
+            }
+        } catch (err) {
+            console.error("Erro ao deslogar:", err);
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao deslogar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    };
 
     if (loading) {
         return (
@@ -184,7 +284,7 @@ export default function PerfilAdotante() {
                 <h2 className="text-base 2xl:text-lg">Configurações do perfil pessoal</h2>
             </div>
 
-            <div className="w-full items-center justify-center flex">
+            <div className="w-full items-center justify-center flex flex-col gap-6">
 
                 <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full px-3 ssm:px-8 sm:px-12 xl:px-24 pt-6 pb-10 rounded-4xl">
                     <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
@@ -262,6 +362,13 @@ export default function PerfilAdotante() {
                     <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
 
                 </form>
+
+                <div className="w-full flex justify-center">
+                    <button onClick={handleLogout} className="border-2 border-[#F35D5D] hover:bg-[#F35D5D] active:bg-[#F35D5D] px-12 py-2 rounded-lg 
+                        text-[#F35D5D] hover:text-background active:text-background font-medium cursor-pointer">
+                        Sair
+                    </button>
+                </div>
             </div>
         </div>
     );

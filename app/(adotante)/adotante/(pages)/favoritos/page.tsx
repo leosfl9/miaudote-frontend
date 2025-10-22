@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 interface Animal {
   id: number;
@@ -22,21 +24,61 @@ interface Animal {
 }
 
 export default function homeAdotante(){
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [loading, setLoading] = useState(true);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
 
     useEffect(() => {
-        carregarAnimais();
+        if (token && userId) carregarAnimais();
     }, []);
 
     async function carregarAnimais() {
         try {
             setLoading(true);
 
-            const response = await fetch(`http://localhost:8080/fotos/adotante/36/pagina/${paginaAtual}`);
-            if (!response.ok) throw new Error("Erro ao buscar dados");
+            const response = await fetch(`http://localhost:8080/fotos/adotante/${userId}/pagina/${paginaAtual}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
+            
+            if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
     
             const data = await response.json();
             console.log("Dados recebidos:", data);
@@ -70,30 +112,161 @@ export default function homeAdotante(){
             setLoading(false);
         }
     }
+
+    const [favoritandoId, setFavoritandoId] = useState<number | null>(null);
     
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
-        try {
-            setLoading(true);
+        let isMounted = true;
+        setFavoritandoId(idPet);
 
-            if (favorito) {
-                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
-                    method: "DELETE",
-                });
-                if (!response.ok) throw new Error("Erro ao remover favorito");
-    
-                setAnimais((prev) =>
-                    prev.map((animal) =>
-                        animal.id === idPet ? { ...animal, favorito: false } : animal
-                    )
-                );
+        try {
+            // Atualização otimista
+            if (isMounted) {
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet
+                    ? { ...animal, favorito: !favorito }
+                    : animal
+                )
+            );
             }
 
-            await carregarAnimais();
-        } catch (error) {
+            // Cria um AbortController para poder cancelar o fetch se desmontar
+            const controller = new AbortController();
+
+            // Cancela o fetch se a página for recarregada ou o componente desmontar
+            window.addEventListener("beforeunload", () => controller.abort());
+
+            if (favorito && favoritoId !== null) {
+                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    let errorMsg = "Erro ao remover favorito!";
+                    try {
+                        const text = await response.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+        
+                    // exibe o erro recebido
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: errorMsg,
+                        showConfirmButton: false,
+                        timer: 2500,
+                    });
+                    return;
+                }
+
+                if (isMounted) {
+                    setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet
+                        ? { ...animal, favorito: false, favoritoId: null }
+                        : animal
+                    ));
+                }
+            } else {
+                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`, 
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        adotanteId: userId,
+                        animalId: idPet,
+                    }),
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    let errorMsg = "Erro ao adicionar favorito!";
+                    try {
+                        const text = await response.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+        
+                    // exibe o erro recebido
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: errorMsg,
+                        showConfirmButton: false,
+                        timer: 2500,
+                    });
+                    return;
+                }
+
+                const novoFav = await response.json();
+
+                if (isMounted) {
+                    setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet
+                        ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                        : animal
+                    ));
+                }
+            }
+
+        } catch (error: any) {
+            if (error.name === "AbortError") {
+                console.log("Requisição cancelada pelo usuário (recarregou a página).");
+                return; // apenas ignora
+            }
+
             console.error(error);
             alert("Não foi possível atualizar os favoritos.");
+
+            if (isMounted) {
+            // Reverte o estado apenas se ainda estiver montado
+            setAnimais((prev) =>
+                prev.map((animal) =>
+                animal.id === idPet
+                    ? { ...animal, favorito, favoritoId }
+                    : animal
+                )
+            );
+            }
         } finally {
-            setLoading(false);
+            if (isMounted) setFavoritandoId(null);
+            isMounted = false;
+            await carregarAnimais();
         }
     }
 
@@ -132,6 +305,7 @@ export default function homeAdotante(){
                         foto={`data:image/jpeg;base64,${animal.foto}`}
                         favoritoId={animal.favoritoId}
                         onToggleFavorito={handleFavorito}
+                        disabled={favoritandoId === animal.id}
                         favorito />
                     ))
                 ) : (

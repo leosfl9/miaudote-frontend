@@ -6,6 +6,7 @@ import LinkButton from "@/components/LinkButton";
 import AnimalPresentation from "@/components/AnimalPresentation";
 import { X } from "lucide-react";
 
+import Cookies from "js-cookie";
 import { use, useEffect, useState } from "react";
 
 import Swal from "sweetalert2";
@@ -32,6 +33,9 @@ interface Animal {
 }
 
 export default function PetPresentation({ params }: { params: Promise<{ id: string }> }) {
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const { id } = use(params);
     const [open, setOpen] = useState(false);
     const [confirming, setConfirming] = useState(false);
@@ -54,10 +58,52 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
     }, [open]);
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+        
         async function carregarAnimal() {
             try {
-            const response = await fetch(`http://localhost:8080/fotos/animal/${id}`);
-            if (!response.ok) throw new Error("Erro ao buscar dados");
+            const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
+
+            if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
 
             const data = await response.json();
             console.log("Dados recebidos:", data);
@@ -72,7 +118,7 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
             setFotos(fotos);
 
             } catch (error) {
-            console.error("Erro ao carregar animal:", error);
+                console.error("Erro ao carregar animal:", error);
             } finally {
                 setLoading(false);
             }
@@ -170,20 +216,49 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                     setConfirming(true);
 
                                     const payload = {
-                                        adotanteId: 36,
+                                        adotanteId: userId,
                                         animalId: id,
                                     };
 
                                     const response = await fetch(`http://localhost:8080/adocoes/cadastrar`, {
                                         method: "POST",
                                         headers: {
+                                            "Authorization": `Bearer ${token}`,
                                             "Content-Type": "application/json",
                                         },
                                         body: JSON.stringify(payload),
                                     });
 
                                     if (!response.ok) {
-                                        throw new Error("Erro ao solicitar adoção");
+                                        let errorMsg = "Erro ao editar!";
+                                        try {
+                                            const text = await response.text();
+                                            try {
+                                            const json = JSON.parse(text);
+                                            errorMsg = json.message || JSON.stringify(json);
+                                            } catch {
+                                            errorMsg = text;
+                                            }
+                                        } catch (error) {
+                                            // envia um alerta para o usuário caso não haja conexão com o servidor
+                                            Swal.fire({
+                                                position: "top",
+                                                icon: "error",
+                                                title: "Erro de conexão com o servidor!",
+                                                showConfirmButton: false,
+                                                timer: 2000,
+                                            });
+                                        }
+                            
+                                        // exibe o erro recebido
+                                        Swal.fire({
+                                            position: "top",
+                                            icon: "error",
+                                            title: errorMsg,
+                                            showConfirmButton: false,
+                                            timer: 2500,
+                                        });
+                                        return;
                                     }
 
                                     Swal.fire({

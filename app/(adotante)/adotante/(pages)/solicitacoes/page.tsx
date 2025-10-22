@@ -1,7 +1,9 @@
 "use client"
 
 import AnimalCard from "@/components/AnimalCard";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 interface Animal {
   id: number;
@@ -18,14 +20,59 @@ interface Animal {
 }
 
 export default function SolicitacoesAdocao(){
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+        
         async function carregarAnimais() {
             try {
-                const response = await fetch(`http://localhost:8080/adocoes/adotante/36`);
-                if (!response.ok) throw new Error("Erro ao buscar dados");
+                const response = await fetch(`http://localhost:8080/adocoes/adotante/${userId}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    }
+                });
+                
+                if (!response.ok) {
+                    let errorMsg = "Erro ao editar!";
+                    try {
+                        const text = await response.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+        
+                    // exibe o erro recebido
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: errorMsg,
+                        showConfirmButton: false,
+                        timer: 2500,
+                    });
+                    return;
+                }
 
                 const data = await response.json();
                 console.log("Dados recebidos:", data);
