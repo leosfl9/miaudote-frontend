@@ -3,7 +3,9 @@
 import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 import SelectField from "@/components/SelectField";
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 
 interface Animal {
   id: number;
@@ -23,6 +25,9 @@ interface Animal {
 }
 
 export default function homeAdotante(){
+    const token = Cookies.get("token");
+    const id = Cookies.get("userId");
+
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
 
@@ -66,21 +71,55 @@ export default function homeAdotante(){
     }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
 
     useEffect(() => {
-        carregarAnimais();
+        if (token && id) carregarAnimais();
     }, [paginaAtual]);
     
 
     async function carregarAnimais() {
       try {
-        const start = performance.now();
         setLoading(true);
 
-        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/36`);
-        const mid = performance.now();
-        if (!response.ok) throw new Error("Erro ao buscar dados");
+        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/36`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+            }
+        });
+
+        if (!response.ok) {
+            let errorMsg = "Erro ao editar!";
+            try {
+                const text = await response.text();
+                try {
+                const json = JSON.parse(text);
+                errorMsg = json.message || JSON.stringify(json);
+                } catch {
+                errorMsg = text;
+                }
+            } catch (error) {
+                // envia um alerta para o usuário caso não haja conexão com o servidor
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro de conexão com o servidor!",
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+            }
+
+            // exibe o erro recebido
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: errorMsg,
+                showConfirmButton: false,
+                timer: 2500,
+            });
+            return;
+        }
 
         const data = await response.json();
-        const end = performance.now();
         console.log("Dados recebidos:", data);
 
         if (data.length > 0) {
@@ -107,12 +146,6 @@ export default function homeAdotante(){
 
         setAnimais(listaAnimais);
 
-        console.log(`
-            Tempo total: ${(end - start).toFixed(2)} ms
-            - Fetch: ${(mid - start).toFixed(2)} ms
-            - JSON parse: ${(end - mid).toFixed(2)} ms
-            - Tamanho resposta: ${(JSON.stringify(data).length / 1024).toFixed(1)} KB
-         `);
       } catch (error) {
         console.error("Erro ao carregar animais:", error);
       } finally {

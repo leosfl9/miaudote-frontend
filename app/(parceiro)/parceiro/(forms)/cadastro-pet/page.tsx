@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import NextImage from "next/image";
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 
 import LinkButton from "@/components/LinkButton";
@@ -80,6 +81,9 @@ const petSchema = z.object({
 type PetForm = z.infer<typeof petSchema>;
 
 export default function CadastroPet() {
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const router = useRouter();
 
     const { 
@@ -182,6 +186,10 @@ export default function CadastroPet() {
 
     const [sending, setSending] = useState(false);
 
+    // useEffect (() => {
+    //     if (!token || !userId) router.push("/login");
+    // }, [])
+
     // ---- Submit final ----
     const onSubmit = async (data: PetForm) => {
         console.log("Dados do animal:", data);
@@ -192,7 +200,7 @@ export default function CadastroPet() {
             const formData = new FormData();
 
             // Campos simples — cada um em texto plano
-            formData.append("parceiroId", "37"); // ou variável dinâmica
+            formData.append("parceiroId", userId ?? ""); // ou variável dinâmica
             formData.append("especie", data.especie);
             formData.append("nome", data.nome);
             formData.append("sexo", data.sexo);
@@ -210,16 +218,40 @@ export default function CadastroPet() {
             // Envio do FormData (sem header Content-Type!)
             const response = await fetch("http://localhost:8080/animais/cadastrar", {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
                 body: formData,
             });
 
             if (!response.ok) {
+                let errorMsg = "Erro ao buscar solicitações!";
+                try {
+                    const text = await response.text();
+                    try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                        errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
+                // exibe o erro recebido
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: "Erro ao cadastrar!",
+                    title: errorMsg,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500,
                 });
                 return;
             }
