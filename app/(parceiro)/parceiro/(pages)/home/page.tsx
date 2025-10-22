@@ -6,6 +6,7 @@ import AnimalCard from "@/components/AnimalCard";
 
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 
 interface Animal {
     id: number;
@@ -45,10 +46,39 @@ export default function homeParceiro(){
             "Content-Type": "application/json",}
         });
 
-        if (!response.ok) throw new Error("Erro ao buscar dados");
+        if (!response.ok) {
+          let errorMsg = "Erro ao editar!";
+          try {
+              const text = await response.text();
+              try {
+              const json = JSON.parse(text);
+              errorMsg = json.message || JSON.stringify(json);
+              } catch {
+              errorMsg = text;
+              }
+          } catch (error) {
+              // envia um alerta para o usuário caso não haja conexão com o servidor
+              Swal.fire({
+                  position: "top",
+                  icon: "error",
+                  title: "Erro de conexão com o servidor!",
+                  showConfirmButton: false,
+                  timer: 2000,
+              });
+          }
+
+          // exibe o erro recebido
+          Swal.fire({
+              position: "top",
+              icon: "error",
+              title: errorMsg,
+              showConfirmButton: false,
+              timer: 2500,
+          });
+          return;
+        }
 
         const data = await response.json();
-        console.log("Dados recebidos:", data);
 
         if (data.length > 0) {
           setTotalPaginas(data[0].totalPaginas);

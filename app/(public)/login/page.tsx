@@ -99,10 +99,14 @@ export default function Login() {
             const userId = dataResponse.id;
             const tipo = dataResponse.tipo;
 
+            // pega o tempo de expiração do token, definido em ms no backend
+            const jwtExpirationMs = 3600000;
+            const expiresInDays = jwtExpirationMs / (24 * 60 * 60 * 1000);
+
             // seta os cookies
-            Cookies.set("token", token, { expires: 7, path: "/"  });
-            Cookies.set("userId", userId, { expires: 7, path: "/"  });
-            Cookies.set("tipo", tipo, { expires: 7, path: "/"  });
+            Cookies.set("token", token, { expires: expiresInDays, path: "/"  });
+            Cookies.set("userId", userId, { expires: expiresInDays, path: "/"  });
+            Cookies.set("tipo", tipo, { expires: expiresInDays, path: "/"  });
 
             Swal.fire({
                 position: "top",

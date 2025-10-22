@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import NextImage from "next/image";
+import Cookies from "js-cookie";
 import { useState, useEffect, use } from "react";
 
 import mascaraCPF from "@/utils/mascaraCPF";
@@ -33,6 +34,9 @@ interface Adocao {
 export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
 
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
+
     const router = useRouter();
 
     const [adocao, setAdocao] = useState<Adocao | null>(null);
@@ -41,9 +45,21 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
     const [sendingCancelar, setSendingCancelar] = useState(false);
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
         async function carregarSolicitacao() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/${id}`);
+            const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
+
             if (!response.ok) throw new Error("Erro ao buscar dados");
 
             const data = await response.json();
@@ -144,44 +160,45 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                     <div className="flex flex-col w-full">
                         <div className="flex flex-col xsm:flex-row xsm:gap-3">
                             <button onClick={async () => {
-                                    try {
-                                        setSendingFinalizar(true);
+                                try {
+                                    setSendingFinalizar(true);
 
-                                        const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
-                                            method: "PATCH",
-                                            headers: {
-                                                "Content-Type": "application/json",
-                                            },
-                                            body: JSON.stringify({ status: "Finalizada com adoção" }),
-                                        });
+                                    const response = await fetch(`http://localhost:8080/adocoes/10`, {
+                                        method: "PATCH",
+                                        headers: {
+                                            "Authorization": `Bearer ${token}`,
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({ status: "Finalizada com adoção" }),
+                                    });
 
-                                        if (!response.ok) {
-                                            throw new Error("Erro ao atualizar status da adoção");
-                                        }
-
-                                        Swal.fire({
-                                            position: "top",
-                                            icon: "success",
-                                            title: "Adoção finalizada com sucesso!",
-                                            showConfirmButton: false,
-                                            timer: 1500,
-                                        });
-
-                                        router.push("/parceiro/solicitacoes");
-
-                                    } catch (error) {
-                                        console.error(error);
-                                        Swal.fire({
-                                            position: "top",
-                                            icon: "error",
-                                            title: "Erro ao finalizar adoção!",
-                                            showConfirmButton: false,
-                                            timer: 1500,
-                                        });
-                                    } finally {
-                                        setSendingFinalizar(false);
+                                    if (!response.ok) {
+                                        throw new Error("Erro ao atualizar status da adoção");
                                     }
-                                }}
+
+                                    Swal.fire({
+                                        position: "top",
+                                        icon: "success",
+                                        title: "Adoção finalizada com sucesso!",
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                    });
+
+                                    router.push("/parceiro/solicitacoes");
+
+                                } catch (error) {
+                                    console.error(error);
+                                    Swal.fire({
+                                        position: "top",
+                                        icon: "error",
+                                        title: "Erro ao finalizar adoção!",
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                    });
+                                } finally {
+                                    setSendingFinalizar(false);
+                                }
+                            }}
                                 disabled={sendingFinalizar || sendingCancelar}
                                 className={`w-full text-lg xl:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
                                     shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 
@@ -193,9 +210,10 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     try {
                                         setSendingCancelar(true);
 
-                                        const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                                        const response = await fetch(`http://localhost:8080/adocoes/10`, {
                                             method: "PATCH",
                                             headers: {
+                                                "Authorization": `Bearer ${token}`,
                                                 "Content-Type": "application/json",
                                             },
                                             body: JSON.stringify({ status: "Finalizada por desistência do parceiro" }),
@@ -242,10 +260,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                         </button>
                     </div>
                 )}
-
-        
             </form>
-
         </div>
     );
 }

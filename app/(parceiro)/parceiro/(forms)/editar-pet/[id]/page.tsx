@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import NextImage from "next/image";
+import Cookies from "js-cookie";
 import { useState, useEffect, use } from "react";
 
 import LinkButton from "@/components/LinkButton";
@@ -60,7 +61,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
 const petSchema = z.object({
     nome: z.string().min(2, "Nome é obrigatório"),
     especie: z.string().min(1, "Selecione a espécie"),
-    idade: z.number().min(1, "Idade é obrigatória"),
+    idade: z.coerce.number().min(1, "Idade é obrigatória"),
     sexo: z.string().min(1, "Selecione o sexo"),
     porte: z.string().min(1, "Selecione o porte"),
     status: z.string().min(1, "Selecione o status"),
@@ -80,6 +81,9 @@ type PetForm = z.infer<typeof petSchema>;
 
 export default function EditarPet({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
+
+    const token = Cookies.get("token");
+    const userId = Cookies.get("userId");
 
     const router = useRouter();
 
@@ -109,16 +113,27 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         clearErrors,
         formState: { errors }, 
         setValue,
-    } = useForm<PetForm>({ 
+    } = useForm({ 
         resolver: zodResolver(petSchema),
         mode: "all",
         shouldFocusError: false,
     });
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
         const fetchAnimal = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/fotos/animal/${id}`);
+                const res = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    }
+                });
                 if (!res.ok) throw new Error("Erro ao buscar animal");
 
                 const data = await res.json();
@@ -150,9 +165,110 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 setLoading(false);
             }
         };
-
+        
         fetchAnimal();
     }, [setValue]);
+
+    const onSubmit = async (data: PetForm) => {
+        try {
+            setSending(true);
+
+            const payload = {
+                parceiroId: userId,
+                especie: data.especie,
+                nome: data.nome,
+                sexo: data.sexo,
+                porte: data.porte,
+                status: data.status,
+                idadeInicial: (data.idade).toString(),
+                obs: data.obs || "",
+                descricao: data.descricao || "",
+            };
+
+            const response = await fetch(`http://localhost:8080/animais/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (response.ok && croppedFiles.length > 0) {
+                const formData = new FormData();
+
+                croppedFiles.forEach((file) => {
+                    formData.append("files", file);
+                });
+
+                const uploadResponse = await fetch(`http://localhost:8080/fotos/cadastrar/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    body: formData,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error("Erro ao enviar imagens");
+                }
+            }
+
+            if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+    
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
+
+            Swal.fire({
+                position: "top",
+                icon: "success",
+                title: "Alterações salvas!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            router.push("/parceiro/home");
+
+        } catch (error) {
+            console.error("Erro ao editar:", error);
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro ao editar!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } finally {
+            setSending(false);
+        }
+    };
 
     const onCropComplete = (_: any, croppedArea: any) => {
         setCroppedAreaPixels(croppedArea);
@@ -183,82 +299,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         }
     };
 
-    const onSubmit = async (data: PetForm) => {
-        try {
-            setSending(true);
-
-            const payload = {
-                parceiroId: 37,
-                especie: data.especie,
-                nome: data.nome,
-                sexo: data.sexo,
-                porte: data.porte,
-                status: data.status,
-                idadeInicial: (data.idade).toString(),
-                obs: data.obs || "",
-                descricao: data.descricao || "",
-            };
-
-            const response = await fetch(`http://localhost:8080/animais/${id}/parceiro/37`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (croppedFiles.length > 0) {
-                const formData = new FormData();
-
-                croppedFiles.forEach((file) => {
-                    formData.append("files", file);
-                });
-
-                const uploadResponse = await fetch(`http://localhost:8080/fotos/cadastrar/${id}`, {
-                    method: "POST",
-                    body: formData,
-                });
-
-                if (!uploadResponse.ok) {
-                    throw new Error("Erro ao enviar imagens");
-                }
-            }
-
-
-            Swal.fire({
-                position: "top",
-                icon: "success",
-                title: "Alterações salvas!",
-                showConfirmButton: false,
-                timer: 1500
-            });
-
-            router.push("/parceiro/home");
-
-            if (!response.ok) {
-                Swal.fire({
-                    position: "top",
-                    icon: "error",
-                    title: "Erro ao editar!",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-                return;
-            }
-
-        } catch (error) {
-            console.error("Erro ao editar:", error);
-            Swal.fire({
-                position: "top",
-                icon: "error",
-                title: "Erro ao editar!",
-                showConfirmButton: false,
-                timer: 1500
-            });
-        } finally {
-            setSending(false);
-        }
-    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(e.target.files || []);
@@ -316,6 +356,9 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
 
             const response = await fetch(`http://localhost:8080/fotos/${fotoId}/animal/${id}`, {
                 method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
             });
 
             if (!response.ok) {

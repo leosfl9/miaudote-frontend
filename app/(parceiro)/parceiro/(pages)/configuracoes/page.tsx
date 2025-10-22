@@ -14,6 +14,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const parceiroSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
@@ -64,6 +65,8 @@ type ParceiroForm = z.infer<typeof parceiroSchema>;
 export default function Configuracoes() {
     const token = Cookies.get("token");
     const id = Cookies.get("userId");
+
+    const router = useRouter();
 
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
@@ -117,13 +120,36 @@ export default function Configuracoes() {
                 timer: 1500
             });
 
+            router.push('/parceiro/home');
+
             if (!response.ok) {
+                let errorMsg = "Erro ao editar!";
+                try {
+                    const text = await response.text();
+                    try {
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                    errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
+                // exibe o erro recebido
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: "Erro ao editar!",
+                    title: errorMsg,
                     showConfirmButton: false,
-                    timer: 1500
+                    timer: 2500,
                 });
                 return;
             }

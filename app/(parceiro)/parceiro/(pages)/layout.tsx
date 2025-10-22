@@ -15,11 +15,10 @@ export default function Layout({
   useEffect(() => {
     const tipo = Cookies.get("tipo");
     const token = Cookies.get("token");
+    
     if (tipo !== "parceiro" || !token) {
       router.push("/login");
     }
-
-    
   }, []);
 
   return (

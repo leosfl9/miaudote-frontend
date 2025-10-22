@@ -2,7 +2,9 @@
 
 import RequestCard from "@/components/RequestCard";
 
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 
 interface Solicitacao {
     id: number;
@@ -14,14 +16,59 @@ interface Solicitacao {
 }
 
 export default function SolicitacoesAdocao(){
+    const token = Cookies.get("token");
+    const id = Cookies.get("userId");
+
     const [solicitacoes, setSolitacoes] = useState<Solicitacao[]>([])
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!token) {
+            window.location.href = "/login";
+            return;
+        }
+
         async function carregarSolicitacoes() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/parceiro/37`);
-            if (!response.ok) throw new Error("Erro ao buscar dados");
+            const response = await fetch(`http://localhost:8080/adocoes/parceiro/${id}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                }
+            });
+
+            if (!response.ok) {
+                let errorMsg = "Erro ao buscar solicitações!";
+                try {
+                    const text = await response.text();
+                    try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                        errorMsg = text;
+                    }
+                } catch (error) {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                }
+
+                // exibe o erro recebido
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: errorMsg,
+                    showConfirmButton: false,
+                    timer: 2500,
+                });
+                return;
+            }
 
             const data = await response.json();
             console.log("Dados recebidos:", data);
@@ -71,7 +118,6 @@ export default function SolicitacoesAdocao(){
             </div>
 
             <div className="flex flex-col plg:flex-row plg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
-                {/* <RequestCard nome={data.nome} /> */}
                 {solicitacoes.length > 0 ? (
                     solicitacoes.map((solicitacao) => (
                         <RequestCard 
