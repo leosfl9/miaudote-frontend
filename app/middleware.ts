@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
+  // armazena os valores dos cookies e da url
   const token = req.cookies.get("token")?.value;
   const tipo = req.cookies.get("tipo")?.value;
   const { pathname } = req.nextUrl;
@@ -35,4 +36,3 @@ export function middleware(req: NextRequest) {
 export const config = {
   matcher: ["/parceiro/:path*", "/adotante/:path*"],
 };
-
