@@ -26,7 +26,7 @@ const cadastroAdotanteSchema = z.object({
     cpf: z.string().regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF inválido").refine((cpf) => 
         validaCPF(cpf), { message: "CPF inválido" }),
     email: z.email("E-mail inválido"), 
-    telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
+    telefone: z.string().regex(/^\(\d{2}\)\s9\d{4}-\d{4}$/, "Número inválido"), 
     dataNasc: z.string().superRefine((val, ctx) => {
         if (val.length < 10) {
             ctx.addIssue({

@@ -38,7 +38,7 @@ const cadastroSchema = z.object({
             });
         }
     }),
-    telefone: z.string().regex(/^\(\d{2}\)\s\d{5}-\d{4}$/, "Telefone inválido"), 
+    telefone: z.string().regex(/^\(\d{2}\)\s9\d{4}-\d{4}$/, "Número inválido"), 
     senha: z.string().superRefine((val, ctx) => {
         const {valido, mensagem} = validaSenha(val, 8);
         if (!valido) {
