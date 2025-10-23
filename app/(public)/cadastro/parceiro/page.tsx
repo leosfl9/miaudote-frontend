@@ -143,12 +143,10 @@ export default function CadastroParceiro() {
                 showConfirmButton: false,
                 timer: 1500
             });
-            
         } finally {
             setSending(false); // habilita novamente o botão
         }
     };
-
 
     return (
         <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 

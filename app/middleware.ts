@@ -4,11 +4,12 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   // armazena os valores dos cookies e da url
   const token = req.cookies.get("token")?.value;
+  const id = req.cookies.get("userId")?.value;
   const tipo = req.cookies.get("tipo")?.value;
   const { pathname } = req.nextUrl;
 
   // se não tiver token, redireciona pro login
-  if (!token) {
+  if (!token || !id) {
     if (pathname !== "/login") {
       const loginUrl = req.nextUrl.clone();
       loginUrl.pathname = "/login";

@@ -26,9 +26,9 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function Login() {
-    const [sending, setSending] = useState(false);
+    const [sending, setSending] = useState(false); // enviando formulário, desabilita botão
 
-    const router = useRouter();
+    const router = useRouter(); // hook de roteamento
 
     // variáveis do react hook form
     const { 
@@ -60,14 +60,14 @@ export default function Login() {
 
             // remove do json e armazena em uma variável a resposta em caso de erro
             if (!response.ok) {
-                let errorMsg = "Erro ao cadastrar!";
+                let errorMsg = "Erro ao fazer login!";
                 try {
                     const text = await response.text();
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
                     } catch {
-                    errorMsg = text;
+                        errorMsg = text;
                     }
                 } catch (error) {
                     // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -108,6 +108,7 @@ export default function Login() {
             Cookies.set("userId", userId, { expires: expiresInDays, path: "/"  });
             Cookies.set("tipo", tipo, { expires: expiresInDays, path: "/"  });
 
+            // mensagem de boas-vindas
             Swal.fire({
                 position: "top",
                 icon: "success",
@@ -132,7 +133,7 @@ export default function Login() {
                 timer: 1500
             });
         } finally {
-            setSending(false);
+            setSending(false); // habilita o botão novamente
         }
     };
 

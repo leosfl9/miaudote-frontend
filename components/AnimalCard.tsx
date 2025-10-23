@@ -27,8 +27,6 @@ interface CardProps {
 
 export default function AnimalCard({
     tipo, favorito, nome, especie, idade, porte, descricao, foto, status, idPet, parceiro, onToggleFavorito, favoritoId, idSolicitacao, disabled}: CardProps){
-    const [sending, setSending] = useState(false); // se está sendo favoritado ou não
-    
     const href = tipo === "solicitacao" ? `/adotante/detalhes-solicitacao/${idSolicitacao}` : `/${tipo}/pet/${idPet}`; // link dinâmico
 
     // ao clicar para favoritar ou desfavoritar um animal, seu estado tem que ser o contrário do armazenado
@@ -39,7 +37,6 @@ export default function AnimalCard({
         }
     };
 
-    
     return(
         <div className="flex flex-col w-full max-w-[380px] bg-white rounded-xl">
             {/* foto principal do animal */}
