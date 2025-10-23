@@ -311,7 +311,13 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                         </div>
 
                         <button className={`w-full text-lg xl:text-xl px-8 py-1 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
-                            shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80`}>
+                            shadow-[0_4px_4px_rgba(0,0,0,0.25)] mt-4 mb-2 bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80`}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                const mensagem = `Olá! Estou te contatando para tratarmos da sua solicitação de adoção do pet ${adocao.animal.nome}, no site MiAudote.`;
+                                const url = `https://wa.me/${adocao.adotante.telefone}?text=${encodeURIComponent(mensagem)}`;
+                                window.open(url, "_blank");
+                            }}>
                             Contatar adotante
                         </button>
                     </div>

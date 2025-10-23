@@ -153,7 +153,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
             {animal ? 
                 <AnimalPresentation tipo="solicitacao" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
                 porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
-                fotos={fotos} href="#" onOpenModalCancela={() => setOpenCancela(true)} status={status} dataAdocao={dataAdocao} /> : 
+                fotos={fotos} href="#" telefone={animal.parceiro.telefone} onOpenModalCancela={() => setOpenCancela(true)} status={status} dataAdocao={dataAdocao} /> : 
                 ""}
 
             {openCancela && (

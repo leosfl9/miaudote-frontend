@@ -11,6 +11,7 @@ interface PresentationProps {
     href: string;
     nome: string;
     especie: string;
+    telefone?: string;
     descricao?: string;
     idade: number;
     obs?: string;
@@ -25,7 +26,7 @@ interface PresentationProps {
 
 export default function AnimalPresentation ({
     tipo, onOpenModal, onOpenModalCancela, href, nome, descricao, idade, obs, porte, 
-    sexo, estado, cidade, fotos: fotosIniciais, especie, status, dataAdocao}: PresentationProps) {
+    sexo, estado, cidade, fotos: fotosIniciais, especie, status, dataAdocao, telefone}: PresentationProps) {
     
     // formata a data recebida em yyyy-mm-dd para dd/mm/yyyy
     const dataFormatada = new Date(dataAdocao!).toLocaleDateString("pt-BR", {
@@ -115,9 +116,14 @@ export default function AnimalPresentation ({
                             <Link href={href} className={`w-full sssm:w-[234px] xsm:w-fit sm:w-[234px] xl:w-fit text-center px-6 py-3 rounded-4xl text-xl shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition 
                                 bg-miau-green text-background hover:bg-miau-light-green active:bg-miau-light-green font-bold`}
                                 onClick={(e) => {
-                                    if (tipo == "adotante" || tipo == "solicitacao"){
+                                    if (tipo == "adotante"){
                                         e.preventDefault();
                                         onOpenModal?.();
+                                    } else if (tipo == "solicitacao") {
+                                        e.preventDefault();
+                                        const mensagem = `Olá! Estou interessado na adoção do pet ${nome} que vi no site MiAudote.`;
+                                        const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+                                        window.open(url, "_blank");
                                     }
                                 }}>
                                 {texto}
