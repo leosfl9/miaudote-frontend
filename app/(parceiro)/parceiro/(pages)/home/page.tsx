@@ -51,10 +51,10 @@ export default function homeParceiro(){
           try {
               const text = await response.text();
               try {
-              const json = JSON.parse(text);
-              errorMsg = json.message || JSON.stringify(json);
+                const json = JSON.parse(text);
+                errorMsg = json.message || JSON.stringify(json);
               } catch {
-              errorMsg = text;
+                errorMsg = text;
               }
           } catch (error) {
               // envia um alerta para o usuário caso não haja conexão com o servidor
