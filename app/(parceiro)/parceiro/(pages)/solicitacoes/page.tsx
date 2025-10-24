@@ -3,6 +3,7 @@
 import RequestCard from "@/components/RequestCard";
 
 import Cookies from "js-cookie";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -131,10 +132,8 @@ export default function SolicitacoesAdocao(){
                         />
                     ))
                 ) : (
-                    <div className="py-8">
-                        <p className="text-text-light-gray font-medium text-2xl">
-                        Nenhuma solicitação de adoção!
-                        </p>
+                    <div className="py-8 px-0 text-start text-text-light-gray font-medium text-2xl">
+                        <p>Ainda não há solicitações, mas em breve alguém especial pode aparecer!</p>
                     </div>
                 )}
 

@@ -92,10 +92,10 @@ export default function homeAdotante(){
             try {
                 const text = await response.text();
                 try {
-                const json = JSON.parse(text);
-                errorMsg = json.message || JSON.stringify(json);
+                    const json = JSON.parse(text);
+                    errorMsg = json.message || JSON.stringify(json);
                 } catch {
-                errorMsg = text;
+                    errorMsg = text;
                 }
             } catch (error) {
                 // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -432,24 +432,27 @@ export default function homeAdotante(){
                     />
                     ))
                 ) : (
-                    <div className="py-8 lg:px-6">
-                        <p className="text-center text-text-light-gray font-medium text-2xl">
-                            Nenhum animal encontrado!
-                        </p>
+                    <div className="py-8 px-0 flex flex-col gap-6 w-full text-center text-text-light-gray font-medium text-2xl">
+                        <div className="space-y-2 sm:space-y-0">
+                            <p>Nenhum animal encontrado!</p>
+                            <p>Onde será que eles estão?</p>
+                        </div>
                     </div>
                 )}
             </div>
 
-            <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
-                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
-                    <button key={num} onClick={() => setPaginaAtual(num)}
-                        className={`w-8 h-8 font-semibold rounded-lg text-center cursor-pointer
-                        ${paginaAtual === num ? "bg-miau-orange text-white" 
-                        : "bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 text-background"}`}>
-                        {num}
-                    </button>
-                ))}
-            </div>
+            {animaisFiltrados.length > 0 && (
+                <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
+                    {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                        <button key={num} onClick={() => setPaginaAtual(num)}
+                            className={`w-8 h-8 font-semibold rounded-lg text-center cursor-pointer
+                            ${paginaAtual === num ? "bg-miau-orange text-white" 
+                            : "bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 text-background"}`}>
+                            {num}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

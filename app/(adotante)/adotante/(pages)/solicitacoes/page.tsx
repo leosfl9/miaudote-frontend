@@ -2,6 +2,7 @@
 
 import AnimalCard from "@/components/AnimalCard";
 import Cookies from "js-cookie";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -136,10 +137,14 @@ export default function SolicitacoesAdocao(){
                     />
                     ))
                 ) : (
-                    <div className="py-8 lg:px-6">
-                    <p className="text-center text-text-light-gray font-medium text-2xl">
-                        Nenhuma solicitação realizada!
-                    </p>
+                    <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
+                        <div className="space-y-2 sm:space-y-0">
+                            <p>Parece que você ainda não solicitou nenhuma adoção... </p>
+                            <p>Que tal dar uma olhadinha nos nossos peludos esperando por um lar?</p>
+                        </div>
+                        <Link href={"/adotante/home"} className="w-fit px-6 py-2 rounded-3xl text-lg shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition font-medium
+                            bg-miau-purple text-background hover:bg-miau-green active:bg-miau-light-green">
+                            Pesquisar pets</Link>
                     </div>
                 )}
 

@@ -5,6 +5,7 @@ import AnimalCard from "@/components/AnimalCard";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import LinkButton from "@/components/LinkButton";
 
 interface Animal {
   id: number;
@@ -272,24 +273,30 @@ export default function homeAdotante(){
                         favorito />
                     ))
                 ) : (
-                    <div className="py-8 lg:px-6">
-                    <p className="text-center text-text-light-gray font-medium text-2xl">
-                        Nenhum animal cadastrado no sistema!
-                    </p>
+                    <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
+                        <div className="space-y-2 sm:space-y-0">
+                            <p>Parece que você ainda não tem nenhum pet favorito...</p>
+                            <p>Que tal encontrar um novo melhor amigo?</p>
+                        </div>
+                        <Link href={"/adotante/home"} className="w-fit px-6 py-2 rounded-3xl text-lg shadow-[0_4px_4px_rgba(0,0,0,0.25)] transition font-medium
+                            bg-miau-purple text-background hover:bg-miau-green active:bg-miau-light-green">
+                            Pesquisar pets</Link>
                     </div>
                 )}
             </div>
 
-            <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
-                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
-                    <button key={num} onClick={() => setPaginaAtual(num)}
-                        className={`w-8 h-8 font-semibold rounded-lg text-center cursor-pointer
-                        ${paginaAtual === num ? "bg-miau-orange text-white" 
-                        : "bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 text-background"}`}>
-                        {num}
-                    </button>
-                ))}
-            </div>
+            {animais.length > 0 && (
+                <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
+                    {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                        <button key={num} onClick={() => setPaginaAtual(num)}
+                            className={`w-8 h-8 font-semibold rounded-lg text-center cursor-pointer
+                            ${paginaAtual === num ? "bg-miau-orange text-white" 
+                            : "bg-miau-purple hover:bg-miau-purple/80 active:bg-miau-purple/80 text-background"}`}>
+                            {num}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
