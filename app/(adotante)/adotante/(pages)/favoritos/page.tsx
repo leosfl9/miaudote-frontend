@@ -122,42 +122,43 @@ export default function homeAdotante(){
         try {
             // Atualização otimista
             if (isMounted) {
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet
-                    ? { ...animal, favorito: !favorito }
-                    : animal
-                )
-            );
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet
+                            ? { ...animal, favorito: !favorito }
+                            : animal
+                    )
+                );
             }
 
-            // Cria um AbortController para poder cancelar o fetch se desmontar
+            // Controlador para abortar se recarregar
             const controller = new AbortController();
-
-            // Cancela o fetch se a página for recarregada ou o componente desmontar
             window.addEventListener("beforeunload", () => controller.abort());
 
+            // Só pode remover se existir favoritoId
             if (favorito && favoritoId !== null) {
-                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                    signal: controller.signal,
-                });
+                const response = await fetch(
+                    `http://localhost:8080/favoritos/${favoritoId}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        signal: controller.signal,
+                    }
+                );
 
                 if (!response.ok) {
                     let errorMsg = "Erro ao remover favorito!";
                     try {
                         const text = await response.text();
                         try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
                         } catch {
-                        errorMsg = text;
+                            errorMsg = text;
                         }
-                    } catch (error) {
-                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                    } catch {
                         Swal.fire({
                             position: "top",
                             icon: "error",
@@ -166,8 +167,18 @@ export default function homeAdotante(){
                             timer: 2000,
                         });
                     }
-        
-                    // exibe o erro recebido
+
+                    // Reverte o estado otimista
+                    if (isMounted) {
+                        setAnimais((prev) =>
+                            prev.map((animal) =>
+                                animal.id === idPet
+                                    ? { ...animal, favorito, favoritoId }
+                                    : animal
+                            )
+                        );
+                    }
+
                     Swal.fire({
                         position: "top",
                         icon: "error",
@@ -178,90 +189,41 @@ export default function homeAdotante(){
                     return;
                 }
 
+                // Atualiza estado final se sucesso
                 if (isMounted) {
                     setAnimais((prev) =>
-                    prev.map((animal) =>
-                        animal.id === idPet
-                        ? { ...animal, favorito: false, favoritoId: null }
-                        : animal
-                    ));
-                }
-            } else {
-                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`, 
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        adotanteId: userId,
-                        animalId: idPet,
-                    }),
-                    signal: controller.signal,
-                });
-
-                if (!response.ok) {
-                    let errorMsg = "Erro ao adicionar favorito!";
-                    try {
-                        const text = await response.text();
-                        try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
-                        } catch {
-                        errorMsg = text;
-                        }
-                    } catch (error) {
-                        // envia um alerta para o usuário caso não haja conexão com o servidor
-                        Swal.fire({
-                            position: "top",
-                            icon: "error",
-                            title: "Erro de conexão com o servidor!",
-                            showConfirmButton: false,
-                            timer: 2000,
-                        });
-                    }
-        
-                    // exibe o erro recebido
-                    Swal.fire({
-                        position: "top",
-                        icon: "error",
-                        title: errorMsg,
-                        showConfirmButton: false,
-                        timer: 2500,
-                    });
-                    return;
-                }
-
-                const novoFav = await response.json();
-
-                if (isMounted) {
-                    setAnimais((prev) =>
-                    prev.map((animal) =>
-                        animal.id === idPet
-                        ? { ...animal, favorito: true, favoritoId: novoFav.id }
-                        : animal
-                    ));
+                        prev.map((animal) =>
+                            animal.id === idPet
+                                ? { ...animal, favorito: false, favoritoId: null }
+                                : animal
+                        )
+                    );
                 }
             }
-
         } catch (error: any) {
             if (error.name === "AbortError") {
                 console.log("Requisição cancelada pelo usuário (recarregou a página).");
-                return; // apenas ignora
+                return;
             }
 
             console.error(error);
-            alert("Não foi possível atualizar os favoritos.");
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Não foi possível atualizar os favoritos.",
+                showConfirmButton: false,
+                timer: 2500,
+            });
 
+            // Reverte o estado em erro inesperado
             if (isMounted) {
-            // Reverte o estado apenas se ainda estiver montado
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet
-                    ? { ...animal, favorito, favoritoId }
-                    : animal
-                )
-            );
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet
+                            ? { ...animal, favorito, favoritoId }
+                            : animal
+                    )
+                );
             }
         } finally {
             if (isMounted) setFavoritandoId(null);
@@ -269,6 +231,7 @@ export default function homeAdotante(){
             await carregarAnimais();
         }
     }
+
 
     if (loading) {
         return (
