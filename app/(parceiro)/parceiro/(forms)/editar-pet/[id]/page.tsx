@@ -57,7 +57,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
   });
 }
 
-
+// objeto do zod para validar formulário de edição de pet
 const petSchema = z.object({
     nome: z.string().min(2, "Nome é obrigatório"),
     especie: z.string().min(1, "Selecione a espécie"),
@@ -80,19 +80,20 @@ const petSchema = z.object({
 type PetForm = z.infer<typeof petSchema>;
 
 export default function EditarPet({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
+    const { id } = use(params); // pega o id do animal na URL
 
+    // armazena dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const router = useRouter();
+    const router = useRouter(); // hook de roteamento
 
-    const [deleting, setDeleting] = useState(false);
+    const [deleting, setDeleting] = useState(false); // desabilita os botões de deletar imagem enquanto uma estiver sendo deletada
 
-    // imagens existentes
+    // armazena imagens existentes
     const [fotos, setFotos] = useState<{ id: number; foto: string }[]>([]);
 
-    // imagens novas
+    // armazena imagens novas
     const [files, setFiles] = useState<File[]>([]);
     const [croppedFiles, setCroppedFiles] = useState<File[]>([]);
 
@@ -104,9 +105,10 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
     const [isDisabled, setIsDisabled] = useState(false);
 
-    const [loading, setLoading] = useState(true);
-    const [sending, setSending] = useState(false);
+    const [loading, setLoading] = useState(true); // loading da página
+    const [sending, setSending] = useState(false); // estado de envio do formulário
 
+    // variáveis do react hook form
     const { 
         register, 
         handleSubmit, 
@@ -120,29 +122,73 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     });
 
     useEffect(() => {
-        if (!token) {
+        // envia o usuário para o login se ele não estiver autenticado
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
 
+        // get de dados do pet
         const fetchAnimal = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                // recebe os dados da API
+                const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json",
                     }
                 });
-                if (!res.ok) throw new Error("Erro ao buscar animal");
 
-                const data = await res.json();
-                console.log(data);
-
+                // se a API retornar erro, exibe
+                if (!response.ok) {
+                    let errorMsg = "Erro ao buscar solicitação!";
+                    try {
+                        const text = await response.text();
+                        try {
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                            errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+                    // exibe o erro recebido
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: errorMsg,
+                        showConfirmButton: false,
+                        timer: 2500,
+                    });
+                    return;
+                }
+                // armazena os dados da resposta num objeto
+                const data = await response.json();
                 const animal = data[0]?.animal;
 
-                if (!animal) throw new Error("Animal não encontrado");
+                // apenas por precaução, se não houver animal, envia o usuário para a home
+                if (!animal) {
+                    Swal.fire({
+                        position: "top",
+                        icon: "error",
+                        title: "Erro ao carregar animal!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    router.push("/parceiro/home");
+                    return;
+                }
 
+                // insere os dados recebidos nos inputs do formulário
                 setValue("nome", animal.nome ?? "");
                 setValue("especie", animal.especie ?? "");
                 setValue("idade", animal.idade ?? "");
@@ -152,27 +198,36 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 setValue("obs", animal.obs ?? "");
                 setValue("descricao", animal.descricao ?? "");
 
+                // obtém e armazena as imagens cadastradas do pet
                 const imagens = data.map((item: any) => ({
                     id: item.id,       
                     foto: item.foto,   
                 }));
 
-                setFotos(imagens);
-
+                setFotos(imagens); // armazena o array de fotos
             } catch (error) {
-                console.error(error);
+                // envia um alerta para o usuário caso não haja conexão com o servidor
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro de conexão com o servidor!",
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
             } finally {
-                setLoading(false);
+                setLoading(false); // termina o carregamento da página
             }
         };
         
-        fetchAnimal();
+        fetchAnimal(); // chama a função
     }, [setValue]);
 
+    // submit do formulário
     const onSubmit = async (data: PetForm) => {
         try {
-            setSending(true);
+            setSending(true); // desabilita o botão de envio
 
+            // formata a resposta no formato esperado pelo backend
             const payload = {
                 parceiroId: userId,
                 especie: data.especie,
@@ -185,6 +240,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 descricao: data.descricao || "",
             };
 
+            // realiza a requisição de patch
             const response = await fetch(`http://localhost:8080/animais/${id}`, {
                 method: "PATCH",
                 headers: {
@@ -194,13 +250,16 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 body: JSON.stringify(payload),
             });
 
+            // se os dados forem enviados, parte para o envio das novas imagens
             if (response.ok && croppedFiles.length > 0) {
-                const formData = new FormData();
+                const formData = new FormData(); // cria um formdata
 
+                // insere as novas imagens no formdata
                 croppedFiles.forEach((file) => {
                     formData.append("files", file);
                 });
 
+                // cadastra as novas imagens
                 const uploadResponse = await fetch(`http://localhost:8080/fotos/cadastrar/12`, {
                     method: "POST",
                     headers: {
@@ -209,6 +268,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     body: formData,
                 });
 
+                // se der erro, exibe na tela
                 if (!uploadResponse.ok) {
                     let errorMsg = "Erro ao editar!";
                     try {
@@ -229,7 +289,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                             timer: 2000,
                         });
                     }
-
                     // exibe o erro recebido
                     Swal.fire({
                         position: "top",
@@ -242,15 +301,16 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 }
             }
 
+            // se der erro no envio dos dados editados do pet, exibe na tela
             if (!response.ok) {
                 let errorMsg = "Erro ao editar!";
                 try {
                     const text = await response.text();
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
                     } catch {
-                    errorMsg = text;
+                        errorMsg = text;
                     }
                 } catch (error) {
                     // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -262,7 +322,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         timer: 2000,
                     });
                 }
-    
                 // exibe o erro recebido
                 Swal.fire({
                     position: "top",
@@ -274,6 +333,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 return;
             }
 
+            // caso nenhum erro seja acionado, exibe mensagem de sucesso 
             Swal.fire({
                 position: "top",
                 icon: "success",
@@ -282,29 +342,30 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 timer: 1500
             });
 
-            router.push("/parceiro/home");
-
+            router.push("/parceiro/home"); // envia o usuário para a home
         } catch (error) {
-            console.error("Erro ao editar:", error);
+            // envia um alerta para o usuário caso não haja conexão com o servidor
             Swal.fire({
                 position: "top",
                 icon: "error",
-                title: "Erro ao editar!",
+                title: "Erro de conexão ao servidor!",
                 showConfirmButton: false,
                 timer: 1500
             });
         } finally {
-            setSending(false);
+            setSending(false); // habilita novamente o botão
         }
     };
 
+    // finaliza o crop
     const onCropComplete = (_: any, croppedArea: any) => {
         setCroppedAreaPixels(croppedArea);
     };
 
+    // confirmação de crop
     const handleConfirmCrop = async () => {
         if (currentCropIndex === null) return;
-        setIsDisabled(true);
+        setIsDisabled(true); // desabilita o botão de confirmar crop
 
         try {
             const imageFile = files[currentCropIndex];
@@ -320,14 +381,13 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             }
             setCurrentCropIndex(null);
         } catch (err) {
-            console.error(err);
             Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
         } finally {
-            setIsDisabled(false);
+            setIsDisabled(false); // habilita novamente o botão
         }
     };
 
-
+    // lida a troca de imagens já cadastradas e imagens novas
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(e.target.files || []);
         const total = fotos.length + croppedFiles.length + selected.length;
@@ -355,7 +415,9 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         e.currentTarget.value = "";
     };
 
+    // função para remover do banco de dados imagens que vieram do cadastro
     const handleRemoveExistingFoto = async (fotoId: number) => {
+        // só remove se o animal tiver mais de uma foto cadastrada no banco de dados
         if (fotos.length === 1 && croppedFiles.length === 0) {
             Swal.fire({
                 icon: "warning",
@@ -366,6 +428,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             return;
         }
 
+        // modal de confirmação
         const confirm = await Swal.fire({
             title: "Tem certeza?",
             text: "Essa imagem será removida permanentemente.",
@@ -377,11 +440,12 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             cancelButtonText: "Cancelar",
         });
 
-        if (!confirm.isConfirmed) return;
+        if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
 
         try {
-            setDeleting(true);
+            setDeleting(true); // desabilita os x de excluir imagens
 
+            // requisição para deletar a foto
             const response = await fetch(`http://localhost:8080/fotos/${fotoId}/animal/${id}`, {
                 method: "DELETE",
                 headers: {
@@ -389,8 +453,9 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 }
             });
 
+            // se der erro, exibe
             if (!response.ok) {
-                let errorMsg = "Erro ao buscar solicitações!";
+                let errorMsg = "Erro ao excluir foto!";
                 try {
                     const text = await response.text();
                     try {
@@ -409,7 +474,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         timer: 2000,
                     });
                 }
-
                 // exibe o erro recebido
                 Swal.fire({
                     position: "top",
@@ -420,7 +484,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 });
                 return;
             }
-
+            // exibe alerta de sucesso caso a imagem seja excluída
             Swal.fire({
                 icon: "success",
                 title: "Imagem excluída!",
@@ -428,21 +492,25 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 timer: 1200,
             });
 
-            setFotos((prev) => prev.filter((foto) => foto.id !== fotoId));
+            setFotos((prev) => prev.filter((foto) => foto.id !== fotoId)); // remove a foto excluída do array
 
         } catch (error) {
-            console.error(error);
+            // envia um alerta para o usuário caso não haja conexão com o servidor
             Swal.fire({
+                position: "top",
                 icon: "error",
-                title: "Erro ao excluir imagem!",
-                timer: 1200,
+                title: "Erro de conexão ao servidor!",
+                showConfirmButton: false,
+                timer: 1500
             });
         } finally {
-            setDeleting(false);
+            setDeleting(false); // habilita novamente os x de exclusão de fotos
         }
     };
 
+    // remoção de novas imagens
     const handleRemoveNewImage = async (index: number) => {
+        // modal de confirmação
         const confirm = await Swal.fire({
             title: "Tem certeza?",
             text: "Deseja mesmo remover a nova imagem?",
@@ -454,18 +522,21 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             cancelButtonText: "Cancelar",
         });
 
-        if (!confirm.isConfirmed) return;
+        if (!confirm.isConfirmed) return; // não faz nada se o usuário cancelar a ação
         
+        // remove dos estados a imagem armazenada neles
         setCroppedFiles(prev => prev.filter((_, i) => i !== index));
         setFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    // conta quantas fotos estão setadas antes de chamar a função que envia o formulário
     const handleFormSubmit = () => {
         const totalFotos = fotos.length + croppedFiles.length;
         setValue("fotos", Array(totalFotos).fill(new File([], "dummy.jpg")), { shouldValidate: true });
         handleSubmit(onSubmit)();
     };
 
+    // exibe a tela de carregamento enquanto os dados do pet são obtidos
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -493,6 +564,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 <div className="flex flex-col w-full gap-2">
                     
                     <div className="flex flex-col">
+                        {/* botão de enviar imagens */}
                         <label htmlFor="fotos" className={`flex flex-col gap-5 border-1 
                             ${errors.fotos ? "border-red-500 text-red-500" : "border-input-bd text-text-gray"}  items-center py-3 rounded-md cursor-pointer mb-2`}>
                             <Pencil className="w-6 h-6" />
@@ -503,22 +575,26 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         )}
                     </div>
 
+                    {/* input escondido, chamado no clique do botão acima */}
                     <input id="fotos" type="file" hidden multiple accept="image/*" onChange={handleFileChange} />
 
+                    {/* prévias das fotos */}
                     {(fotos.length > 0 || croppedFiles.length > 0) && (
                         <div className="grid grid-cols-3 ssm:grid-cols-4 sm:grid-cols-5 gap-2 mb-2">
+                            {/* fotos antigas */}
                             {fotos.map((foto, idx) => (
                                 <div key={`foto-${foto.id}`} className="relative group">
                                     <NextImage src={`data:image/jpeg;base64,${foto.foto}`} alt={`foto-${idx}`}
                                         width={100} height={100} className="object-cover rounded-md" />
                                     <button type="button" onClick={() => handleRemoveExistingFoto(foto.id)} disabled={deleting}
-                                        className={`${deleting ? "hidden" : "absolute"} top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center 
+                                        className={`${(deleting || sending) ? "hidden" : "absolute"} top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center 
                                         justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group`} >
                                         <X className="w-4 h-4 hover:text-[#F35D5D]" />
                                     </button>
                                 </div>
                             ))}
 
+                            {/* fotos novas */}
                             {croppedFiles.map((file, idx) => (
                                 <div key={`new-${idx}`} className="relative group">
                                     <NextImage src={URL.createObjectURL(file)} alt={`new-${idx}`}
@@ -532,7 +608,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                             ))}
                         </div>
                     )}
-
 
                     <div className="flex flex-col ssm:flex-row gap-2 lg:gap-3">
                         <InputField label="Nome do pet *" maxLength={100} {...register("nome")} onFocus={() => clearErrors("nome")} 
@@ -582,18 +657,30 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
 
                 </div>
 
+                {/* botão de envio do formulário */}
                 <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
                     className="mt-2 mb-2" disabled={sending} />
             </form>
 
+            {/* modal de cropper */}
             {currentCropIndex !== null && currentImageSrc && (
+                // escurece o fundo da tela
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                     <div className="relative w-[90vw] h-[80vh] bg-white rounded-lg p-4 flex flex-col">
+                        {/* área do cropper */}
                         <div className="relative flex-1">
-                            <Cropper image={URL.createObjectURL(files[currentCropIndex])} crop={crop} zoom={zoom}
-                                aspect={1} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
+                            <Cropper 
+                                image={URL.createObjectURL(files[currentCropIndex])} 
+                                crop={crop} 
+                                zoom={zoom}
+                                aspect={1} 
+                                onCropChange={setCrop} 
+                                onZoomChange={setZoom} 
+                                onCropComplete={onCropComplete} 
+                            />
                         </div>
 
+                        {/* botões de envio ou cancelamento */}
                         <div className="flex justify-end gap-2 mt-4 z-10">
                             <button type="button" className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md cursor-pointer font-semibold text-lg"
                                 onClick={() => {
@@ -614,7 +701,6 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

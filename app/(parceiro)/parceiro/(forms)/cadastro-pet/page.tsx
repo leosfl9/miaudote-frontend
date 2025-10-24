@@ -22,7 +22,7 @@ import Cropper from "react-easy-crop";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
-// ---- Função utilitária para cortar imagem ----
+// função utilitária para cortar imagem
 async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
     return new Promise((resolve, reject) => {
         const image = new Image();
@@ -58,7 +58,7 @@ async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
     });
 }
 
-// ---- Schema ----
+// objeto do zod para validar formulário de cadastro de pet
 const petSchema = z.object({
     nome: z.string().min(2, "Nome é obrigatório"),
     especie: z.string().min(1, "Selecione a espécie"),
@@ -75,17 +75,23 @@ const petSchema = z.object({
     .refine((files) => files.length <= 5, {
       message: "Máximo 5 fotos",
     }),
-    // fotos: z.custom<File[]>().optional()
 });
 
 type PetForm = z.infer<typeof petSchema>;
 
 export default function CadastroPet() {
+    // armazena dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const router = useRouter();
+    // se o usuário não estiver autenticado, o envia para o login
+    useEffect (() => {
+        if (!token || !userId) router.push("/login");
+    }, [])
 
+    const router = useRouter(); // hook de roteamento
+
+    // variáveis do react hook form
     const { 
         register, 
         handleSubmit, 
@@ -97,11 +103,11 @@ export default function CadastroPet() {
         mode: "all",
         shouldFocusError: false,
         defaultValues: {
-            fotos: [], // 👈 começa vazio
+            fotos: [], 
         },
     });
 
-    // ---- Estados de imagens ----
+    // estados de imagens
     const [files, setFiles] = useState<File[]>([]);
     const [croppedFiles, setCroppedFiles] = useState<File[]>([]);
     const [currentCropIndex, setCurrentCropIndex] = useState<number | null>(null);
@@ -110,64 +116,63 @@ export default function CadastroPet() {
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
     const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
 
+    const [isDisabled, setIsDisabled] = useState(false); // estado para desabilitar o botão de confirmar corte de imagem
 
-    const [isDisabled, setIsDisabled] = useState(false);
-
+    // sempre que uma foto é cortada, é inserida no array de fotos, que faz parte do formulário
     useEffect(() => {
         setValue("fotos", croppedFiles, { shouldValidate: croppedFiles.length > 0 });
     }, [croppedFiles, setValue]);
 
 
-    // ---- Crop completo ----
+    // crop completo
     const onCropComplete = (_: any, croppedArea: any) => {
         setCroppedAreaPixels(croppedArea);
     };
 
+    // confirmação de crop de imagem
     const handleConfirmCrop = async () => {
         if (currentCropIndex === null) return;
-        setIsDisabled(true);
+        setIsDisabled(true); // desabilita o botão de confirmação
 
         try {
             const imageFile = files[currentCropIndex];
             const src = URL.createObjectURL(imageFile);
             const croppedImage = await getCroppedImg(src, croppedAreaPixels);
-            // revogamos a URL temporária criada
+            // revoga a URL temporária criada
             URL.revokeObjectURL(src);
 
             setCroppedFiles((prev) => [...prev, croppedImage]);
 
             // limpa URL atual e fecha modal
             if (currentImageSrc) {
-            URL.revokeObjectURL(currentImageSrc);
-            setCurrentImageSrc(null);
+                URL.revokeObjectURL(currentImageSrc);
+                setCurrentImageSrc(null);
             }
             setCurrentCropIndex(null);
         } catch (err) {
-            console.error(err);
             Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
         } finally {
-            setIsDisabled(false);
+            setIsDisabled(false); // habilita novamente o botão
         }
     };
 
-
-    // ---- Seleção de arquivos ----
+    // seleção de arquivos
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(e.target.files || []);
 
         if (selected.length + files.length > 5) {
             Swal.fire({
-            position: "top",
-            icon: "error",
-            title: "Máximo de 5 imagens!",
-            showConfirmButton: false,
-            timer: 1500
+                position: "top",
+                icon: "error",
+                title: "Máximo de 5 imagens!",
+                showConfirmButton: false,
+                timer: 1500
             });
             e.currentTarget.value = "";
             return;
         }
 
-        // Atualiza files e abre o cropper para a primeira imagem nova usando prev.length
+        // atualiza files e abre o cropper para a primeira imagem nova
         setFiles(prev => {
             const startIndex = prev.length; // índice da primeira imagem nova
             const newFiles = [...prev, ...selected];
@@ -182,40 +187,34 @@ export default function CadastroPet() {
 
         // reset do input para permitir selecionar o mesmo arquivo em seguida
         e.currentTarget.value = "";
-        };
+    };
 
-    const [sending, setSending] = useState(false);
+    const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
-    // useEffect (() => {
-    //     if (!token || !userId) router.push("/login");
-    // }, [])
-
-    // ---- Submit final ----
-    const onSubmit = async (data: PetForm) => {
-        console.log("Dados do animal:", data);
-        
-        setSending(true);
+    // submit do formulário
+    const onSubmit = async (data: PetForm) => {     
+        setSending(true); // desabilita botão de cadastro
 
         try {
-            const formData = new FormData();
+            const formData = new FormData(); // cria um objeto do tipo multipart/form-data, que o backend espera receber
 
-            // Campos simples — cada um em texto plano
-            formData.append("parceiroId", userId ?? ""); // ou variável dinâmica
+            // campos
+            formData.append("parceiroId", userId ?? "");
             formData.append("especie", data.especie);
             formData.append("nome", data.nome);
             formData.append("sexo", data.sexo);
             formData.append("porte", data.porte);
-            formData.append("status", "Disponível"); // valor fixo ou dinâmico
+            formData.append("status", "Disponível"); // valor default do cadastro
             formData.append("idadeInicial", data.idade);
             formData.append("obs", data.obs || "");
             formData.append("descricao", data.descricao || "");
 
-            // Arquivos — mesmo nome que no DTO (provavelmente "fotos")
+            // adiciona os arquivos de imagem ao formdata
             data.fotos.forEach((foto) => {
                 formData.append("fotos", foto);
             });
 
-            // Envio do FormData (sem header Content-Type!)
+            // fetch da API com método POST
             const response = await fetch("http://localhost:8080/animais/cadastrar", {
                 method: "POST",
                 headers: {
@@ -224,8 +223,9 @@ export default function CadastroPet() {
                 body: formData,
             });
 
+            // se a API retornar erro, exibe
             if (!response.ok) {
-                let errorMsg = "Erro ao buscar solicitações!";
+                let errorMsg = "Erro ao cadastrar!";
                 try {
                     const text = await response.text();
                     try {
@@ -244,7 +244,6 @@ export default function CadastroPet() {
                         timer: 2000,
                     });
                 }
-
                 // exibe o erro recebido
                 Swal.fire({
                     position: "top",
@@ -256,6 +255,7 @@ export default function CadastroPet() {
                 return;
             }
 
+            // caso nenhum erro seja acionado, exibe mensagem de sucesso
             Swal.fire({
                 position: "top",
                 icon: "success",
@@ -264,22 +264,22 @@ export default function CadastroPet() {
                 timer: 1500
             });
 
-            router.push("/parceiro/home");
-
+            router.push("/parceiro/home"); // envia o usuário para a home
         } catch (error) {
-            console.error("Erro ao enviar fotos:", error);
+            // envia um alerta para o usuário caso não haja conexão com o servidor
             Swal.fire({
                 position: "top",
                 icon: "error",
-                title: "Erro ao cadastrar!",
+                title: "Erro de conexão ao servidor!",
                 showConfirmButton: false,
                 timer: 1500
             });
         } finally {
-            setSending(false);
+            setSending(false); // habilita novamente o botão
         }
     };
 
+    // remoção de imagens clicando no x
     const handleRemoveImage = (index: number) => {
         setCroppedFiles((prev) => prev.filter((_, i) => i !== index));
         setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -302,6 +302,7 @@ export default function CadastroPet() {
 
                 <div className="flex flex-col w-full gap-2">
                     <div className="flex flex-col">
+                        {/* botão de enviar imagens */}
                         <label htmlFor="fotos" className={`flex flex-col gap-5 border-1 
                             ${errors.fotos ? "border-red-500 text-red-500" : "border-input-bd text-text-gray"}  items-center py-3 rounded-md cursor-pointer mb-2`}>
                             <Pencil className="w-6 h-6" />
@@ -310,9 +311,9 @@ export default function CadastroPet() {
                         {errors.fotos && (
                             <p className="text-red-500 text-sm">{errors.fotos.message}</p>
                         )}
-
                     </div>
 
+                    {/* input escondido, chamado no clique do botão acima */}
                     <input id="fotos" type="file" hidden multiple accept="image/*" onChange={handleFileChange} />
 
                     {/* preview de imagens cortadas */}
@@ -322,9 +323,11 @@ export default function CadastroPet() {
                                 <div key={idx} className="relative group">
                                     <NextImage src={URL.createObjectURL(file)} alt={`foto-${idx}`}
                                     width={100} height={100} className="object-cover rounded-md" />
-                                    <button type="button" onClick={() => handleRemoveImage(idx)}
-                                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center
-                                    opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group"><X className="w-4 h-4 hover:text-[#F35D5D]"/></button>
+                                    {sending ? "" : (
+                                        <button type="button" onClick={() => handleRemoveImage(idx)}
+                                        className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-6 h-6 flex items-center justify-center
+                                        opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer group"><X className="w-4 h-4 hover:text-[#F35D5D]"/></button>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -368,32 +371,36 @@ export default function CadastroPet() {
 
                 </div>
 
-                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar Pet"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2 mb-2" disabled={sending} />
+                {/* botão de envio do formulário */}
+                <FormButton text={`${sending ? "Cadastrando..." : "Cadastrar Pet"}`} color={`${sending ? "disabled" : "green"}`} 
+                    type="submit" className="mt-2 mb-2" disabled={sending} />
             </form>
 
-            {/* Modal de cropper */}
+            {/* modal de cropper */}
             {currentCropIndex !== null && currentImageSrc && (
-                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+                // escurece o fundo da tela
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"> 
                     <div className="relative w-[90vw] h-[80vh] bg-white rounded-lg p-4 flex flex-col">
-                    {/* Área do cropper */}
+                    {/* área do cropper */}
                     <div className="relative flex-1">
                         <Cropper
-                        image={URL.createObjectURL(files[currentCropIndex])}
-                        crop={crop}
-                        zoom={zoom}
-                        aspect={1}
-                        onCropChange={setCrop}
-                        onZoomChange={setZoom}
-                        onCropComplete={onCropComplete} />
+                            image={URL.createObjectURL(files[currentCropIndex])}
+                            crop={crop}
+                            zoom={zoom}
+                            aspect={1}
+                            onCropChange={setCrop}
+                            onZoomChange={setZoom}
+                            onCropComplete={onCropComplete} 
+                        />
                     </div>
 
-                    {/* Botões sempre visíveis e clicáveis */}
+                    {/* botões de envio ou cancelamento */}
                     <div className="flex justify-end gap-2 mt-4 z-10">
                         <button type="button" className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md cursor-pointer font-semibold text-lg"
                             onClick={() => {
                                 if (currentImageSrc) {
-                                    URL.revokeObjectURL(currentImageSrc);
-                                    setCurrentImageSrc(null);
+                                        URL.revokeObjectURL(currentImageSrc);
+                                        setCurrentImageSrc(null);
                                     }
                                     setCurrentCropIndex(null);
                                 }} >
@@ -409,7 +416,6 @@ export default function CadastroPet() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }
