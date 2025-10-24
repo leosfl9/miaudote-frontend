@@ -162,13 +162,13 @@ export default function homeAdotante(){
         try {
             // Atualização otimista
             if (isMounted) {
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet
-                    ? { ...animal, favorito: !favorito }
-                    : animal
-                )
-            );
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                    animal.id === idPet
+                        ? { ...animal, favorito: !favorito }
+                        : animal
+                    )
+                );
             }
 
             // Cria um AbortController para poder cancelar o fetch se desmontar
@@ -178,131 +178,158 @@ export default function homeAdotante(){
             window.addEventListener("beforeunload", () => controller.abort());
 
             if (favorito && favoritoId !== null) {
-            const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                },
-                signal: controller.signal,
-            });
+                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                    signal: controller.signal,
+                });
 
-            if (!response.ok) {
-                let errorMsg = "Erro ao remover favorito!";
-                try {
-                    const text = await response.text();
+                if (!response.ok) {
+                    let errorMsg = "Erro ao remover favorito!";
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
-                    } catch {
-                    errorMsg = text;
+                        const text = await response.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
                     }
-                } catch (error) {
-                    // envia um alerta para o usuário caso não haja conexão com o servidor
+
+                    if (isMounted) {
+                        setAnimais((prev) =>
+                            prev.map((animal) =>
+                                animal.id === idPet
+                                    ? { ...animal, favorito, favoritoId }
+                                    : animal
+                            )
+                        );
+                    }
+        
+                    // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
-                        title: "Erro de conexão com o servidor!",
+                        title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 2500,
                     });
+                    return;
                 }
-    
-                // exibe o erro recebido
-                Swal.fire({
-                    position: "top",
-                    icon: "error",
-                    title: errorMsg,
-                    showConfirmButton: false,
-                    timer: 2500,
-                });
-                return;
-            }
 
-            if (isMounted) {
-                setAnimais((prev) =>
-                prev.map((animal) =>
-                    animal.id === idPet
-                    ? { ...animal, favorito: false, favoritoId: null }
-                    : animal
-                )
-                );
-            }
+                if (isMounted) {
+                    setAnimais((prev) =>
+                        prev.map((animal) =>
+                            animal.id === idPet
+                                ? { ...animal, favorito: false, favoritoId: null }
+                                : animal
+                        )
+                    );
+                }
+
             } else {
-            const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`, 
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    adotanteId: userId,
-                    animalId: idPet,
-                }),
-                signal: controller.signal,
-            });
+                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`, 
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        adotanteId: userId,
+                        animalId: idPet,
+                    }),
+                    signal: controller.signal,
+                });
 
-            if (!response.ok) {
-                let errorMsg = "Erro ao adicionar favorito!";
-                try {
-                    const text = await response.text();
+                if (!response.ok) {
+                    let errorMsg = "Erro ao adicionar favorito!";
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
-                    } catch {
-                    errorMsg = text;
+                        const text = await response.text();
+                        try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                        errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
                     }
-                } catch (error) {
-                    // envia um alerta para o usuário caso não haja conexão com o servidor
+        
+                    if (isMounted) {
+                        setAnimais((prev) =>
+                            prev.map((animal) =>
+                                animal.id === idPet
+                                    ? { ...animal, favorito, favoritoId }
+                                    : animal
+                            )
+                        );
+                    }
+
+                    // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
-                        title: "Erro de conexão com o servidor!",
+                        title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 2500,
                     });
+                    return;
                 }
-    
-                // exibe o erro recebido
-                Swal.fire({
-                    position: "top",
-                    icon: "error",
-                    title: errorMsg,
-                    showConfirmButton: false,
-                    timer: 2500,
-                });
-                return;
-            }
 
-            const novoFav = await response.json();
+                const novoFav = await response.json();
 
-            if (isMounted) {
-                setAnimais((prev) =>
-                prev.map((animal) =>
-                    animal.id === idPet
-                    ? { ...animal, favorito: true, favoritoId: novoFav.id }
-                    : animal
-                )
-                );
-            }
+                if (isMounted) {
+                    setAnimais((prev) =>
+                    prev.map((animal) =>
+                        animal.id === idPet
+                        ? { ...animal, favorito: true, favoritoId: novoFav.id }
+                        : animal
+                    )
+                    );
+                }
             }
         } catch (error: any) {
             if (error.name === "AbortError") {
-            console.log("Requisição cancelada pelo usuário (recarregou a página).");
-            return; // apenas ignora
+                console.log("Requisição cancelada pelo usuário (recarregou a página).");
+                return; // apenas ignora
             }
 
             console.error(error);
-            alert("Não foi possível atualizar os favoritos.");
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Não foi possível atualizar os favoritos.",
+                showConfirmButton: false,
+                timer: 2500,
+            });
 
             if (isMounted) {
-            // Reverte o estado apenas se ainda estiver montado
-            setAnimais((prev) =>
-                prev.map((animal) =>
-                animal.id === idPet
-                    ? { ...animal, favorito, favoritoId }
-                    : animal
-                )
-            );
+                // Reverte o estado apenas se ainda estiver montado
+                setAnimais((prev) =>
+                    prev.map((animal) =>
+                    animal.id === idPet
+                        ? { ...animal, favorito, favoritoId }
+                        : animal
+                    )
+                );
             }
         } finally {
             if (isMounted) setFavoritandoId(null);
