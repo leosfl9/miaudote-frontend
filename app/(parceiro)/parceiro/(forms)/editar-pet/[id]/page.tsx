@@ -529,6 +529,88 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         setFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    // função para excluir o pet inteiro
+    const handleDeletePet = async () => {
+        // modal de confirmação
+        const confirm = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Essa ação não poderá ser desfeita.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#F35D5D",
+            cancelButtonColor: "#1B998B",
+            confirmButtonText: "Sim, excluir",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
+
+        try {
+            setDeleting(true); // desabilita os botões de deletar
+
+            // requisição para deletar o pet
+            const response = await fetch(`https://miaudote-8av5.onrender.com/animais/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            // se der erro, exibe
+            if (!response.ok) {
+                let errorMsg = "Erro ao excluir o pet!";
+                try {
+                    const text = await response.text();
+                    try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                        errorMsg = text;
+                    }
+                } catch {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        position: "top",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+                // exibe o erro recebido
+                Swal.fire({
+                    icon: "error",
+                    title: errorMsg,
+                    position: "top",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                return;
+            }
+            // exibe mensagem de sucesso
+            Swal.fire({
+                icon: "success",
+                title: "Pet excluído com sucesso!",
+                position: "top",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+
+            router.push("/parceiro/home"); // redireciona o usuário para a home
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Erro de conexão com o servidor!",
+                position: "top",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        } finally {
+            setDeleting(false); // habilita os botões de deletar
+        }
+    };
+
+
     // conta quantas fotos estão setadas antes de chamar a função que envia o formulário
     const handleFormSubmit = () => {
         const totalFotos = fotos.length + croppedFiles.length;
@@ -547,7 +629,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
     }
 
     return (
-        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6 lxl:py-10 
+        <div className="flex flex-col gap-6 sm:gap-8 items-center justify-center min-h-screen px-2 md:px-8 py-6
             bg-[url('/grafo_cadastro.png')] bg-no-repeat bg-cover bg-center">
             
             <div className="w-full max-w-[640px] lxl:absolute lxl:top-10 2xl:top-24 lxl:left-10 2xl:left-18">
@@ -659,7 +741,15 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
 
                 {/* botão de envio do formulário */}
                 <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
-                    className="mt-2 mb-2" disabled={sending} />
+                    className="mt-2" disabled={sending} />
+
+                {/* botão de exclusão do pet */}
+                <div className="flex w-full justify-end">
+                    <button type="button" onClick={handleDeletePet} disabled={sending || deleting} className={`w-fitrounded-md font-semibold 
+                        text-[#F35D5D] hover:text-[#F35D5D]/80 transition cursor-pointer ${sending || deleting ? "text-text-gray" : ""}`}>
+                        {deleting ? "Excluindo..." : "Excluir pet"}
+                    </button>
+                </div>
             </form>
 
             {/* modal de cropper */}
