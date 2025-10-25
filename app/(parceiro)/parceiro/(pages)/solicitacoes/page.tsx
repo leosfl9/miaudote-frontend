@@ -22,7 +22,39 @@ export default function SolicitacoesAdocao(){
     const userId = Cookies.get("userId");
 
     const [solicitacoes, setSolitacoes] = useState<Solicitacao[]>([]) // armazena as solicitações
+    const [solicitacoesFiltradas, setSolitacoesFiltradas] = useState<Solicitacao[]>([])
+
     const [loading, setLoading] = useState(true); // estado de loading da página
+
+    // estados dos filtros
+    const [filtroAbertas, setFiltroAbertas] = useState("");
+    const [filtroEncerradas, setFiltroEncerradas] = useState("");
+    const [filtroCanceladas, setFiltroCanceladas] = useState("");
+
+    // inicializa e executa os filtros
+    useEffect(() => {
+        let filtradas = solicitacoes;
+
+        if (filtroAbertas) {
+            filtradas = filtradas.filter((s) =>
+                s.status == "Em Aberto"
+            );
+        }
+
+        if (filtroEncerradas) {
+            filtradas = filtradas.filter((s) =>
+                s.status == "Encerrada"
+            );
+        }
+
+        if (filtroCanceladas) {
+            filtradas = filtradas.filter((s) =>
+                s.status == "Cancelada"
+            );
+        }
+
+        setSolitacoesFiltradas(filtradas);
+    }, [solicitacoes, filtroAbertas, filtroEncerradas, filtroCanceladas]);
 
     useEffect(() => {
         // se o usuário não estiver logado, é redirecionado para o login
@@ -132,10 +164,52 @@ export default function SolicitacoesAdocao(){
                 <h2 className="text-base 2xl:text-lg">Visualize e gerencie suas solicitações de adoção.</h2>
             </div>
 
+            <div className="flex flex-row flex-wrap gap-4 ssm:gap-8">
+                <label className="flex flex-col sm:flex-row items-center gap-1 text-text-light-gray cursor-pointer">
+                    <input type="radio" name="status" value="" checked={!filtroAbertas && !filtroEncerradas && !filtroCanceladas} className="cursor-pointer"
+                        onChange={() => {
+                            setFiltroAbertas("");
+                            setFiltroEncerradas("");
+                            setFiltroCanceladas("");
+                        }} />
+                    Todas
+                </label>
+
+                <label className="flex flex-col sm:flex-row items-center gap-1 text-text-light-gray cursor-pointer">
+                    <input type="radio" name="status" value="Em Aberto" checked={filtroAbertas !== ""} className="cursor-pointer"
+                        onChange={() => {
+                            setFiltroAbertas("Em Aberto");
+                            setFiltroEncerradas("");
+                            setFiltroCanceladas("");
+                        }} />
+                    Em aberto
+                </label>
+
+                <label className="flex flex-col sm:flex-row items-center gap-1 text-text-light-gray cursor-pointer">
+                    <input type="radio" name="status" value="Encerrada" checked={filtroEncerradas !== ""} className="cursor-pointer"
+                        onChange={() => {
+                            setFiltroAbertas("");
+                            setFiltroEncerradas("Encerrada");
+                            setFiltroCanceladas("");
+                        }} />
+                    Encerradas
+                </label>
+
+                <label className="flex flex-col sm:flex-row items-center gap-1 text-text-light-gray cursor-pointer">
+                    <input type="radio" name="status" value="Finalizada" checked={filtroCanceladas !== ""} className="cursor-pointer"
+                        onChange={() => {
+                            setFiltroAbertas("");
+                            setFiltroEncerradas("");
+                            setFiltroCanceladas("Cancelada");
+                        }} />
+                    Canceladas
+                </label>
+            </div>
+
             <div className="flex flex-col plg:flex-row plg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
                 {/* lista as solicitações de adoção */}
-                {solicitacoes.length > 0 ? (
-                    solicitacoes.map((solicitacao) => (
+                {solicitacoesFiltradas.length > 0 ? (
+                    solicitacoesFiltradas.map((solicitacao) => (
                         <RequestCard 
                             key={solicitacao.id}
                             id={solicitacao.id}
