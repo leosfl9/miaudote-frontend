@@ -1,12 +1,9 @@
 "use client"
 
-import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 
-import LinkButton from "@/components/LinkButton";
 import InputField from "@/components/InputField";
 import SelectField from "@/components/SelectField";
 import FormButton from "@/components/FormButton";
@@ -19,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import Swal from "sweetalert2";
 
+// objeto do zod para validação do form
 const adotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
     email: z.email("E-mail inválido"), 
@@ -65,14 +63,14 @@ const adotanteSchema = z.object({
 type AdotanteForm = z.infer<typeof adotanteSchema>;
 
 export default function PerfilAdotante() {
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const router = useRouter();
-
-    const [loading, setLoading] = useState(true);
-    const [sending, setSending] = useState(false);
+    const [loading, setLoading] = useState(true); // estado de loading da página
+    const [sending, setSending] = useState(false); // estado de envio do form
     
+    // variáveis do react hook form
     const { 
         register, 
         handleSubmit, 
@@ -85,10 +83,12 @@ export default function PerfilAdotante() {
         shouldFocusError: false,
     });
 
+    // submit do form
     const onSubmit = async (data: AdotanteForm) => { 
         try {
-            setSending(true);
-
+            setSending(true); // desabilita botão de envio
+        
+            // formata o json que o backend espera receber
             const payload = {
                 usuario: {
                     nome: data.nome,
@@ -100,12 +100,12 @@ export default function PerfilAdotante() {
                 }
             };
 
+            // se o usuário alterou a senha, envia junto
             if (data.senha.trim() !== "") {
                 payload.usuario.senha = data.senha;
             }
 
-            console.log("Enviando dados:", payload);
-
+            // envia os dados editados para a API
             const response = await fetch(`http://localhost:8080/adotantes/${userId}`, {
                 method: "PATCH",
                 headers: {
@@ -115,23 +115,15 @@ export default function PerfilAdotante() {
                 body: JSON.stringify(payload),
             });
 
-            Swal.fire({
-                position: "top",
-                icon: "success",
-                title: "Alterações salvas!",
-                showConfirmButton: false,
-                timer: 1500
-            });
-
             if (!response.ok) {
-                let errorMsg = "Erro ao editar!";
+                let errorMsg = "Erro ao editar perfil!";
                 try {
                     const text = await response.text();
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
                     } catch {
-                    errorMsg = text;
+                        errorMsg = text;
                     }
                 } catch (error) {
                     // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -140,44 +132,54 @@ export default function PerfilAdotante() {
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
-    
                 // exibe o erro recebido
                 Swal.fire({
                     position: "top",
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }
 
-        } catch (error) {
-            console.error("Erro ao editar:", error);
+            // mensagem de sucesso
             Swal.fire({
                 position: "top",
-                icon: "error",
-                title: "Erro ao editar!",
+                icon: "success",
+                title: "Alterações salvas!",
                 showConfirmButton: false,
                 timer: 1500
             });
+        } catch (error) {
+            // envia um alerta para o usuário caso não haja conexão com o servidor
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro de conexão com o servidor!",
+                showConfirmButton: false,
+                timer: 1500,
+            });
         } finally {
-            setSending(false);
+            setSending(false); // habilita novamente o botão
         }
     };
 
     useEffect(() => {
-        if (!token) {
+        // se o usuário não estiver autenticado, o envia para o login
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
 
+        // obtendo os dados do usuário
         const fetchUsuario = async () => {
             try {
-                const res = await fetch(`http://localhost:8080/adotantes/${userId}`, {
+                // GET dos dados
+                const response = await fetch(`http://localhost:8080/adotantes/${userId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -185,15 +187,16 @@ export default function PerfilAdotante() {
                     }
                 });
 
-                if (!res.ok) {
-                    let errorMsg = "Erro ao editar!";
+                // exibe alerta em caso de erro
+                if (!response.ok) {
+                    let errorMsg = "Erro ao obter dados!";
                     try {
-                        const text = await res.text();
+                        const text = await response.text();
                         try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
                         } catch {
-                        errorMsg = text;
+                            errorMsg = text;
                         }
                     } catch (error) {
                         // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -202,23 +205,23 @@ export default function PerfilAdotante() {
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
-        
                     // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
 
-                const usuario = await res.json();
+                const usuario = await response.json(); // armazena os dados retornados
 
+                // preenche os campos do form com os dados obtidos
                 setValue("nome", usuario.nome ?? "");
                 setValue("email", usuario.email ?? "");
                 setValue("telefone", mascaraTelefone(usuario.telefone ?? ""));
@@ -226,37 +229,56 @@ export default function PerfilAdotante() {
                 setValue("cidade", usuario.cidade ?? "");
 
             } catch (error) {
-                console.error(error);
+                // envia um alerta para o usuário caso não haja conexão com o servidor
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro de conexão com o servidor!",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
             } finally {
                 setLoading(false); // termina o carregamento
             }
         };
 
-        fetchUsuario();
+        fetchUsuario(); // chama a função
     }, [setValue]);
 
+    // função de logout
     const handleLogout = async () => {
         try {
-            const res = await fetch("/api/logout", { method: "POST" });
-
-            if (res.ok) {
-            Swal.fire({
-                position: "top",
-                icon: "success",
-                title: "Deslogado com sucesso!",
-                showConfirmButton: false,
-                timer: 1000
+            // chama a API de logout
+            const response = await fetch("/api/logout", { 
+                method: "POST" 
             });
 
-            // Espera o swal terminar antes de redirecionar
-            setTimeout(() => {
-                window.location.href = "/login";
-            }, 1000);
+            // se der tudo certo, redireciona para o login
+            if (response.ok) {
+                Swal.fire({
+                    position: "top",
+                    icon: "success",
+                    title: "Deslogado com sucesso!",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+
+                // espera o swal terminar antes de redirecionar
+                setTimeout(() => {
+                    window.location.href = "/login";
+                }, 1000);
             } else {
-                throw new Error("Falha ao deslogar");
+                // mensagem de falha
+                Swal.fire({
+                    position: "top",
+                    icon: "success",
+                    title: "Falha ao deslogar!",
+                    showConfirmButton: false,
+                    timer: 1000
+                });
             }
         } catch (err) {
-            console.error("Erro ao deslogar:", err);
+            // mensagem de erro
             Swal.fire({
                 position: "top",
                 icon: "error",
@@ -267,6 +289,7 @@ export default function PerfilAdotante() {
         }
     };
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -277,7 +300,6 @@ export default function PerfilAdotante() {
     }
     
     return (
-        
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
             <div className="flex flex-col gap-2 text-text-light-gray">
                 <h1 className="font-bold text-3xl 2xl:text-4xl">Meus perfil</h1>
@@ -285,7 +307,7 @@ export default function PerfilAdotante() {
             </div>
 
             <div className="w-full items-center justify-center flex flex-col gap-6">
-
+                {/* formulário de edição de perfil */}
                 <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full px-3 ssm:px-8 sm:px-12 xl:px-24 pt-6 pb-10 rounded-4xl">
                     <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
                         Informações básicas</h1>
@@ -359,10 +381,11 @@ export default function PerfilAdotante() {
                         </div>
                     </div>
 
+                    {/* botão de envio */}
                     <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" className="mt-2" disabled={sending} />
-
                 </form>
-
+                
+                {/* botão de logout */}
                 <div className="w-full flex justify-center">
                     <button onClick={handleLogout} className="border-2 border-[#F35D5D] hover:bg-[#F35D5D] active:bg-[#F35D5D] px-12 py-2 rounded-lg 
                         text-[#F35D5D] hover:text-background active:text-background font-medium cursor-pointer">

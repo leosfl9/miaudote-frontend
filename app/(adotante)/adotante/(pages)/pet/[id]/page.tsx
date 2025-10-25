@@ -12,6 +12,7 @@ import { use, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
+// tipagem dos dados do animal
 interface Animal {
     id: number;
     nome: string;
@@ -33,19 +34,23 @@ interface Animal {
 }
 
 export default function PetPresentation({ params }: { params: Promise<{ id: string }> }) {
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const { id } = use(params);
-    const [open, setOpen] = useState(false);
-    const [confirming, setConfirming] = useState(false);
+    const { id } = use(params); // pega o id do pet pela URL
 
-    const [animal, setAnimal] = useState<Animal | null>(null);
-    const [fotos, setFotos] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false); // estado do modal de diretrizes
+    const [confirming, setConfirming] = useState(false); // estado do botão de confirmar adoção
 
-    const router = useRouter();
+    const [animal, setAnimal] = useState<Animal | null>(null); // estado dos dados do animal
+    const [fotos, setFotos] = useState([]); // estado das fotos do animal
 
+    const [loading, setLoading] = useState(true); // estado de carregamento dos dados
+
+    const router = useRouter(); // hook de roteamento
+
+    // efeito para controlar o overflow do body quando o modal estiver aberto
     useEffect(() => {
         if (open) {
             document.body.style.overflow = "hidden";
@@ -58,75 +63,82 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
     }, [open]);
 
     useEffect(() => {
-        if (!token) {
+        // redireciona para a página de login se não estiver autenticado
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
         
+        // função para carregar os dados do animal
         async function carregarAnimal() {
             try {
-            const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                }
-            });
-
-            if (!response.ok) {
-                let errorMsg = "Erro ao editar!";
-                try {
-                    const text = await response.text();
-                    try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
-                    } catch {
-                    errorMsg = text;
+                // faz a requisição para obter os dados do animal
+                const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     }
-                } catch (error) {
-                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                });
+
+                // trata erros na resposta
+                if (!response.ok) {
+                    let errorMsg = "Erro ao obter dados do animal!";
+                    try {
+                        const text = await response.text();
+                        try {
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                            errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+                    // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
-                        title: "Erro de conexão com o servidor!",
+                        title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
+                    return;
                 }
-    
-                // exibe o erro recebido
+
+                const data = await response.json(); // dados do animal
+
+                const animal = data[0]?.animal; // obtém os dados do animal
+                const fotos = data.map((item: { foto: string; }) => item.foto); // obtém as fotos do animal
+
+                setAnimal(animal); // atualiza o estado dos dados do animal
+                setFotos(fotos); // atualiza o estado das fotos do animal
+
+            } catch (error) {
+                // envia um alerta para o usuário caso não haja conexão com o servidor
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: errorMsg,
+                    title: "Erro de conexão com o servidor!",
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
-                return;
-            }
-
-            const data = await response.json();
-            console.log("Dados recebidos:", data);
-
-            const animal = data[0]?.animal;
-            const fotos = data.map((item: { foto: string; }) => item.foto);
-
-            console.log("Animal:", animal);
-            console.log("Fotos:", fotos);
-
-            setAnimal(animal);
-            setFotos(fotos);
-
-            } catch (error) {
-                console.error("Erro ao carregar animal:", error);
             } finally {
-                setLoading(false);
+                setLoading(false); // desativa o estado de carregamento
             }
         }
 
-        carregarAnimal();
+        carregarAnimal(); // chama a função para carregar os dados do animal
     }, [id]);
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -144,12 +156,14 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                 <LinkButton href={"/adotante/home"} text="Voltar" color="white" back={true} />
             </div>
 
-            {animal ? 
-                <AnimalPresentation tipo="adotante" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
-                porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
-                fotos={fotos} href="#" onOpenModal={() => setOpen(true)} /> : 
-                ""}
+            {/* se o animal estiver definido, apresenta seus dados */}
+            {animal 
+                ? <AnimalPresentation tipo="adotante" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
+                    porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
+                    fotos={fotos} href="#" onOpenModal={() => setOpen(true)} /> 
+                : ""}
 
+            {/* exibe o modal de diretrizes de adoção */}
             {open && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setOpen(false)}>
                     <div className="relative bg-white rounded-lg p-4 xsm:px-10 xl:px-20 flex flex-col items-center gap-4 
@@ -211,15 +225,18 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                 </div>
                             </div>
 
+                            {/* botão de confirmação de solicitação de adoção */}
                             <button onClick={async () => {
                                 try {
-                                    setConfirming(true);
+                                    setConfirming(true); // ativa o estado de confirmação
 
+                                    // monta o payload da requisição
                                     const payload = {
                                         adotanteId: userId,
                                         animalId: id,
                                     };
 
+                                    // faz a requisição para cadastrar a solicitação de adoção
                                     const response = await fetch(`http://localhost:8080/adocoes/cadastrar`, {
                                         method: "POST",
                                         headers: {
@@ -229,15 +246,16 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                         body: JSON.stringify(payload),
                                     });
 
+                                    // trata erros na resposta
                                     if (!response.ok) {
-                                        let errorMsg = "Erro ao editar!";
+                                        let errorMsg = "Erro ao solicitar adoção!";
                                         try {
                                             const text = await response.text();
                                             try {
-                                            const json = JSON.parse(text);
-                                            errorMsg = json.message || JSON.stringify(json);
+                                                const json = JSON.parse(text);
+                                                errorMsg = json.message || JSON.stringify(json);
                                             } catch {
-                                            errorMsg = text;
+                                                errorMsg = text;
                                             }
                                         } catch (error) {
                                             // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -246,21 +264,21 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                                 icon: "error",
                                                 title: "Erro de conexão com o servidor!",
                                                 showConfirmButton: false,
-                                                timer: 2000,
+                                                timer: 1500,
                                             });
                                         }
-                            
                                         // exibe o erro recebido
                                         Swal.fire({
                                             position: "top",
                                             icon: "error",
                                             title: errorMsg,
                                             showConfirmButton: false,
-                                            timer: 2500,
+                                            timer: 1500,
                                         });
                                         return;
                                     }
 
+                                    // exibe mensagem de sucesso
                                     Swal.fire({
                                         position: "top",
                                         icon: "success",
@@ -269,19 +287,19 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                         timer: 1500,
                                     });
 
-                                    router.push("/adotante/solicitacoes");
+                                    router.push("/adotante/solicitacoes"); // redireciona para a página de solicitações
 
                                 } catch (error) {
-                                    console.error(error);
+                                    // envia um alerta para o usuário caso não haja conexão com o servidor
                                     Swal.fire({
                                         position: "top",
                                         icon: "error",
-                                        title: "Erro ao solicitar adoção!",
+                                        title: "Erro de conexão com o servidor!",
                                         showConfirmButton: false,
                                         timer: 1500,
                                     });
                                 } finally {
-                                    setConfirming(false);
+                                    setConfirming(false); // desativa o estado de confirmação, habilitando o botão novamente
                                 }
                             }}
                                 className={`w-fit self-center text-lg xl:text-xl px-8 py-1 rounded-[48px] 

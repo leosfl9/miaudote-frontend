@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
+// tipagem dos dados do animal
 interface Animal {
   id: number;
   idPet: number;
@@ -21,20 +22,24 @@ interface Animal {
 }
 
 export default function SolicitacoesAdocao(){
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const [animais, setAnimais] = useState<Animal[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [animais, setAnimais] = useState<Animal[]>([]); // estado para armazenar a lista de animais
+    const [loading, setLoading] = useState(true); // estado para controlar o carregamento
 
     useEffect(() => {
-        if (!token) {
+        // redireciona para a página de login caso não esteja autenticado
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
         
+        // função para carregar os animais solicitados
         async function carregarAnimais() {
             try {
+                // faz a requisição para obter as adoções do adotante
                 const response = await fetch(`http://localhost:8080/adocoes/adotante/${userId}`, {
                     method: "GET",
                     headers: {
@@ -43,15 +48,16 @@ export default function SolicitacoesAdocao(){
                     }
                 });
                 
+                // trata erros de resposta
                 if (!response.ok) {
-                    let errorMsg = "Erro ao editar!";
+                    let errorMsg = "Erro ao obter solicitações de adoção!";
                     try {
                         const text = await response.text();
                         try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
                         } catch {
-                        errorMsg = text;
+                            errorMsg = text;
                         }
                     } catch (error) {
                         // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -60,24 +66,23 @@ export default function SolicitacoesAdocao(){
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
-        
                     // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
 
-                const data = await response.json();
-                console.log("Dados recebidos:", data);
+                const data = await response.json(); // obtém os dados da resposta
 
+                // mapeia os dados para o formato esperado
                 const listaAnimais: Animal[] = data.map((item: any) => ({
                     id: item.adocao.id,
                     idPet: item.adocao.animal.id,
@@ -92,17 +97,25 @@ export default function SolicitacoesAdocao(){
                     foto: item.fotos[0].foto,
                 }));
 
-                setAnimais(listaAnimais);
+                setAnimais(listaAnimais); // atualiza o estado com a lista de animais
             } catch (error) {
-                console.error("Erro ao carregar animais:", error);
+                // envia um alerta para o usuário caso não haja conexão com o servidor
+                Swal.fire({
+                    position: "top",
+                    icon: "error",
+                    title: "Erro de conexão com o servidor!",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
             } finally {
-                setLoading(false);
+                setLoading(false); // desativa o estado de carregamento
             }
         }
 
-        carregarAnimais();
+        carregarAnimais(); // chama a função para carregar os animais
     }, []);
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -120,6 +133,7 @@ export default function SolicitacoesAdocao(){
             </div>
 
             <div className="flex flex-col plg:flex-row plg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* se houveren solicitações, exibe-as */}
                 {animais.length > 0 ? (
                     animais.map((animal) => (
                     <AnimalCard
@@ -137,6 +151,7 @@ export default function SolicitacoesAdocao(){
                     />
                     ))
                 ) : (
+                    // se não houver solicitações, exibe mensagem e link para a home
                     <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
                         <div className="space-y-2 sm:space-y-0">
                             <p>Parece que você ainda não solicitou nenhuma adoção... </p>
