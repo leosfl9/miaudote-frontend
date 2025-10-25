@@ -22,7 +22,7 @@ interface Animal {
     foto: string;
 }
 
-export default function homeParceiro(){
+export default function HomeParceiro(){
     // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");

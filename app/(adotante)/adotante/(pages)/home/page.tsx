@@ -24,7 +24,7 @@ interface Animal {
   favoritoId: number | null;
 }
 
-export default function homeAdotante(){
+export default function HomeAdotante(){
     // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
