@@ -1,12 +1,12 @@
 "use client"
 
-import Link from "next/link";
 import AnimalCard from "@/components/AnimalCard";
 import SelectField from "@/components/SelectField";
 import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 
+// tipagem dos dados do animal
 interface Animal {
   id: number;
   nome: string;
@@ -25,20 +25,26 @@ interface Animal {
 }
 
 export default function homeAdotante(){
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
+    // lista de animais
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true); // estado de loading da página
+
+    // gerenciamento de paginação
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
 
+    // estado dos filtros
     const [filtroEspecie, setFiltroEspecie] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("");
     const [filtroSexo, setFiltroSexo] = useState("");
 
+    // limpa filtros
     function limparFiltros() {
         setFiltroEspecie("");
         setFiltroEstado("");
@@ -46,30 +52,32 @@ export default function homeAdotante(){
         setAnimaisFiltrados(animais);
     }
 
+    // inicializa e executa os filtros
     useEffect(() => {
         let filtrados = animais;
 
         if (filtroEspecie) {
             filtrados = filtrados.filter((a) =>
-            a.especie.toLowerCase() === filtroEspecie.toLowerCase()
+                a.especie.toLowerCase() === filtroEspecie.toLowerCase()
             );
         }
 
         if (filtroEstado) {
             filtrados = filtrados.filter((a) =>
-            a.estado.toLowerCase() === filtroEstado.toLowerCase()
+                a.estado.toLowerCase() === filtroEstado.toLowerCase()
             );
         }
 
         if (filtroSexo) {
             filtrados = filtrados.filter((a) =>
-            a.sexo.toLowerCase() === filtroSexo.toLowerCase()
+                a.sexo.toLowerCase() === filtroSexo.toLowerCase()
             );
         }
 
         setAnimaisFiltrados(filtrados);
     }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
 
+    // se o usuário estiver autenticado, carrega os animais
     useEffect(() => {
         if (token && userId) carregarAnimais();
     }, [paginaAtual]);
@@ -77,8 +85,9 @@ export default function homeAdotante(){
 
     async function carregarAnimais() {
       try {
-        setLoading(true);
+        setLoading(true); // inicia o loading da página
 
+        // obtém os dados dos animais
         const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/${userId}`, {
             method: "GET",
             headers: {
@@ -87,8 +96,9 @@ export default function homeAdotante(){
             }
         });
 
+        // exibe alerta de erro se der errado
         if (!response.ok) {
-            let errorMsg = "Erro ao editar!";
+            let errorMsg = "Erro ao obter animais!";
             try {
                 const text = await response.text();
                 try {
@@ -104,29 +114,28 @@ export default function homeAdotante(){
                     icon: "error",
                     title: "Erro de conexão com o servidor!",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 1500,
                 });
             }
-
             // exibe o erro recebido
             Swal.fire({
                 position: "top",
                 icon: "error",
                 title: errorMsg,
                 showConfirmButton: false,
-                timer: 2500,
+                timer: 1500,
             });
             return;
         }
 
-        const data = await response.json();
-        console.log("Dados recebidos:", data);
+        const data = await response.json(); // armazena os dados dos animais
 
+        // seta o total de páginas
         if (data.length > 0) {
             setTotalPaginas(data[0].totalPaginas);
         }
             
-        // Agora o backend retorna um array de objetos
+        // armazena os dados dos animais em array
         const listaAnimais: Animal[] = data.map((item: any) => ({
           id: item.animal.id,
           nome: item.animal.nome,
@@ -144,23 +153,30 @@ export default function homeAdotante(){
           favoritoId: item.favoritoId,
         }));
 
-        setAnimais(listaAnimais);
+        setAnimais(listaAnimais); // seta a lista de animais
 
       } catch (error) {
-        console.error("Erro ao carregar animais:", error);
+        // envia um alerta para o usuário caso não haja conexão com o servidor
+        Swal.fire({
+            position: "top",
+            icon: "error",
+            title: "Erro de conexão com o servidor!",
+            showConfirmButton: false,
+            timer: 1500,
+        });
       } finally {
-        setLoading(false);
+        setLoading(false); // termina o loading da página
       }
     }
 
-    const [favoritandoId, setFavoritandoId] = useState<number | null>(null);
+    const [favoritandoId, setFavoritandoId] = useState<number | null>(null); // armazena o id do animal sendo favoritado
 
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
         let isMounted = true;
-        setFavoritandoId(idPet);
+        setFavoritandoId(idPet); // armazena o id do pet sendo favoritado
 
         try {
-            // Atualização otimista
+            // atualização otimista
             if (isMounted) {
                 setAnimais((prev) =>
                     prev.map((animal) =>
@@ -171,12 +187,10 @@ export default function homeAdotante(){
                 );
             }
 
-            // Cria um AbortController para poder cancelar o fetch se desmontar
-            const controller = new AbortController();
+            const controller = new AbortController(); // cria um AbortController para poder cancelar o fetch se desmontar
+            window.addEventListener("beforeunload", () => controller.abort()); // cancela o fetch se a página for recarregada ou o componente desmontar
 
-            // Cancela o fetch se a página for recarregada ou o componente desmontar
-            window.addEventListener("beforeunload", () => controller.abort());
-
+            // deleta dos favoritos se o pet já estiver favoritado
             if (favorito && favoritoId !== null) {
                 const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
                     method: "DELETE",
@@ -186,15 +200,16 @@ export default function homeAdotante(){
                     signal: controller.signal,
                 });
 
+                // exibe erro se der errado
                 if (!response.ok) {
                     let errorMsg = "Erro ao remover favorito!";
                     try {
                         const text = await response.text();
                         try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
                         } catch {
-                        errorMsg = text;
+                            errorMsg = text;
                         }
                     } catch (error) {
                         // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -203,10 +218,11 @@ export default function homeAdotante(){
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
 
+                    // reverte o estado otimista
                     if (isMounted) {
                         setAnimais((prev) =>
                             prev.map((animal) =>
@@ -223,11 +239,12 @@ export default function homeAdotante(){
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
 
+                // atualiza estado final se não houver erro
                 if (isMounted) {
                     setAnimais((prev) =>
                         prev.map((animal) =>
@@ -237,8 +254,8 @@ export default function homeAdotante(){
                         )
                     );
                 }
-
             } else {
+                // se o animal não estava favoritado, torna-o favorito
                 const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
                     method: "POST",
                     headers: {
@@ -252,15 +269,16 @@ export default function homeAdotante(){
                     signal: controller.signal,
                 });
 
+                // se der erro, exibe alerta
                 if (!response.ok) {
                     let errorMsg = "Erro ao adicionar favorito!";
                     try {
                         const text = await response.text();
                         try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
                         } catch {
-                        errorMsg = text;
+                            errorMsg = text;
                         }
                     } catch (error) {
                         // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -269,7 +287,7 @@ export default function homeAdotante(){
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
         
@@ -289,12 +307,12 @@ export default function homeAdotante(){
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
 
-                const novoFav = await response.json();
+                const novoFav = await response.json(); // obtém o id do novo favorito
 
                 if (isMounted) {
                     setAnimais((prev) =>
@@ -308,21 +326,19 @@ export default function homeAdotante(){
             }
         } catch (error: any) {
             if (error.name === "AbortError") {
-                console.log("Requisição cancelada pelo usuário (recarregou a página).");
                 return; // apenas ignora
             }
 
-            console.error(error);
             Swal.fire({
                 position: "top",
                 icon: "error",
                 title: "Não foi possível atualizar os favoritos.",
                 showConfirmButton: false,
-                timer: 2500,
+                timer: 1000,
             });
 
             if (isMounted) {
-                // Reverte o estado apenas se ainda estiver montado
+                // reverte o estado apenas se ainda estiver montado
                 setAnimais((prev) =>
                     prev.map((animal) =>
                     animal.id === idPet
@@ -332,11 +348,12 @@ export default function homeAdotante(){
                 );
             }
         } finally {
-            if (isMounted) setFavoritandoId(null);
+            if (isMounted) setFavoritandoId(null); // remove o id do favorito
             isMounted = false;
         }
     }
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -352,6 +369,7 @@ export default function homeAdotante(){
                 <h1 className="font-bold text-3xl 2xl:text-4xl text-center">Pets disponíveis para adoção</h1>
             </div>
 
+            {/* filtros */}
             <div className="flex flex-col plg:flex-row justify-between items-center plg:gap-2 lg:gap-4 mb-4">
                 <div className="flex flex-col xsm:flex-row gap-1 xsm:gap-2 lg:gap-4 w-full">
 
@@ -402,6 +420,7 @@ export default function homeAdotante(){
                     </SelectField>
                 </div>
 
+                {/* botão que limpa filtros */}
                 <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
                     shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
                     Limpar filtros
@@ -409,6 +428,7 @@ export default function homeAdotante(){
             </div>
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* listagem de animais */}
                 {animaisFiltrados.length > 0 ? (
                     animaisFiltrados.map((animal) => (
                     <AnimalCard
@@ -432,6 +452,7 @@ export default function homeAdotante(){
                     />
                     ))
                 ) : (
+                    // exibe mensagem se nenhum animal foi encontrado
                     <div className="py-8 px-0 flex flex-col gap-6 w-full text-center text-text-light-gray font-medium text-2xl">
                         <div className="space-y-2 sm:space-y-0">
                             <p>Nenhum animal encontrado!</p>
@@ -441,6 +462,7 @@ export default function homeAdotante(){
                 )}
             </div>
 
+            {/* exibe botões de paginação se houver pelo menos um animal */}
             {animaisFiltrados.length > 0 && (
                 <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
                     {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (

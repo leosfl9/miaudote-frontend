@@ -130,7 +130,7 @@ export default function homeAdotante(){
     const [favoritandoId, setFavoritandoId] = useState<number | null>(null); // armazena id do animal favoritado
     
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
-        let isMounted = true; // garante que o usuário está na página
+        let isMounted = true; 
         setFavoritandoId(idPet); // seta o id do animal a ser desfavoritado
 
         try {
@@ -216,15 +216,16 @@ export default function homeAdotante(){
             }
         } catch (error: any) {
             if (error.name === "AbortError") {
-                return;
+                return; // apenas ignora
             }
 
+            // erro genérico
             Swal.fire({
                 position: "top",
                 icon: "error",
                 title: "Não foi possível atualizar os favoritos.",
                 showConfirmButton: false,
-                timer: 2500,
+                timer: 1000,
             });
 
             // reverte o estado em erro inesperado
@@ -239,7 +240,7 @@ export default function homeAdotante(){
             }
         } finally {
             if (isMounted) setFavoritandoId(null); // remove o id do favorito
-            isMounted = false; // considera que a página está desmontada, para recarregá-la
+            isMounted = false;
             await carregarAnimais(); // recarrega os animais
         }
     }
