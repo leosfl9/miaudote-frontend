@@ -67,7 +67,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
 
     useEffect(() => {
         // redireciona para o login se o usuário não estiver autenticado
-        if (!token || userId) {
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
