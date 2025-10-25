@@ -158,7 +158,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
                     // exibe o erro recebido
@@ -167,7 +167,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
@@ -212,7 +212,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     icon: "error",
                     title: "Erro de conexão com o servidor!",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 1500,
                 });
             } finally {
                 setLoading(false); // termina o carregamento da página
@@ -286,7 +286,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
                     // exibe o erro recebido
@@ -295,7 +295,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
@@ -319,7 +319,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
                 // exibe o erro recebido
@@ -328,7 +328,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }
@@ -471,7 +471,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
                 // exibe o erro recebido
@@ -480,7 +480,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }
@@ -489,7 +489,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 icon: "success",
                 title: "Imagem excluída!",
                 showConfirmButton: false,
-                timer: 1200,
+                timer: 1000,
             });
 
             setFotos((prev) => prev.filter((foto) => foto.id !== fotoId)); // remove a foto excluída do array

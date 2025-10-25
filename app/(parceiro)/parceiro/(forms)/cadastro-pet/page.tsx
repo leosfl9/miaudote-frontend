@@ -241,7 +241,7 @@ export default function CadastroPet() {
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
                 // exibe o erro recebido
@@ -250,7 +250,7 @@ export default function CadastroPet() {
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }

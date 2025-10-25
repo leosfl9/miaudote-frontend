@@ -10,8 +10,9 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
+  const router = useRouter(); // hook de roteamento
 
+  // verifica se o usuário está autenticado e é um parceiro. se não for, envia-o para fazer login
   useEffect(() => {
     const tipo = Cookies.get("tipo");
     const token = Cookies.get("token");

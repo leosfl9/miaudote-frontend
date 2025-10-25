@@ -76,7 +76,7 @@ export default function Login() {
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
 
@@ -86,7 +86,7 @@ export default function Login() {
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }

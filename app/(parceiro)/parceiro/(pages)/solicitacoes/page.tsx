@@ -3,10 +3,10 @@
 import RequestCard from "@/components/RequestCard";
 
 import Cookies from "js-cookie";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
+// tipagem dos dados da solicitação de adoção
 interface Solicitacao {
     id: number;
     nomePet: string;
@@ -17,91 +17,105 @@ interface Solicitacao {
 }
 
 export default function SolicitacoesAdocao(){
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
-    const id = Cookies.get("userId");
+    const userId = Cookies.get("userId");
 
-    const [solicitacoes, setSolitacoes] = useState<Solicitacao[]>([])
-    const [loading, setLoading] = useState(true);
+    const [solicitacoes, setSolitacoes] = useState<Solicitacao[]>([]) // armazena as solicitações
+    const [loading, setLoading] = useState(true); // estado de loading da página
 
     useEffect(() => {
-        if (!token) {
+        // se o usuário não estiver logado, é redirecionado para o login
+        if (!token || !userId) {
             window.location.href = "/login";
             return;
         }
 
+        // carrega as solicitações de adoção
         async function carregarSolicitacoes() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/parceiro/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                }
-            });
-
-            if (!response.ok) {
-                let errorMsg = "Erro ao buscar solicitações!";
-                try {
-                    const text = await response.text();
-                    try {
-                        const json = JSON.parse(text);
-                        errorMsg = json.message || JSON.stringify(json);
-                    } catch {
-                        errorMsg = text;
+                // faz um GET das solicitações de adoção
+                const response = await fetch(`http://localhost:8080/adocoes/parceiro/${userId}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     }
-                } catch (error) {
-                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                });
+
+                // se der erro, exibe o alerta na tela
+                if (!response.ok) {
+                    let errorMsg = "Erro ao buscar solicitações!";
+                    try {
+                        const text = await response.text();
+                        try {
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                            errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+
+                    // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
-                        title: "Erro de conexão com o servidor!",
+                        title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
+                    return;
                 }
 
-                // exibe o erro recebido
+                const data = await response.json(); // armazena os dados recebidos da API
+
+                // lista as solicitações
+                const listaSolicitacoes: Solicitacao[] = data.map((item: any) => {
+                    // formata a data recebida
+                    const [ano, mes, dia] = item.adocao.dataCadastro.split("-"); 
+                    const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                    // retorna um objeto com os dados que serão utilizados
+                    return {
+                        id: item.adocao.id,
+                        idPet: item.adocao.animal.id,
+                        idAdotante: item.adocao.adotante.id,
+                        nomePet: item.adocao.animal.nome,
+                        nomeAdotante: item.adocao.adotante.nome,
+                        data: dataFormatada,
+                        status: item.adocao.status,
+                        foto: item.fotos[0].foto,
+                    };
+                });
+
+                setSolitacoes(listaSolicitacoes); // salva a lista de solicitações
+            } catch (error) {
+                // envia um alerta para o usuário caso não haja conexão com o servidor
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: errorMsg,
+                    title: "Erro de conexão com o servidor!",
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
-                return;
-            }
-
-            const data = await response.json();
-            console.log("Dados recebidos:", data);
-
-            const listaSolicitacoes: Solicitacao[] = data.map((item: any) => {
-                const [ano, mes, dia] = item.adocao.dataCadastro.split("-");
-                const dataFormatada = `${dia}/${mes}/${ano}`;
-
-                return {
-                    id: item.adocao.id,
-                    idPet: item.adocao.animal.id,
-                    idAdotante: item.adocao.adotante.id,
-                    nomePet: item.adocao.animal.nome,
-                    nomeAdotante: item.adocao.adotante.nome,
-                    data: dataFormatada,
-                    status: item.adocao.status,
-                    foto: item.fotos[0].foto,
-                };
-            });
-
-            setSolitacoes(listaSolicitacoes);
-
-            } catch (error) {
-                console.error("Erro ao carregar solicitações:", error);
             } finally {
-                setLoading(false);
+                setLoading(false); // termina o loading
             }
         }
 
-        carregarSolicitacoes();
+        carregarSolicitacoes(); // chama a função
     }, []);
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -119,6 +133,7 @@ export default function SolicitacoesAdocao(){
             </div>
 
             <div className="flex flex-col plg:flex-row plg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* lista as solicitações de adoção */}
                 {solicitacoes.length > 0 ? (
                     solicitacoes.map((solicitacao) => (
                         <RequestCard 
@@ -132,11 +147,11 @@ export default function SolicitacoesAdocao(){
                         />
                     ))
                 ) : (
+                    // se não houverem solicitações, exibe uma mensagem
                     <div className="py-8 px-0 text-start text-text-light-gray font-medium text-2xl">
                         <p>Ainda não há solicitações, mas em breve alguém especial pode aparecer!</p>
                     </div>
                 )}
-
             </div>
         </div>
     );

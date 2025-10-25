@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 
+// tipagem dos dados do animal
 interface Animal {
     id: number;
     nome: string;
@@ -22,32 +23,38 @@ interface Animal {
 }
 
 export default function homeParceiro(){
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
-    const id = Cookies.get("userId");
+    const userId = Cookies.get("userId");
 
-    const [animais, setAnimais] = useState<Animal[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [animais, setAnimais] = useState<Animal[]>([]); // armazena dados do animal
+    const [loading, setLoading] = useState(true); // estado de loading da página
 
+    // gerenciamento da página
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
 
+    // executa a função somente se o usuario estiver autenticado
     useEffect(() => {
-      if (token && id) carregarAnimais();
+      if (token && userId) carregarAnimais();
     }, [paginaAtual]);
 
+    // carrega os dados dos animais
     async function carregarAnimais() {
       try {
-        setLoading(true);
+        setLoading(true); // exibe a tela de carregamento
 
-        const response = await fetch(`http://localhost:8080/fotos/parceiro/${id}/pagina/${paginaAtual}`, {
+        // obtém os dados do animal
+        const response = await fetch(`http://localhost:8080/fotos/parceiro/${userId}/pagina/${paginaAtual}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",}
         });
 
+        // se der erro, exibe um alerta
         if (!response.ok) {
-          let errorMsg = "Erro ao editar!";
+          let errorMsg = "Erro ao carregar animais!";
           try {
               const text = await response.text();
               try {
@@ -63,7 +70,7 @@ export default function homeParceiro(){
                   icon: "error",
                   title: "Erro de conexão com o servidor!",
                   showConfirmButton: false,
-                  timer: 2000,
+                  timer: 1500,
               });
           }
 
@@ -78,12 +85,15 @@ export default function homeParceiro(){
           return;
         }
 
+        // armazena os dados do animal
         const data = await response.json();
 
+        // seta o total de páginas, recebido da API
         if (data.length > 0) {
           setTotalPaginas(data[0].totalPaginas);
         }
 
+        // mapeia os dados do animal
         const listaAnimais: Animal[] = data.map((item: any) => ({
           id: item.animal.id,
           nome: item.animal.nome,
@@ -97,15 +107,23 @@ export default function homeParceiro(){
           foto: item.foto,
         }));
 
-        setAnimais(listaAnimais);
+        setAnimais(listaAnimais); // armazena a lista de animais
 
       } catch (error) {
-        console.error("Erro ao carregar animais:", error);
+        // envia um alerta para o usuário caso não haja conexão com o servidor
+        Swal.fire({
+            position: "top",
+            icon: "error",
+            title: "Erro de conexão com o servidor!",
+            showConfirmButton: false,
+            timer: 1500,
+        });
       } finally {
-        setLoading(false);
+        setLoading(false); // finaliza o carregamento
       }
     }
 
+    // tela de carregamento
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -123,6 +141,7 @@ export default function homeParceiro(){
             </div>
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* botão para cadastrar novo pet */}
                 <Link href={"/parceiro/cadastro-pet"} className="bg-[#C09BD84D] hover:bg-miau-purple active:bg-miau-purple/80 
                     text-text-gray hover:text-background active:text-background flex gap-2 items-center px-4 py-2 rounded-xl w-full max-w-[380px]
                     lg:h-[512px] lg:flex-col lg:items-center lg:justify-center lg:gap-6">
@@ -130,6 +149,7 @@ export default function homeParceiro(){
                     <h3 className="font-semibold text-lg lg:text-2xl">Adicionar novo pet</h3>
                 </Link>
 
+                {/* lista animais se tiver pelo menos um */}
                 {animais.length > 0 ? (
                   animais.map((animal) => (
                     <AnimalCard
@@ -146,6 +166,7 @@ export default function homeParceiro(){
                     />
                   ))
                 ) : (
+                  // exibe mensagem se nenhum animal estiver cadastrado
                   <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
                     <div className="space-y-2 sm:space-y-0">
                       <p>Nenhum animal cadastrado!</p>
@@ -155,6 +176,7 @@ export default function homeParceiro(){
                 )}
             </div>
 
+            {/* se tiver pelo menos um animal, exibe o contador de páginas */}
             {animais.length > 0 && (
               <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
                 {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
