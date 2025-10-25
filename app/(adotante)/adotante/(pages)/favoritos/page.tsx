@@ -5,8 +5,8 @@ import AnimalCard from "@/components/AnimalCard";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import LinkButton from "@/components/LinkButton";
 
+// tipagem dos dados do animal
 interface Animal {
   id: number;
   nome: string;
@@ -25,22 +25,27 @@ interface Animal {
 }
 
 export default function homeAdotante(){
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const [animais, setAnimais] = useState<Animal[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [animais, setAnimais] = useState<Animal[]>([]); // armazena dados do animal
+    const [loading, setLoading] = useState(true); // estado de loading da página
+
+    // gerenciamento de paginação
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
 
+    // carrega os animais se o usuário estiver autenticado
     useEffect(() => {
         if (token && userId) carregarAnimais();
     }, []);
 
     async function carregarAnimais() {
         try {
-            setLoading(true);
+            setLoading(true); // inicia o loading da página
 
+            // faz uma requisição do tipo GET para a API
             const response = await fetch(`http://localhost:8080/fotos/adotante/${userId}/pagina/${paginaAtual}`, {
                 method: "GET",
                 headers: {
@@ -49,15 +54,16 @@ export default function homeAdotante(){
                 }
             });
             
+            // se der errado, exibe um alerta
             if (!response.ok) {
-                let errorMsg = "Erro ao editar!";
+                let errorMsg = "Erro ao obter favoritos!";
                 try {
                     const text = await response.text();
                     try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
                     } catch {
-                    errorMsg = text;
+                        errorMsg = text;
                     }
                 } catch (error) {
                     // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -66,7 +72,7 @@ export default function homeAdotante(){
                         icon: "error",
                         title: "Erro de conexão com o servidor!",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
                 }
     
@@ -76,19 +82,19 @@ export default function homeAdotante(){
                     icon: "error",
                     title: errorMsg,
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 1500,
                 });
                 return;
             }
     
-            const data = await response.json();
-            console.log("Dados recebidos:", data);
+            const data = await response.json(); // armazena os dados recebidos da API
 
+            // armazena o total de páginas, retornado pela API
             if (data.length > 0) {
                 setTotalPaginas(data[0].totalPaginas);
             }
                 
-            // Agora o backend retorna um array de objetos
+            // armazena o array de objetos
             const listaAnimais: Animal[] = data.map((item: any) => ({
                 id: item.animal.id,
                 nome: item.animal.nome,
@@ -106,22 +112,29 @@ export default function homeAdotante(){
                 favoritoId: item.favoritoId,
             }));
     
-            setAnimais(listaAnimais);
+            setAnimais(listaAnimais); // armazena a lista de animais
         } catch (error) {
-            console.error("Erro ao carregar animais:", error);
+            // envia um alerta para o usuário caso não haja conexão com o servidor
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Erro de conexão com o servidor!",
+                showConfirmButton: false,
+                timer: 1500,
+            });
         } finally {
-            setLoading(false);
+            setLoading(false); // termina o loading da página
         }
     }
 
-    const [favoritandoId, setFavoritandoId] = useState<number | null>(null);
+    const [favoritandoId, setFavoritandoId] = useState<number | null>(null); // armazena id do animal favoritado
     
     async function handleFavorito(idPet: number, favorito: boolean, favoritoId: number | null) {
-        let isMounted = true;
-        setFavoritandoId(idPet);
+        let isMounted = true; // garante que o usuário está na página
+        setFavoritandoId(idPet); // seta o id do animal a ser desfavoritado
 
         try {
-            // Atualização otimista
+            // atualização otimista, assume que a API retornou sucesso
             if (isMounted) {
                 setAnimais((prev) =>
                     prev.map((animal) =>
@@ -132,23 +145,22 @@ export default function homeAdotante(){
                 );
             }
 
-            // Controlador para abortar se recarregar
+            // controlador para abortar se o usuário recarregar ou sair da página
             const controller = new AbortController();
             window.addEventListener("beforeunload", () => controller.abort());
 
-            // Só pode remover se existir favoritoId
+            // só pode remover se existir favoritoId
             if (favorito && favoritoId !== null) {
-                const response = await fetch(
-                    `http://localhost:8080/favoritos/${favoritoId}`,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                        signal: controller.signal,
-                    }
-                );
+                // realiza a requisição de DELETE do favorito
+                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    signal: controller.signal,
+                });
 
+                // se der erro, exibe um alerta
                 if (!response.ok) {
                     let errorMsg = "Erro ao remover favorito!";
                     try {
@@ -160,16 +172,17 @@ export default function homeAdotante(){
                             errorMsg = text;
                         }
                     } catch {
+                        // exibe erro de conexão com o servidor
                         Swal.fire({
                             position: "top",
                             icon: "error",
                             title: "Erro de conexão com o servidor!",
                             showConfirmButton: false,
-                            timer: 2000,
+                            timer: 1500,
                         });
                     }
 
-                    // Reverte o estado otimista
+                    // reverte o estado otimista
                     if (isMounted) {
                         setAnimais((prev) =>
                             prev.map((animal) =>
@@ -179,18 +192,18 @@ export default function homeAdotante(){
                             )
                         );
                     }
-
+                    // exibe mensagem de erro do backend
                     Swal.fire({
                         position: "top",
                         icon: "error",
                         title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2500,
+                        timer: 1500,
                     });
                     return;
                 }
 
-                // Atualiza estado final se sucesso
+                // atualiza estado final se não houver erro
                 if (isMounted) {
                     setAnimais((prev) =>
                         prev.map((animal) =>
@@ -203,11 +216,9 @@ export default function homeAdotante(){
             }
         } catch (error: any) {
             if (error.name === "AbortError") {
-                console.log("Requisição cancelada pelo usuário (recarregou a página).");
                 return;
             }
 
-            console.error(error);
             Swal.fire({
                 position: "top",
                 icon: "error",
@@ -216,7 +227,7 @@ export default function homeAdotante(){
                 timer: 2500,
             });
 
-            // Reverte o estado em erro inesperado
+            // reverte o estado em erro inesperado
             if (isMounted) {
                 setAnimais((prev) =>
                     prev.map((animal) =>
@@ -227,13 +238,13 @@ export default function homeAdotante(){
                 );
             }
         } finally {
-            if (isMounted) setFavoritandoId(null);
-            isMounted = false;
-            await carregarAnimais();
+            if (isMounted) setFavoritandoId(null); // remove o id do favorito
+            isMounted = false; // considera que a página está desmontada, para recarregá-la
+            await carregarAnimais(); // recarrega os animais
         }
     }
 
-
+    // tela de carregamento
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -251,6 +262,7 @@ export default function homeAdotante(){
             </div>
 
             <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+                {/* se houverem animais, exibe-os */}
                 {animais.length > 0 ? (
                     animais.map((animal) => (
                     <AnimalCard
@@ -273,6 +285,7 @@ export default function homeAdotante(){
                         favorito />
                     ))
                 ) : (
+                    // se não houverem animais, exibe uma mensagem e link para a home
                     <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
                         <div className="space-y-2 sm:space-y-0">
                             <p>Parece que você ainda não tem nenhum pet favorito...</p>
@@ -285,6 +298,7 @@ export default function homeAdotante(){
                 )}
             </div>
 
+            {/* exibe os botões de paginação apenas se existirem animais */}
             {animais.length > 0 && (
                 <div className="flex flex-row gap-3 text-background w-full items-center justify-center text-center mt-2">
                     {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (

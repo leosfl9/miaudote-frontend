@@ -10,6 +10,7 @@ import { useState, useEffect, use } from "react";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
+// tipagem de dados do animal
 interface Animal {
     id: number;
     nome: string;
@@ -33,21 +34,26 @@ interface Animal {
 }
 
 export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: string }> }) {
+    // dados de autenticação do usuário
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
-    const { id } = use(params);
+    const { id } = use(params); // pega o id da solicitação pela URL
+
+    // estado do modal de cancelamento de adoção
     const [openCancela, setOpenCancela] = useState(false);
     const [cancelling, setCancelling] = useState(false);
 
-    const [animal, setAnimal] = useState<Animal | null>(null);
-    const [status, setStatus] = useState(undefined);
-    const [dataAdocao, setDataAdocao] = useState(undefined);
-    const [fotos, setFotos] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [animal, setAnimal] = useState<Animal | null>(null); // armazena dados do animal
+    const [status, setStatus] = useState(undefined); // armazena o status da solicitação
+    const [dataAdocao, setDataAdocao] = useState(undefined); // armazena a data da solicitação 
+    const [fotos, setFotos] = useState([]); // armazena as fotos
 
-    const router = useRouter();
+    const [loading, setLoading] = useState(true); // estado de loading da página
 
+    const router = useRouter(); // hook de roteamento
+
+    // altera o estilo da página quando o modal de cancelamento for aberto
     useEffect(() => {
         if (openCancela) {
             document.body.style.overflow = "hidden";
@@ -60,79 +66,88 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
     }, [openCancela]);
 
     useEffect(() => {
-        if (!token) {
+        // redireciona para o login se o usuário não estiver autenticado
+        if (!token || userId) {
             window.location.href = "/login";
             return;
         }
 
+        // carrega dados da solicitação de adoção
         async function carregarSolicitacao() {
             try {
-            const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                }
-            });
-            
-            if (!response.ok) {
-                let errorMsg = "Erro ao editar!";
-                try {
-                    const text = await response.text();
-                    try {
-                    const json = JSON.parse(text);
-                    errorMsg = json.message || JSON.stringify(json);
-                    } catch {
-                    errorMsg = text;
+                // obtém os dados da solicitação
+                const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json",
                     }
-                } catch (error) {
-                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                });
+                
+                // se der erro, exibe um alerta
+                if (!response.ok) {
+                    let errorMsg = "Erro ao obter solicitação de adoção!";
+                    try {
+                        const text = await response.text();
+                        try {
+                            const json = JSON.parse(text);
+                            errorMsg = json.message || JSON.stringify(json);
+                        } catch {
+                            errorMsg = text;
+                        }
+                    } catch (error) {
+                        // envia um alerta para o usuário caso não haja conexão com o servidor
+                        Swal.fire({
+                            position: "top",
+                            icon: "error",
+                            title: "Erro de conexão com o servidor!",
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+        
+                    // exibe o erro recebido
                     Swal.fire({
                         position: "top",
                         icon: "error",
-                        title: "Erro de conexão com o servidor!",
+                        title: errorMsg,
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 1500,
                     });
+                    return;
                 }
-    
-                // exibe o erro recebido
+
+                const data = await response.json(); // armazena  os dados da solicitação
+
+                // armazena os dados variados
+                const statusAdocao = data.adocao.status;
+                const dataAdocao = data.adocao.dataCadastro;
+                const animal = data.adocao.animal;
+                const fotos = data.fotos.map((item: { foto: string; }) => item.foto);
+
+                // seta os dados variados
+                setAnimal(animal);
+                setStatus(statusAdocao);
+                setDataAdocao(dataAdocao);
+                setFotos(fotos);
+            } catch (error) {
+                // envia um alerta para o usuário caso não haja conexão com o servidor
                 Swal.fire({
                     position: "top",
                     icon: "error",
-                    title: errorMsg,
+                    title: "Erro de conexão com o servidor!",
                     showConfirmButton: false,
-                    timer: 2500,
+                    timer: 2000,
                 });
-                return;
-            }
-
-            const data = await response.json();
-            console.log("Dados recebidos:", data);
-
-            const statusAdocao = data.adocao.status;
-            const dataAdocao = data.adocao.dataCadastro;
-            const animal = data.adocao.animal;
-            const fotos = data.fotos.map((item: { foto: string; }) => item.foto);
-
-            console.log("Animal:", animal);
-            console.log("Fotos:", fotos);
-
-            setAnimal(animal);
-            setStatus(statusAdocao);
-            setDataAdocao(dataAdocao);
-            setFotos(fotos);
-
-            } catch (error) {
-            console.error("Erro ao carregar animal:", error);
             } finally {
-                setLoading(false);
+                setLoading(false); // termina o carregamento da página
             }
         }
 
-        carregarSolicitacao();
+        carregarSolicitacao(); // chama a função quando a URL termina de ser lida
     }, [id]);
 
+    // tela de loading
     if (loading) {
         return (
             <div className="absolute w-screen h-screen flex flex-col gap-4 items-center justify-center bg-miau-purple">
@@ -150,12 +165,15 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                 <LinkButton href={"/adotante/solicitacoes"} text="Voltar" color="white" back={true} />
             </div>
 
-            {animal ? 
-                <AnimalPresentation tipo="solicitacao" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
-                porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
-                fotos={fotos} href="#" telefone={animal.parceiro.telefone} onOpenModalCancela={() => setOpenCancela(true)} status={status} dataAdocao={dataAdocao} /> : 
-                ""}
+            {/* se o animal estiver definido, apresenta seus dados */}
+            {animal 
+                ? <AnimalPresentation tipo="solicitacao" nome={animal.nome} descricao={animal.descricao} idade={animal.idade} sexo={animal.sexo} 
+                    porte={animal.porte} cidade={animal.parceiro.cidade} estado={animal.parceiro.estado} obs={animal.obs} especie={animal.especie}
+                    fotos={fotos} href="#" telefone={animal.parceiro.telefone} onOpenModalCancela={() => setOpenCancela(true)} status={status} dataAdocao={dataAdocao} /> 
+                : ""
+            }
 
+            {/* exibe o modal de cancelamento de solicitação */}
             {openCancela && (
                 <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setOpenCancela(false)}>
                     <div className="relative bg-white rounded-lg px-4 ssm:px-6 pt-12 ssm:pt-14 pb-4 sm:pb-6 flex flex-col items-center gap-4 
@@ -170,28 +188,33 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                         <div className="flex flex-col gap-4 xl:gap-6 text-center">
                             <h2 className="text-text-gray text-xl ssm:text-2xl">Deseja mesmo cancelar a solicitação de adoção?</h2>
 
+                            {/* botão de cancelar solicitação */}
                             <button onClick={async () => {
                                 try {
-                                    setCancelling(true);
+                                    setCancelling(true); // desabilita o botão de cancelar
 
+                                    // chama o PATCH da API, alterando o status da solicitação
                                     const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
                                             "Authorization": `Bearer ${token}`,
                                             "Content-Type": "application/json",
                                         },
-                                        body: JSON.stringify({ status: "Finalizada por desistência do adotante" }),
+                                        body: JSON.stringify({ 
+                                            status: "Finalizada por desistência do adotante" 
+                                        }),
                                     });
 
+                                    // se der erro, exibe um alerta
                                     if (!response.ok) {
-                                        let errorMsg = "Erro ao remover favorito!";
+                                        let errorMsg = "Erro ao cancelar solicitação de adoção!";
                                         try {
                                             const text = await response.text();
                                             try {
-                                            const json = JSON.parse(text);
-                                            errorMsg = json.message || JSON.stringify(json);
+                                                const json = JSON.parse(text);
+                                                errorMsg = json.message || JSON.stringify(json);
                                             } catch {
-                                            errorMsg = text;
+                                                errorMsg = text;
                                             }
                                         } catch (error) {
                                             // envia um alerta para o usuário caso não haja conexão com o servidor
@@ -200,7 +223,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                                 icon: "error",
                                                 title: "Erro de conexão com o servidor!",
                                                 showConfirmButton: false,
-                                                timer: 2000,
+                                                timer: 1500,
                                             });
                                         }
                             
@@ -210,11 +233,12 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                             icon: "error",
                                             title: errorMsg,
                                             showConfirmButton: false,
-                                            timer: 2500,
+                                            timer: 1500,
                                         });
                                         return;
                                     }
 
+                                    // mensagem de sucesso
                                     Swal.fire({
                                         position: "top",
                                         icon: "success",
@@ -223,19 +247,19 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                         timer: 1500,
                                     });
 
-                                    router.push("/adotante/solicitacoes");
+                                    router.push("/adotante/solicitacoes"); // envia o usuário para a página de solicitações
 
                                 } catch (error) {
-                                    console.error(error);
+                                    // envia um alerta para o usuário caso não haja conexão com o servidor
                                     Swal.fire({
                                         position: "top",
                                         icon: "error",
-                                        title: "Erro ao cancelar adoção!",
+                                        title: "Erro de conexão com o servidor!",
                                         showConfirmButton: false,
                                         timer: 1500,
                                     });
                                 } finally {
-                                    setCancelling(false);
+                                    setCancelling(false); // habilita novamento o botão
                                 }
                             }}
                                 className={`w-fit self-center text-lg ssm:text-xl px-8 py-1 rounded-[48px] transition-colors  
@@ -248,7 +272,6 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                     </div>
                 </div>
             )}
-
         </div>
     );
 }
