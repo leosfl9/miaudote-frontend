@@ -314,7 +314,7 @@ export default function CadastroPet() {
                     </div>
 
                     {/* input escondido, chamado no clique do botão acima */}
-                    <input id="fotos" type="file" hidden multiple accept="image/*" onChange={handleFileChange} />
+                    <input id="fotos" type="file" hidden accept="image/*" onChange={handleFileChange} />
 
                     {/* preview de imagens cortadas */}
                     {croppedFiles.length > 0 && (

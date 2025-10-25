@@ -576,7 +576,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                     </div>
 
                     {/* input escondido, chamado no clique do botão acima */}
-                    <input id="fotos" type="file" hidden multiple accept="image/*" onChange={handleFileChange} />
+                    <input id="fotos" type="file" hidden accept="image/*" onChange={handleFileChange} />
 
                     {/* prévias das fotos */}
                     {(fotos.length > 0 || croppedFiles.length > 0) && (
