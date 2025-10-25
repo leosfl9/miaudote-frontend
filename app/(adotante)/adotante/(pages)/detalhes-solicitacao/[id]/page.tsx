@@ -76,7 +76,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
         async function carregarSolicitacao() {
             try {
                 // obtém os dados da solicitação
-                const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -194,7 +194,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     setCancelling(true); // desabilita o botão de cancelar
 
                                     // chama o PATCH da API, alterando o status da solicitação
-                                    const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                                    const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
                                             "Authorization": `Bearer ${token}`,

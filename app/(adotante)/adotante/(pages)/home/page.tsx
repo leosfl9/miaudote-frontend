@@ -88,7 +88,7 @@ export default function homeAdotante(){
         setLoading(true); // inicia o loading da página
 
         // obtém os dados dos animais
-        const response = await fetch(`http://localhost:8080/fotos/pagina/${paginaAtual}/${userId}`, {
+        const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/pagina/${paginaAtual}/${userId}`, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`,
@@ -192,7 +192,7 @@ export default function homeAdotante(){
 
             // deleta dos favoritos se o pet já estiver favoritado
             if (favorito && favoritoId !== null) {
-                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/favoritos/${favoritoId}`, {
                     method: "DELETE",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -256,7 +256,7 @@ export default function homeAdotante(){
                 }
             } else {
                 // se o animal não estava favoritado, torna-o favorito
-                const response = await fetch("http://localhost:8080/favoritos/cadastrar", {
+                const response = await fetch("https://miaudote-8av5.onrender.com/favoritos/cadastrar", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`, 

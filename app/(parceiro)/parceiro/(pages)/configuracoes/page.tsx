@@ -110,7 +110,7 @@ export default function Configuracoes() {
             }
 
             // chama a API com método PATCH
-            const response = await fetch(`http://localhost:8080/parceiros/${userId}`, {
+            const response = await fetch(`https://miaudote-8av5.onrender.com/parceiros/${userId}`, {
                 method: "PATCH",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -187,7 +187,7 @@ export default function Configuracoes() {
         const fetchParceiro = async () => {
             try {
                 // armazena os dados
-                const response = await fetch(`http://localhost:8080/parceiros/${userId}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/parceiros/${userId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,

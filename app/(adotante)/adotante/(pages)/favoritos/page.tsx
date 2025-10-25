@@ -46,7 +46,7 @@ export default function homeAdotante(){
             setLoading(true); // inicia o loading da página
 
             // faz uma requisição do tipo GET para a API
-            const response = await fetch(`http://localhost:8080/fotos/adotante/${userId}/pagina/${paginaAtual}`, {
+            const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/adotante/${userId}/pagina/${paginaAtual}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -152,7 +152,7 @@ export default function homeAdotante(){
             // só pode remover se existir favoritoId
             if (favorito && favoritoId !== null) {
                 // realiza a requisição de DELETE do favorito
-                const response = await fetch(`http://localhost:8080/favoritos/${favoritoId}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/favoritos/${favoritoId}`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${token}`,

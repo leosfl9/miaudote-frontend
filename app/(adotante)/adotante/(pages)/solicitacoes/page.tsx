@@ -40,7 +40,7 @@ export default function SolicitacoesAdocao(){
         async function carregarAnimais() {
             try {
                 // faz a requisição para obter as adoções do adotante
-                const response = await fetch(`http://localhost:8080/adocoes/adotante/${userId}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/adotante/${userId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,

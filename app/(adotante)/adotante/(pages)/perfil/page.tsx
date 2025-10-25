@@ -106,7 +106,7 @@ export default function PerfilAdotante() {
             }
 
             // envia os dados editados para a API
-            const response = await fetch(`http://localhost:8080/adotantes/${userId}`, {
+            const response = await fetch(`https://miaudote-8av5.onrender.com/adotantes/${userId}`, {
                 method: "PATCH",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -179,7 +179,7 @@ export default function PerfilAdotante() {
         const fetchUsuario = async () => {
             try {
                 // GET dos dados
-                const response = await fetch(`http://localhost:8080/adotantes/${userId}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/adotantes/${userId}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,

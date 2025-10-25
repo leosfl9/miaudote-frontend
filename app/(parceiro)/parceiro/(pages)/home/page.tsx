@@ -45,7 +45,7 @@ export default function homeParceiro(){
         setLoading(true); // exibe a tela de carregamento
 
         // obtém os dados do animal
-        const response = await fetch(`http://localhost:8080/fotos/parceiro/${userId}/pagina/${paginaAtual}`, {
+        const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/parceiro/${userId}/pagina/${paginaAtual}`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,

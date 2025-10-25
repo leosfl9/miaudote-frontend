@@ -59,7 +59,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
         async function carregarSolicitacao() {
             try {
                 // recebe os dados da API
-                const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -210,7 +210,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                     setSendingFinalizar(true); // desabilita os botões
 
                                     // chama a API para atualizar o status da solicitação de adoção
-                                    const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                                    const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                                         method: "PATCH",
                                         headers: {
                                             "Authorization": `Bearer ${token}`,
@@ -287,7 +287,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                         setSendingCancelar(true); // desabilita os botões
 
                                         // chama a API para atualizar o status da solicitação de adoção
-                                        const response = await fetch(`http://localhost:8080/adocoes/${id}`, {
+                                        const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                                             method: "PATCH",
                                             headers: {
                                                 "Authorization": `Bearer ${token}`,

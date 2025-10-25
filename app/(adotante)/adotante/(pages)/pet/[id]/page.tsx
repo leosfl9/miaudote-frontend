@@ -73,7 +73,7 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
         async function carregarAnimal() {
             try {
                 // faz a requisição para obter os dados do animal
-                const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/animal/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -237,7 +237,7 @@ export default function PetPresentation({ params }: { params: Promise<{ id: stri
                                     };
 
                                     // faz a requisição para cadastrar a solicitação de adoção
-                                    const response = await fetch(`http://localhost:8080/adocoes/cadastrar`, {
+                                    const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/cadastrar`, {
                                         method: "POST",
                                         headers: {
                                             "Authorization": `Bearer ${token}`,

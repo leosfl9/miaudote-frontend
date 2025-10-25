@@ -215,7 +215,7 @@ export default function CadastroPet() {
             });
 
             // fetch da API com método POST
-            const response = await fetch("http://localhost:8080/animais/cadastrar", {
+            const response = await fetch("https://miaudote-8av5.onrender.com/animais/cadastrar", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

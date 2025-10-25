@@ -52,7 +52,7 @@ export default function PetDetails({ params }: { params: Promise<{ id: string }>
         async function carregarAnimal() {
             try {
                 // API retorna dados do animal
-                const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/animal/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,

@@ -50,7 +50,7 @@ export default function Login() {
             };
 
             // chama a API e armazena a resposta recebida
-            const response = await fetch("http://localhost:8080/usuarios/login", {
+            const response = await fetch("https://miaudote-8av5.onrender.com/usuarios/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

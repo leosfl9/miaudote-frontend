@@ -91,7 +91,7 @@ export default function CadastroParceiro() {
             };
 
             // chama a API e armazena a resposta recebida
-            const response = await fetch("http://localhost:8080/parceiros/cadastrar", {
+            const response = await fetch("https://miaudote-8av5.onrender.com/parceiros/cadastrar", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -132,7 +132,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
         const fetchAnimal = async () => {
             try {
                 // recebe os dados da API
-                const response = await fetch(`http://localhost:8080/fotos/animal/${id}`, {
+                const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/animal/${id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -241,7 +241,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             };
 
             // realiza a requisição de patch
-            const response = await fetch(`http://localhost:8080/animais/${id}`, {
+            const response = await fetch(`https://miaudote-8av5.onrender.com/animais/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -260,7 +260,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 });
 
                 // cadastra as novas imagens
-                const uploadResponse = await fetch(`http://localhost:8080/fotos/cadastrar/12`, {
+                const uploadResponse = await fetch(`https://miaudote-8av5.onrender.com/fotos/cadastrar/12`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -446,7 +446,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
             setDeleting(true); // desabilita os x de excluir imagens
 
             // requisição para deletar a foto
-            const response = await fetch(`http://localhost:8080/fotos/${fotoId}/animal/${id}`, {
+            const response = await fetch(`https://miaudote-8av5.onrender.com/fotos/${fotoId}/animal/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${token}`,
