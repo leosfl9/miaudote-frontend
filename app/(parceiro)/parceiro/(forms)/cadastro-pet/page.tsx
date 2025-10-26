@@ -97,7 +97,7 @@ export default function CadastroPet() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
     const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
-    
+
     const [isDisabled, setIsDisabled] = useState(false); // estado para desabilitar o botão de confirmar corte de imagem
     const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
@@ -159,6 +159,20 @@ export default function CadastroPet() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // validação de tamanho (máximo 1.5MB por imagem)
+        const maxSize = 1.5 * 1024 * 1024; // 1.5MB em bytes
+        if (file.size > maxSize) {
+            Swal.fire({
+                position: "top",
+                icon: "error",
+                title: "Imagem muito grande (máx. 1,5MB)",
+                showConfirmButton: false,
+                timer: 1000
+            });
+            e.target.value = ""; // limpa o input
+            return;
+        }
+
         // checagem direta no array final
         if (croppedFiles.length >= 5) {
             Swal.fire({
@@ -166,7 +180,7 @@ export default function CadastroPet() {
                 icon: "error",
                 title: "Máximo de 5 imagens!",
                 showConfirmButton: false,
-                timer: 1500
+                timer: 1000
             });
             return;
         }
