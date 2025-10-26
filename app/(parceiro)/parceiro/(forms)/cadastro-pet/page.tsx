@@ -155,6 +155,7 @@ export default function CadastroPet() {
             Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
         } finally {
             setIsDisabled(false); // habilita novamente o botão
+            setFileInputKey((prev) => prev + 1); // reseta o input de arquivo
         }
     };
 
