@@ -91,6 +91,8 @@ export default function CadastroPet() {
 
     const router = useRouter(); // hook de roteamento
 
+    const [fileInputKey, setFileInputKey] = useState(0); // chave para resetar input de arquivo
+
     // variáveis do react hook form
     const { 
         register, 
@@ -185,8 +187,8 @@ export default function CadastroPet() {
         setCurrentImageSrc(URL.createObjectURL(selected[0]));
 
         e.currentTarget.value = "";
+        setFileInputKey((prev) => prev + 1); // reseta o input de arquivo
     };
-
 
     const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
@@ -313,7 +315,7 @@ export default function CadastroPet() {
                     </div>
 
                     {/* input escondido, chamado no clique do botão acima */}
-                    <input id="fotos" type="file" hidden accept="image/*" onChange={handleFileChange} />
+                    <input id="fotos" key={fileInputKey} type="file" hidden accept="image/*" onChange={handleFileChange} />
 
                     {/* preview de imagens cortadas */}
                     {croppedFiles.length > 0 && (
@@ -402,6 +404,7 @@ export default function CadastroPet() {
                                         setCurrentImageSrc(null);
                                     }
                                     setCurrentCropIndex(null);
+                                    setFileInputKey((prev) => prev + 1); // força recriação do input
                                 }} >
                             Cancelar
                         </button>
