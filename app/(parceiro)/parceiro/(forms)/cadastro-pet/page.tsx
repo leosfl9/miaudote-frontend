@@ -11,16 +11,14 @@ import SelectField from "@/components/SelectField";
 import TextAreaField from "@/components/TextAreaField";
 import FormButton from "@/components/FormButton";
 
-import { X } from "lucide-react";
+import { X, Pencil } from "lucide-react";
+import Cropper from "react-easy-crop";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form"; 
 import { z } from "zod"; 
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { Pencil } from "lucide-react";
-import Cropper from "react-easy-crop";
-import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
 
 // função utilitária para cortar imagem
 async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<File> {
@@ -84,14 +82,24 @@ export default function CadastroPet() {
     const token = Cookies.get("token");
     const userId = Cookies.get("userId");
 
+    const router = useRouter(); // hook de roteamento
+
     // se o usuário não estiver autenticado, o envia para o login
     useEffect (() => {
         if (!token || !userId) router.push("/login");
-    }, [])
+    }, []);
 
-    const router = useRouter(); // hook de roteamento
-
-    const [fileInputKey, setFileInputKey] = useState(0); // chave para resetar input de arquivo
+    // lógica de arquivos
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [croppedFiles, setCroppedFiles] = useState<File[]>([]);
+    const [currentCropIndex, setCurrentCropIndex] = useState<number | null>(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+    const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
+    
+    const [isDisabled, setIsDisabled] = useState(false); // estado para desabilitar o botão de confirmar corte de imagem
+    const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
     // variáveis do react hook form
     const { 
@@ -109,22 +117,12 @@ export default function CadastroPet() {
         },
     });
 
-    // estados de imagens
-    const [files, setFiles] = useState<File[]>([]);
-    const [croppedFiles, setCroppedFiles] = useState<File[]>([]);
-    const [currentCropIndex, setCurrentCropIndex] = useState<number | null>(null);
-    const [crop, setCrop] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
-    const [currentImageSrc, setCurrentImageSrc] = useState<string | null>(null);
-
-    const [isDisabled, setIsDisabled] = useState(false); // estado para desabilitar o botão de confirmar corte de imagem
-
     // sempre que uma foto é cortada, é inserida no array de fotos, que faz parte do formulário
     useEffect(() => {
-        setValue("fotos", croppedFiles, { shouldValidate: croppedFiles.length > 0 });
-    }, [croppedFiles, setValue]);
-
+        // evita validação indevida durante o crop
+        setValue("fotos", croppedFiles);
+        if (croppedFiles.length > 0) clearErrors("fotos");
+    }, [croppedFiles]);
 
     // crop completo
     const onCropComplete = (_: any, croppedArea: any) => {
@@ -133,19 +131,17 @@ export default function CadastroPet() {
 
     // confirmação de crop de imagem
     const handleConfirmCrop = async () => {
-        if (currentCropIndex === null) return;
+        if (!selectedFile) return;
         setIsDisabled(true); // desabilita o botão de confirmação
 
         try {
-            const imageFile = files[currentCropIndex];
-            const src = URL.createObjectURL(imageFile);
+            const src = URL.createObjectURL(selectedFile);
             const croppedImage = await getCroppedImg(src, croppedAreaPixels);
-            // revoga a URL temporária criada
             URL.revokeObjectURL(src);
 
             setCroppedFiles((prev) => [...prev, croppedImage]);
+            setSelectedFile(null);
 
-            // limpa URL atual e fecha modal
             if (currentImageSrc) {
                 URL.revokeObjectURL(currentImageSrc);
                 setCurrentImageSrc(null);
@@ -155,20 +151,16 @@ export default function CadastroPet() {
             Swal.fire({ icon: "error", title: "Erro ao cortar imagem" });
         } finally {
             setIsDisabled(false); // habilita novamente o botão
-            setFileInputKey((prev) => prev + 1); // reseta o input de arquivo
         }
     };
 
     // seleção de arquivos
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selected = Array.from(e.target.files || []);
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-        // se não tem nada, não faz nada
-        if (selected.length === 0) return;
-
-        const newFiles = [...files, selected[0]]; // adiciona só uma por vez
-
-        if (newFiles.length > 5) {
+        // checagem direta no array final
+        if (croppedFiles.length >= 5) {
             Swal.fire({
                 position: "top",
                 icon: "error",
@@ -176,22 +168,15 @@ export default function CadastroPet() {
                 showConfirmButton: false,
                 timer: 1500
             });
-            e.currentTarget.value = "";
             return;
         }
 
-        setFiles(newFiles);
+        setSelectedFile(file);
+        setCurrentCropIndex(croppedFiles.length);
+        setCurrentImageSrc(URL.createObjectURL(file));
 
-        // abre o cropper pra imagem adicionada
-        const startIndex = newFiles.length - 1;
-        setCurrentCropIndex(startIndex);
-        setCurrentImageSrc(URL.createObjectURL(selected[0]));
-
-        e.currentTarget.value = "";
-        setFileInputKey((prev) => prev + 1); // reseta o input de arquivo
+        e.target.value = ""; // limpa o input
     };
-
-    const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
     // submit do formulário
     const onSubmit = async (data: PetForm) => {     
@@ -284,7 +269,6 @@ export default function CadastroPet() {
     // remoção de imagens clicando no x
     const handleRemoveImage = (index: number) => {
         setCroppedFiles((prev) => prev.filter((_, i) => i !== index));
-        setFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
     return (
@@ -316,7 +300,7 @@ export default function CadastroPet() {
                     </div>
 
                     {/* input escondido, chamado no clique do botão acima */}
-                    <input id="fotos" key={fileInputKey} type="file" hidden accept="image/*" onChange={handleFileChange} />
+                    <input id="fotos" type="file" hidden accept="image/*" onChange={handleFileChange} />
 
                     {/* preview de imagens cortadas */}
                     {croppedFiles.length > 0 && (
@@ -386,7 +370,7 @@ export default function CadastroPet() {
                     {/* área do cropper */}
                     <div className="relative flex-1">
                         <Cropper
-                            image={URL.createObjectURL(files[currentCropIndex])}
+                            image={currentImageSrc}
                             crop={crop}
                             zoom={zoom}
                             aspect={1}
@@ -404,8 +388,8 @@ export default function CadastroPet() {
                                         URL.revokeObjectURL(currentImageSrc);
                                         setCurrentImageSrc(null);
                                     }
+                                    setSelectedFile(null);
                                     setCurrentCropIndex(null);
-                                    setFileInputKey((prev) => prev + 1); // força recriação do input
                                 }} >
                             Cancelar
                         </button>
