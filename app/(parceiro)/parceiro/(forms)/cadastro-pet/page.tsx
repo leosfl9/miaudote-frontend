@@ -160,7 +160,12 @@ export default function CadastroPet() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = Array.from(e.target.files || []);
 
-        if (selected.length + files.length > 5) {
+        // se não tem nada, não faz nada
+        if (selected.length === 0) return;
+
+        const newFiles = [...files, selected[0]]; // adiciona só uma por vez
+
+        if (newFiles.length > 5) {
             Swal.fire({
                 position: "top",
                 icon: "error",
@@ -172,22 +177,16 @@ export default function CadastroPet() {
             return;
         }
 
-        // atualiza files e abre o cropper para a primeira imagem nova
-        setFiles(prev => {
-            const startIndex = prev.length; // índice da primeira imagem nova
-            const newFiles = [...prev, ...selected];
+        setFiles(newFiles);
 
-            // abre o cropper para a primeira imagem nova
-            setCurrentCropIndex(startIndex);
-            // cria URL para o cropper usar imediatamente (limpeza abaixo)
-            setCurrentImageSrc(URL.createObjectURL(selected[0]));
+        // abre o cropper pra imagem adicionada
+        const startIndex = newFiles.length - 1;
+        setCurrentCropIndex(startIndex);
+        setCurrentImageSrc(URL.createObjectURL(selected[0]));
 
-            return newFiles;
-        });
-
-        // reset do input para permitir selecionar o mesmo arquivo em seguida
         e.currentTarget.value = "";
     };
+
 
     const [sending, setSending] = useState(false); // estado que desabilita botão de cadastro
 
