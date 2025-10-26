@@ -740,8 +740,8 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 </div>
 
                 {/* botão de envio do formulário */}
-                <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} type="submit" 
-                    className="mt-2" disabled={sending} />
+                <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending || deleting ? "disabled" : "green"}`} type="submit" 
+                    className="mt-2" disabled={sending || deleting} />
 
                 {/* botão de exclusão do pet */}
                 <div className="flex w-full justify-end">

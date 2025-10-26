@@ -72,6 +72,7 @@ export default function Configuracoes() {
 
     const [loading, setLoading] = useState(true); // estado de loading da página
     const [sending, setSending] = useState(false); // estado de envio de formulário
+    const [deleting, setDeleting] = useState(false); // estado de exclusão de conta
     
     // variáveis do react hook form
     const { 
@@ -173,6 +174,91 @@ export default function Configuracoes() {
             });
         } finally {
             setSending(false); // habilita novamente o botão
+        }
+    };
+
+    // função para excluir conta
+    const handleDeleteConta = async () => {
+        // modal de confirmação
+        const confirm = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Essa ação não poderá ser desfeita.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#F35D5D",
+            cancelButtonColor: "#1B998B",
+            confirmButtonText: "Sim, excluir conta",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
+
+        try {
+            setDeleting(true); // desabilita os botões de deletar
+
+            // requisição para deletar a conta
+            const response = await fetch(`https://miaudote-8av5.onrender.com/parceiros/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            // se der erro, exibe
+            if (!response.ok) {
+                let errorMsg = "Erro ao excluir conta!";
+                try {
+                    const text = await response.text();
+                    try {
+                        const json = JSON.parse(text);
+                        errorMsg = json.message || JSON.stringify(json);
+                    } catch {
+                        errorMsg = text;
+                    }
+                } catch {
+                    // envia um alerta para o usuário caso não haja conexão com o servidor
+                    Swal.fire({
+                        icon: "error",
+                        title: "Erro de conexão com o servidor!",
+                        position: "top",
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+                // exibe o erro recebido
+                Swal.fire({
+                    icon: "error",
+                    title: errorMsg,
+                    position: "top",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+                return;
+            }
+            // exibe mensagem de sucesso
+            Swal.fire({
+                icon: "success",
+                title: "Conta excluída com sucesso!",
+                position: "top",
+                showConfirmButton: false,
+                timer: 1000,
+            });
+
+            // espera o alerta terminar antes de deslogar
+                setTimeout(() => {
+                    handleLogout(); // desloga o usuário
+                }, 1000);
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Erro de conexão com o servidor!",
+                position: "top",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        } finally {
+            setDeleting(false); // habilita os botões de deletar
         }
     };
 
@@ -397,8 +483,16 @@ export default function Configuracoes() {
                     </div>
 
                     {/* botão de envio */}
-                    <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending ? "disabled" : "green"}`} 
-                        type="submit" className="mt-2" disabled={sending} />
+                    <FormButton text={`${sending ? "Salvando..." : "Salvar alterações"}`} color={`${sending || deleting ? "disabled" : "green"}`} 
+                        type="submit" className="mt-2" disabled={sending || deleting} />
+
+                    {/* botão de exclusão de conta */}
+                    <div className="flex w-full justify-end">
+                        <button type="button" onClick={handleDeleteConta} disabled={sending || deleting } className={`w-fitrounded-md font-semibold 
+                            text-[#F35D5D] hover:text-[#F35D5D]/80 transition cursor-pointer ${sending || deleting ? "text-text-gray" : ""}`}>
+                            {deleting ? "Excluindo..." : "Excluir conta"}
+                        </button>
+                    </div>
                 </form>
 
                 {/* botão de logout */}
