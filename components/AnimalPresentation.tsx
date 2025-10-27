@@ -122,7 +122,7 @@ export default function AnimalPresentation ({
                                     } else if (tipo == "solicitacao") {
                                         e.preventDefault();
                                         const mensagem = `Olá! Estou interessado na adoção do pet ${nome} que vi no site MiAudote.`;
-                                        const url = `https://wa.me/${telefone}?text=${encodeURIComponent(mensagem)}`;
+                                        const url = `https://wa.me/+55${telefone}?text=${encodeURIComponent(mensagem)}`;
                                         window.open(url, "_blank");
                                     }
                                 }}>

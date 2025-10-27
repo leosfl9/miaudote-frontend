@@ -367,7 +367,7 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                             onClick={(e) => {
                                 e.preventDefault();
                                 const mensagem = `Olá! Estou te contatando para tratarmos da sua solicitação de adoção do pet ${adocao.animal.nome}, no site MiAudote.`;
-                                const url = `https://wa.me/${adocao.adotante.telefone}?text=${encodeURIComponent(mensagem)}`;
+                                const url = `https://wa.me/+55${adocao.adotante.telefone}?text=${encodeURIComponent(mensagem)}`;
                                 window.open(url, "_blank");
                             }}>
                             Contatar adotante
