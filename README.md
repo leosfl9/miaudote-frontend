@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://miaudote.org/logo-main.png" alt="MiAudote Logo" width="180" />
+  <img src="https://miaudote.org/logo-main.png" alt="MiAudote Logo" width="240" />
 
   # 🐾 MiAudote
 
