@@ -427,7 +427,7 @@ export default function HomeAdotante(){
                 </button>
             </div>
 
-            <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start">
+            <div className="flex flex-col lg:flex-row lg:flex-wrap gap-3 lg:gap-6 items-center lg:items-start justify-center">
                 {/* listagem de animais */}
                 {animaisFiltrados.length > 0 ? (
                     animaisFiltrados.map((animal) => (

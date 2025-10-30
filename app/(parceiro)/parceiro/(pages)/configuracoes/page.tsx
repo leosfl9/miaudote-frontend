@@ -397,7 +397,7 @@ export default function Configuracoes() {
     
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-16 md:px-20 lg:px-30 py-4 sm:py-8 lg:py-10 ">
-            <div className="flex flex-col gap-2 text-text-light-gray">
+            <div className="flex flex-col gap-2 text-text-light-gray text-center">
                 <h1 className="font-bold text-3xl 2xl:text-4xl">Configurações</h1>
                 <h2 className="text-base 2xl:text-lg">Configurações do perfil de parceiro</h2>
             </div>
