@@ -52,7 +52,11 @@ O projeto foi desenvolvido como **trabalho de faculdade**, com o objetivo de apl
 
 ---
 
-Desenvolvido por **Leonardo da Silva Flores**, responsável pelo **Frontend** e **Banco de Dados** do projeto.
+Desenvolvido por:
+**Leonardo Flores**, responsável pelo **Frontend** e **Banco de Dados** do projeto.
+**Cauê Shimoda, Bruna Ogura e Samuel Leite**, responsáveis pelo **Backend** do projeto.
+**Ayana Hanashiro**, responsável pelo **design e documentação** do projeto.
+**Caio Luiz**, responsável pela **documentação** do projeto.
 
 ---
 
