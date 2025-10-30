@@ -42,7 +42,7 @@ O projeto foi desenvolvido como **trabalho de faculdade**, com o objetivo de apl
 | Camada | Plataforma | Link |
 |:-------|:------------|:------|
 | **Frontend** | [Vercel](https://vercel.com/) | 🌐 [miaudote.org](https://miaudote.org) |
-| **Backend** | [Render](https://render.com/) | 🔗 Endpoint protegido |
+| **Backend** | [Render](https://render.com/) | 🔗 Endpoint utilizado pelo Frontend |
 | **Banco de Dados** | [Aiven (MySQL)](https://aiven.io/) | 🔒 Privado |
 
 ---
