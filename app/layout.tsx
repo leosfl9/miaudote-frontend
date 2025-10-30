@@ -7,9 +7,37 @@ const fredoka = Fredoka({
   subsets: ["latin"],
 });
 
+// metadados da aplicação
 export const metadata: Metadata = {
   title: "MiAudote",
   description: "Plataforma de adoção de animais",
+  icons: {
+    icon: "/icon.ico",
+  },
+  openGraph: {
+    title: "MiAudote - Plataforma de adoção de animais",
+    description:
+      "Adote com amor. Conectamos pessoas e pets que precisam de um lar.",
+    url: "https://www.miaudote.org",
+    siteName: "MiAudote",
+    images: [
+      {
+        url: "/icon_gato.png",
+        width: 512,
+        height: 512,
+        alt: "Logo MiAudote",
+      },
+    ],
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MiAudote - Plataforma de adoção de animais",
+    description:
+      "Adote com amor. Conectamos pessoas e pets que precisam de um lar.",
+    images: ["/icon.ico"],
+  },
 };
 
 export default function RootLayout({
