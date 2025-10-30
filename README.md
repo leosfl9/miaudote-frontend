@@ -47,13 +47,18 @@ O projeto foi desenvolvido como **trabalho de faculdade**, com o objetivo de apl
 
 ---
 
-## 👨‍💻 Responsáveis
+## 👥 Equipe do projeto
 
-**Desenvolvido por:**  
+Este repositório corresponde ao **Frontend** do projeto *MiAudote*.
+
+Desenvolvido por:
+
 **Leonardo Flores**, responsável pelo **Frontend** e **Banco de Dados** do projeto.  
-**Cauê Shimoda, Bruna Ogura e Samuel Leite**, responsáveis pelo **Backend** do projeto.  
-**Ayana Hanashiro**, responsável pelo **design e documentação** do projeto.  
-**Caio Luiz**, responsável pela **documentação** do projeto.  
+
+Projeto desenvolvido em equipe por:  
+**Cauê Shimoda, Bruna Ogura e Samuel Leite** — responsáveis pelo **Backend**.  
+**Ayana Hanashiro** — responsável pelo **design e documentação**.  
+**Caio Luiz** — responsável pela **documentação**.  
 
 📚 Curso: *Análise e Desenvolvimento de Sistemas (FATEC-SP)*  
 🏫 Projeto acadêmico desenvolvido em equipe para fins educacionais.
