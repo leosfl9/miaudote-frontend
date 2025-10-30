@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     siteName: "MiAudote",
     images: [
       {
-        url: "https://www.miaudote.org/og-image.png",
-        width: 1200,
-        height: 630,
+        url: "https://www.miaudote.org/icon_gato256.png",
+        width: 256,
+        height: 256,
         alt: "Logo MiAudote",
       },
     ],
