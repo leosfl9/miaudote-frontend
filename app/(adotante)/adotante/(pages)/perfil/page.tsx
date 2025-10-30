@@ -394,7 +394,8 @@ export default function PerfilAdotante() {
 
             <div className="w-full items-center justify-center flex flex-col gap-6">
                 {/* formulário de edição de perfil */}
-                <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full px-3 ssm:px-8 sm:px-12 xl:px-24 pt-6 pb-10 rounded-4xl">
+                <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col gap-3 items-center w-full max-w-[1180px]
+                    px-3 ssm:px-8 sm:px-12 xl:px-18 pt-6 pb-10 rounded-4xl">
                     <h1 className="text-miau-green font-bold text-[22px] lg:text-3xl xl:text-[34px] text-center">
                         Informações básicas</h1>
                     <div className="flex flex-col gap-1 self-start w-full">
