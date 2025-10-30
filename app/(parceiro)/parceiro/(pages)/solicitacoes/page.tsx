@@ -223,7 +223,15 @@ export default function SolicitacoesAdocao(){
                 ) : (
                     // se não houverem solicitações, exibe uma mensagem
                     <div className="py-8 px-0 text-start text-text-light-gray font-medium text-2xl">
-                        <p>Ainda não há solicitações, mas em breve alguém especial pode aparecer!</p>
+                        {filtroAbertas ? (
+                            <p>Ainda não há solicitações, mas em breve alguém especial pode aparecer!</p>
+                        ) : filtroEncerradas ? (
+                            <p>Nenhuma solicitação encerrada!</p>
+                        ) : filtroCanceladas ? (
+                            <p>Nenhuma solicitação cancelada!</p>
+                        ) : (
+                            <p>Ainda não há solicitações, mas em breve alguém especial pode aparecer!</p>
+                        )}
                     </div>
                 )}
             </div>

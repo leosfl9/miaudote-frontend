@@ -33,6 +33,9 @@ export default function HomeAdotante(){
     const [animais, setAnimais] = useState<Animal[]>([]);
     const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
 
+    const [msg1, setMsg1] = useState("Nenhum animal encontrado!"); // armazena mensagem 1 de ausência de solicitações
+    const [msg2, setMsg2] = useState("Onde será que eles estão?"); // armazena mensagem 2 de ausência de solicitações
+
     const [loading, setLoading] = useState(true); // estado de loading da página
 
     // gerenciamento de paginação
@@ -75,6 +78,23 @@ export default function HomeAdotante(){
         }
 
         setAnimaisFiltrados(filtrados);
+
+        // define mensagens conforme o contexto
+        const filtrosAtivos = filtroEspecie || filtroEstado || filtroSexo;
+
+        if (filtrados.length === 0) {
+            if (filtrosAtivos) {
+                setMsg1("Nenhum animal encontrado com esses filtros!");
+                setMsg2("Tente outra combinação ou limpe os filtros.");
+            } else {
+                setMsg1("Nenhum animal encontrado!");
+                setMsg2("Onde será que eles estão?");
+            }
+        } else {
+            // se encontrou animais, restaura mensagens padrão
+            setMsg1("Nenhum animal encontrado!");
+            setMsg2("Onde será que eles estão?");
+        }
     }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
 
     // se o usuário estiver autenticado, carrega os animais
@@ -455,8 +475,8 @@ export default function HomeAdotante(){
                     // exibe mensagem se nenhum animal foi encontrado
                     <div className="py-8 px-0 flex flex-col gap-6 w-full text-center text-text-light-gray font-medium text-2xl">
                         <div className="space-y-2 sm:space-y-0">
-                            <p>Nenhum animal encontrado!</p>
-                            <p>Onde será que eles estão?</p>
+                            <p>{msg1}</p>
+                            <p>{msg2}</p>
                         </div>
                     </div>
                 )}
