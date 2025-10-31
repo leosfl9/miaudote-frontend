@@ -343,6 +343,20 @@ export default function Configuracoes() {
 
     // função de logout usando api em typescript
     const handleLogout = async () => {
+        // modal de confirmação
+        const confirm = await Swal.fire({
+            title: "Tem certeza?",
+            text: "Para acessar sua conta, será necessário fazer login novamente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#F35D5D",
+            cancelButtonColor: "#1B998B",
+            confirmButtonText: "Sim, sair",
+            cancelButtonText: "Cancelar",
+        });
+
+        if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
+
         try {
             // chama a API
             const response = await fetch("/api/logout", { 
