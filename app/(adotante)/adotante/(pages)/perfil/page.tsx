@@ -336,7 +336,7 @@ export default function PerfilAdotante() {
         // modal de confirmação
         const confirm = await Swal.fire({
             title: "Tem certeza?",
-            text: "Será necessário fazer login novamente.",
+            text: "Para acessar sua conta, será necessário fazer login novamente.",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#F35D5D",
