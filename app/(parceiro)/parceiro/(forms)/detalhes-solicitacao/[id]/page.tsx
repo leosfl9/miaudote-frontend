@@ -209,6 +209,20 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                                 try {
                                     setSendingFinalizar(true); // desabilita os botões
 
+                                    // modal de confirmação
+                                    const confirm = await Swal.fire({
+                                        title: "Tem certeza?",
+                                        text: "A solicitação será finalizada com adoção.",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#1B998B",
+                                        cancelButtonColor: "#F35D5D",
+                                        confirmButtonText: "Sim, finalizar solicitação",
+                                        cancelButtonText: "Cancelar",
+                                    });
+                            
+                                    if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
+
                                     // chama a API para atualizar o status da solicitação de adoção
                                     const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
                                         method: "PATCH",
@@ -285,6 +299,20 @@ export default function DetalhesSolicitacao({ params }: { params: Promise<{ id: 
                             <button onClick={async () => {
                                     try {
                                         setSendingCancelar(true); // desabilita os botões
+
+                                        // modal de confirmação
+                                        const confirm = await Swal.fire({
+                                            title: "Tem certeza?",
+                                            text: "A solicitação será cancelada.",
+                                            icon: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: "#F35D5D",
+                                            cancelButtonColor: "#1B998B",
+                                            confirmButtonText: "Sim, cancelar solicitação",
+                                            cancelButtonText: "Cancelar",
+                                        });
+                                
+                                        if (!confirm.isConfirmed) return; // caso o usuário cancele a ação, não faz nada
 
                                         // chama a API para atualizar o status da solicitação de adoção
                                         const response = await fetch(`https://miaudote-8av5.onrender.com/adocoes/${id}`, {
