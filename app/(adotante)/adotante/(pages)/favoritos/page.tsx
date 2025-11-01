@@ -287,7 +287,7 @@ export default function homeAdotante(){
                     ))
                 ) : (
                     // se não houverem animais, exibe uma mensagem e link para a home
-                    <div className="py-8 px-0 flex flex-col gap-6 text-start text-text-light-gray font-medium text-2xl">
+                    <div className="py-8 px-0 flex flex-col gap-6 text-center text-text-light-gray font-medium text-2xl items-center">
                         <div className="space-y-2 sm:space-y-0">
                             <p>Parece que você ainda não tem nenhum pet favorito...</p>
                             <p>Que tal encontrar um novo melhor amigo?</p>
