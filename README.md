@@ -33,7 +33,7 @@ O projeto foi desenvolvido como **trabalho de faculdade**, com o objetivo de apl
 ### **Backend**
 - [Java](https://www.java.com/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
-- [MySQL](https://www.mysql.com/) (hospedado no [Aiven](https://aiven.io/))
+- [MySQL](https://www.mysql.com/)
 
 ---
 
