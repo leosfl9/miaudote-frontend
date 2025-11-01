@@ -14,7 +14,7 @@ export default function ComoAdotar() {
                         <div className="flex flex-col text-justify md:w-[280px] lg:w-[340px] xl:w-[370px] md:space-y-2">
                             <h2 className="text-text-black font-semibold text-lg lg:text-xl xl:text-2xl">
                                 <span className="text-miau-purple text-2xl lg:text-3xl pr-1 font-bold">1.</span> Escolha sua nova companhia</h2>
-                            <p className="text-text-light-gray font-medium xl:text-lg">Aplique filtros, escolha por localização e espécie.</p>
+                            <p className="text-text-light-gray font-medium xl:text-lg">Aplique filtros, escolha por localização, sexo e espécie.</p>
                         </div>
 
                         <div className="flex flex-col font-bold text-justify md:w-[280px] lg:w-[340px] xl:w-[370px] md:space-y-2">
