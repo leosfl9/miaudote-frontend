@@ -13,8 +13,8 @@ export default function DesktopLinks({tipo}: LinksProps) {
             return (
                 <ul className="hidden lg:flex justify-between w-fit gap-16">
                     <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/"}>Home</Link></li>
-                    <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/"}>Sobre</Link></li>
-                    <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/"}>ONGs</Link></li>
+                    <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/sobre"}>Sobre</Link></li>
+                    <li><Link className="hover:text-miau-green active:text-miau-green/80 transition" href={"/como-adotar"}>Como Adotar</Link></li>
                 </ul>
             )
         // links do parceiro
