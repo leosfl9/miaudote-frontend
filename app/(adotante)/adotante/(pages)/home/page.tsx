@@ -395,14 +395,14 @@ export default function HomeAdotante(){
 
                     <SelectField name="filtroEspecie" label="Espécie" className="appearance-none mb-2"
                         value={filtroEspecie} onChange={(e) => setFiltroEspecie(e.target.value)} >
-                        <option value={""} disabled>Pesquise por espécie</option>
+                        <option value={""}>Pesquise por espécie</option>
                         <option value="Cachorro">Cão</option>
                         <option value="Gato">Gato</option>
                     </SelectField>
 
                     <SelectField name="filtroEstado" label="Estado" className="appearance-none mb-2"
                         value={filtroEstado} onChange={(e) => setFiltroEstado(e.target.value)} >
-                        <option value={""} disabled>Pesquise por estado</option>
+                        <option value={""}>Pesquise por estado</option>
                         <option value="AC">Acre</option>
                         <option value="AL">Alagoas</option>
                         <option value="AP">Amapá</option>
@@ -434,7 +434,7 @@ export default function HomeAdotante(){
 
                     <SelectField name="filtroSexo" label="Sexo" className="appearance-none mb-2"
                         value={filtroSexo} onChange={(e) => setFiltroSexo(e.target.value)} >
-                        <option value={""} disabled>Pesquise por sexo</option>
+                        <option value={""}>Pesquise por sexo</option>
                         <option value="Macho">Macho</option>
                         <option value="Fêmea">Fêmea</option>
                     </SelectField>
