@@ -81,7 +81,7 @@ git clone https://github.com/leosfl9/miaudote-frontend.git
 cd miaudote-frontend
 
 # Instalar dependências
-npm i ou npm install
+npm i, npm install ou yarn install
 
 # Rodar o servidor de desenvolvimento
-npm run dev
+npm run dev ou yarn dev
