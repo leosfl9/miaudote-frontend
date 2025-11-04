@@ -68,6 +68,7 @@ Projeto desenvolvido em equipe por:
 ## 🚀 Como executar localmente
 
 ### Pré-requisitos
+- Git
 - Node.js 18+  
 - npm ou yarn  
 
