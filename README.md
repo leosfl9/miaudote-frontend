@@ -60,7 +60,7 @@ Projeto desenvolvido em equipe por:
 **Ayana Hanashiro** — responsável pelo **design e documentação**.  
 **Caio Luiz** — responsável pela **documentação**.  
 
-📚 Curso: *Análise e Desenvolvimento de Sistemas (FATEC-SP)*  
+📚 Curso: Análise e Desenvolvimento de Sistemas (FATEC-SP)  
 🏫 Projeto acadêmico desenvolvido em equipe para fins educacionais.
 
 ---
