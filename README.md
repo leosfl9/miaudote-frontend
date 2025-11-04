@@ -16,7 +16,7 @@
 
 ## 🐶 Sobre o projeto
 
-O **MiAudote** é uma plataforma desenvolvida para **facilitar a conexão entre ONGs/protetores de animais e pessoas interessadas em adotar**.  
+O ***MiAudote*** é uma plataforma desenvolvida para **facilitar a conexão entre ONGs/protetores de animais e pessoas interessadas em adotar**.  
 Permite o cadastro e gerenciamento de animais disponíveis, além de possibilitar que adotantes encontrem e favoritem animais, e solicitem adoções de forma prática e organizada.
 
 O projeto foi desenvolvido como **trabalho de faculdade**, com o objetivo de aplicar conceitos de **Engenharia de Software**.
