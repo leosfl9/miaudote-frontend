@@ -96,7 +96,6 @@ export default function Configuracoes() {
             const payload = {
                 usuario: {
                     nome: data.nome,
-                    email: data.email,
                     senha: data.senha,
                     telefone: data.telefone.replace(/\D/g, ''),
                     estado: data.estado,
@@ -161,8 +160,6 @@ export default function Configuracoes() {
                 showConfirmButton: false,
                 timer: 1500
             });
-
-            router.push('/parceiro/home'); // envia o usuário para home
         } catch (error) {
             // erro de conexão
             Swal.fire({
@@ -435,8 +432,8 @@ export default function Configuracoes() {
                             <InputField label="Celular / Whatsapp *" {...register("telefone")} onFocus={() => clearErrors("telefone")} error={errors.telefone?.message} 
                                 name="telefone" mask={"(00) 00000-0000"} type="text" inputMode="numeric" placeholder="Digite um número para contato" className="mb-2" />
                             <div className="sm:col-span-2 lg:col-span-1">
-                                <InputField label="E-mail" maxLength={200} {...register("email")} onFocus={() => clearErrors("email")} 
-                                    error={errors.email?.message} name="email" type="text" placeholder="Digite o e-mail" className="mb-2 bg-blue-50" disabled />
+                                <InputField label="E-mail" maxLength={200} {...register("email")} name="email" 
+                                    type="text" placeholder="Digite o e-mail" className="mb-2 bg-blue-50" disabled />
                             </div>
                         </div>
 
