@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://miaudote.org/logo-main.png" alt="MiAudote Logo" width="260" />
 
-  # 🐾 MiAudote
+  # 🐾 MiAudote — Frontend
 
   **Plataforma para conectar ONGs, protetores de animais e adotantes.**
 
