@@ -471,8 +471,9 @@ export default function HomeAdotante(){
                 </div>
 
                 {/* botão que limpa filtros */}
-                <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
-                    shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
+                <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] 
+                    transition-colors text-white font-semibold cursor-pointer shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit 
+                    bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
                     Limpar filtros
                 </button>
             </div>
