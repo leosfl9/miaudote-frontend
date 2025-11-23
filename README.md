@@ -58,7 +58,7 @@ Desenvolvido por:
 **Leonardo Flores**, responsável pelo **Frontend** e **Banco de Dados** do projeto.  
 
 Projeto desenvolvido em equipe por:  
-**Cauê Shimoda, Bruna Ogura e Samuel Leite** — responsáveis pelo **Backend**.  
+**Bruna Ogura, Cauê Shimoda e Samuel Leite** — responsáveis pelo **Backend**.  
 **Ayana Hanashiro** — responsável pelo **design e documentação**.  
 **Caio Luiz** — responsável pela **documentação**.  
 
