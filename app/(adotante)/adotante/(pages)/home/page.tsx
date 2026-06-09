@@ -46,12 +46,20 @@ export default function HomeAdotante(){
     const [filtroEspecie, setFiltroEspecie] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("");
     const [filtroSexo, setFiltroSexo] = useState("");
+    const [filtroPorte, setFiltroPorte] = useState("");
+    const [filtroIdade, setFiltroIdade] = useState("");
+
+    // filtros adicionais
+    const [filtrosAdicionais, setFiltrosAdicionais] = useState(false);
 
     // limpa filtros
     function limparFiltros() {
         setFiltroEspecie("");
         setFiltroEstado("");
         setFiltroSexo("");
+        setFiltroPorte("");
+        setFiltroIdade("");
+        setFiltrosAdicionais(false);
         setAnimaisFiltrados(animais);
     }
 
@@ -77,10 +85,33 @@ export default function HomeAdotante(){
             );
         }
 
+        if (filtroPorte) {
+            filtrados = filtrados.filter((a) =>
+                a.porte.toLowerCase() === filtroPorte.toLowerCase()
+            );
+        }
+
+        if (filtroIdade) {
+            switch (filtroIdade) {
+                case "filhote":
+                    filtrados = filtrados.filter((a) => a.idade <= 1);
+                    break;
+                case "jovem":
+                    filtrados = filtrados.filter((a) => a.idade >= 2 && a.idade <= 3);
+                    break;
+                case "adulto":
+                    filtrados = filtrados.filter((a) => a.idade >= 4 && a.idade <= 7);
+                    break;
+                case "idoso":
+                    filtrados = filtrados.filter((a) => a.idade >= 8);
+                    break;
+            }
+        }
+
         setAnimaisFiltrados(filtrados);
 
         // define mensagens conforme o contexto
-        const filtrosAtivos = filtroEspecie || filtroEstado || filtroSexo;
+        const filtrosAtivos = filtroEspecie || filtroEstado || filtroSexo || filtroPorte || filtroIdade;
 
         if (filtrados.length === 0) {
             if (filtrosAtivos) {
@@ -95,7 +126,7 @@ export default function HomeAdotante(){
             setMsg1("Nenhum animal encontrado!");
             setMsg2("Onde será que eles estão?");
         }
-    }, [animais, filtroEspecie, filtroEstado, filtroSexo]);
+    }, [animais, filtroEspecie, filtroEstado, filtroSexo, filtroPorte, filtroIdade]);
 
     // se o usuário estiver autenticado, carrega os animais
     useEffect(() => {
@@ -392,7 +423,6 @@ export default function HomeAdotante(){
             {/* filtros */}
             <div className="flex flex-col plg:flex-row justify-between items-center plg:gap-2 lg:gap-4 mb-4">
                 <div className="flex flex-col xsm:flex-row gap-1 xsm:gap-2 lg:gap-4 w-full">
-
                     <SelectField name="filtroEspecie" label="Espécie" className="appearance-none mb-2"
                         value={filtroEspecie} onChange={(e) => setFiltroEspecie(e.target.value)} >
                         <option value={""}>Pesquise por espécie</option>
@@ -441,8 +471,9 @@ export default function HomeAdotante(){
                 </div>
 
                 {/* botão que limpa filtros */}
-                <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] transition-colors text-white font-semibold cursor-pointer 
-                    shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
+                <button onClick={limparFiltros} className={`w-full plg:w-[220px] mt-4 text-lg xl:text-xl px-8 py-2 rounded-[48px] 
+                    transition-colors text-white font-semibold cursor-pointer shadow-[0_4px_4px_rgba(0,0,0,0.25)] h-fit 
+                    bg-miau-purple hover:bg-miau-light-green active:bg-miau-light-green`}>
                     Limpar filtros
                 </button>
             </div>
