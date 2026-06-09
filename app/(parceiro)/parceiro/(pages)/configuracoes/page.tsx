@@ -232,6 +232,23 @@ export default function Configuracoes() {
                 });
                 return;
             }
+
+            // chama a API
+            const logout = await fetch("/api/logout", { 
+                method: "POST" 
+            });
+
+            if (!logout.ok) {
+                // mensagem de falha
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro ao sair da conta!",
+                    position: "top",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+
             // exibe mensagem de sucesso
             Swal.fire({
                 icon: "success",
