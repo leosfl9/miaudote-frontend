@@ -16,8 +16,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import Swal from "sweetalert2";
 
-const router = useRouter();
-
 // objeto do zod para validação do form
 const adotanteSchema = z.object({ 
     nome: z.string().min(2, "Nome é obrigatório"), 
@@ -256,7 +254,7 @@ export default function PerfilAdotante() {
 
             // espera o alerta terminar antes de deslogar
             setTimeout(() => {
-                router.replace("/login");
+                window.location.href = "/login"; // desloga o usuário
             }, 1000);
 
         } catch (error) {
