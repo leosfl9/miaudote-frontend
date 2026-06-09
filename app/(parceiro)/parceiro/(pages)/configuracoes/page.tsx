@@ -243,7 +243,7 @@ export default function Configuracoes() {
 
             // espera o alerta terminar antes de deslogar
                 setTimeout(() => {
-                    handleLogout(); // desloga o usuário
+                    window.location.href = "/login"; // desloga o usuário
                 }, 1000);
 
         } catch (error) {
