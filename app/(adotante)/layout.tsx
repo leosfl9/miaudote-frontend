@@ -17,7 +17,7 @@ export default function Layout({
     const token = Cookies.get("token");
     
     if (tipo !== "adotante" || !token) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, []);
   
