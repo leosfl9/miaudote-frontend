@@ -226,6 +226,23 @@ export default function PerfilAdotante() {
                 });
                 return;
             }
+
+            // chama a API
+            const logout = await fetch("/api/logout", { 
+                method: "POST" 
+            });
+
+            if (!logout.ok) {
+                // mensagem de falha
+                Swal.fire({
+                    icon: "error",
+                    title: "Erro ao sair da conta!",
+                    position: "top",
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            }
+
             // exibe mensagem de sucesso
             Swal.fire({
                 icon: "success",
@@ -236,9 +253,9 @@ export default function PerfilAdotante() {
             });
 
             // espera o alerta terminar antes de deslogar
-                setTimeout(() => {
-                    window.location.href = "/login"; // desloga o usuário
-                }, 1000);
+            setTimeout(() => {
+                window.location.href = "/login"; // desloga o usuário
+            }, 1000);
 
         } catch (error) {
             Swal.fire({
