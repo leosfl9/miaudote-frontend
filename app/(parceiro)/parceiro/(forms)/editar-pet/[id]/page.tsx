@@ -260,7 +260,7 @@ export default function EditarPet({ params }: { params: Promise<{ id: string }> 
                 });
 
                 // cadastra as novas imagens
-                const uploadResponse = await fetch(`https://miaudote-8av5.onrender.com/fotos/cadastrar/12`, {
+                const uploadResponse = await fetch(`https://miaudote-8av5.onrender.com/fotos/cadastrar/${id}`, {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
